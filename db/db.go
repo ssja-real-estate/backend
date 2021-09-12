@@ -3,8 +3,6 @@ package db
 import (
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
 	"gopkg.in/mgo.v2"
 )
@@ -32,15 +30,17 @@ func (c *conn) Close() {
 }
 
 func (c *conn) DB() *mgo.Database {
-	return c.session.DB(os.Getenv("DATABASE_NAME"))
+	// return c.session.DB(os.Getenv("DATABASE_NAME"))
+	return c.session.DB("Amlak")
 }
 func getUrl() string {
-	port, err := strconv.Atoi(os.Getenv("DATABASE_PORT"))
+	// port, err := strconv.Atoi(os.Getenv("DATABASE_PORT"))
 
-	if err != nil {
-		log.Println("error in load os.getenv", err.Error())
-		port = 2707
-	}
+	// if err != nil {
+	// 	log.Println("error in load os.getenv", err.Error())
+	// 	port = 2707
+	// }
+	port := 27017
 	return fmt.Sprintf("mongodb://localhost:%d", port)
 	// return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", os.Getenv("DATABASE_USER"),
 

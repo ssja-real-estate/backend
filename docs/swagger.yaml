@@ -1,0 +1,511 @@
+basePath: /
+definitions:
+  models.AssignmentType:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.City:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.EstateType:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Province:
+    properties:
+      cites:
+        items:
+          $ref: '#/definitions/models.City'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Unit:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      mobile:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_name:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  title: User API documentation
+  version: 1.0.0
+paths:
+  /:
+    get:
+      description: get all users
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get all users
+      tags:
+      - User
+  /EstateType:
+    post:
+      description: Create a new EstateType
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EstateType'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Create a new EstateType
+      tags:
+      - EstateType
+  /EstateType/:
+    put:
+      description: update Assginmenttype
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EstateType'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: update EstateType
+      tags:
+      - EstateType
+  /Province:
+    post:
+      description: Create a new Province
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Province'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Create a new Province
+      tags:
+      - Province
+  /Province/:
+    put:
+      description: update Assginmenttype
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Province'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: update Province
+      tags:
+      - Province
+  /Unit:
+    post:
+      description: Create a new Unit
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Unit'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Create a new Unit
+      tags:
+      - Unit
+  /Unit/:
+    put:
+      description: update Assginmenttype
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Unit'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: update Unit
+      tags:
+      - Unit
+  /assignmenttype/:
+    post:
+      description: Create a new Assginmenttype
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AssignmentType'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Create a new Assginmenttype
+      tags:
+      - AssignmentType
+    put:
+      description: update Assginmenttype
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AssignmentType'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: update Assginmenttype
+      tags:
+      - AssignmentType
+  /assignmenttype/id:
+    delete:
+      description: Delete AssignmentType by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AssignmentType'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete AssignmentType by id
+      tags:
+      - AssignmentType
+    get:
+      description: Get AssignmentType by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AssignmentType'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get AssignmentType by id
+      tags:
+      - AssignmentType
+  /assignmenttypes:
+    get:
+      description: Get All AssignmentType
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AssignmentType'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get All AssignmentType
+      tags:
+      - AssignmentType
+  /estatetype/id:
+    delete:
+      description: Delete EstateType by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EstateType'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete EstateType by id
+      tags:
+      - EstateType
+    get:
+      description: Get EstateType by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EstateType'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get EstateType by id
+      tags:
+      - EstateType
+  /estatetypes:
+    get:
+      description: Get All EstateType
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.EstateType'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get All EstateType
+      tags:
+      - EstateType
+  /id:
+    get:
+      description: get user by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get user by id
+      tags:
+      - User
+  /province/city/id:
+    delete:
+      description: Delete City in Province
+      parameters:
+      - description: Province ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.City'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete City in Province
+      tags:
+      - Province
+    post:
+      description: Add City to Province
+      parameters:
+      - description: Province ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.City'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Add City to Province
+      tags:
+      - Province
+  /province/id:
+    delete:
+      description: Delete Province by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Province'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete Province by id
+      tags:
+      - Province
+    get:
+      description: Get Province by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Province'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get Province by id
+      tags:
+      - Province
+  /provinces:
+    get:
+      description: Get All Province
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Province'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get All Province
+      tags:
+      - Province
+  /unit/id:
+    delete:
+      description: Delete Unit by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Unit'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete Unit by id
+      tags:
+      - Unit
+    get:
+      description: Get Unit by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Unit'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get Unit by id
+      tags:
+      - Unit
+  /units:
+    get:
+      description: Get All Unit
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Unit'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get All Unit
+      tags:
+      - Unit
+swagger: "2.0"

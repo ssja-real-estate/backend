@@ -43,18 +43,18 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	newUser.Email = util.NormalizeEmail(newUser.Email)
-	if !govalidator.IsEmail(newUser.Email) {
-		return ctx.
-			Status(http.StatusBadRequest).
-			JSON(util.NewJError(util.ErrInvalidEmail))
-	}
-	exists, err := c.usersRepo.GetByEmail(newUser.Email)
+	// newUser.Username = newUser.Username
+	// if !govalidator.IsEmail(newUser.Email) {
+	// 	return ctx.
+	// 		Status(http.StatusBadRequest).
+	// 		JSON(util.NewJError(util.ErrInvalidEmail))
+	// }
+	exists, err := c.usersRepo.GetByUserName(newUser.UserName)
 	if err == mgo.ErrNotFound {
-		if strings.TrimSpace(newUser.Password) == "" {
+		if strings.TrimSpace(newUser.UserName) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
-				JSON(util.NewJError(util.ErrEmptyPassword))
+				JSON(util.NewJError(util.ErrEmptyName))
 		}
 		newUser.Password, err = security.EncryptPassword(newUser.Password)
 		if err != nil {
@@ -93,24 +93,24 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	input.Email = util.NormalizeEmail(input.Email)
-	user, err := c.usersRepo.GetByEmail(input.Email)
+
+	user, err := c.usersRepo.GetByUserName(input.UserName)
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.Email, err.Error())
+		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	err = security.VerifyPassword(user.Password, input.Password)
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.Email, err.Error())
+		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	token, err := security.NewToken(user.Id.Hex())
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.Email, err.Error())
+		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(err))
@@ -123,6 +123,14 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 		})
 }
 
+// GetUser ... Get user by id
+// @Summary Get user by id
+// @Description get user by id
+// @Tags User
+// @Success 200 {object} models.User
+// @Param id path int true "Item ID"
+// @Failure 404 {object} object
+// @Router /id [get]
 func (c *authController) GetUser(ctx *fiber.Ctx) error {
 	payload, err := AuthRequestWithId(ctx)
 	if err != nil {
@@ -141,6 +149,13 @@ func (c *authController) GetUser(ctx *fiber.Ctx) error {
 		JSON(user)
 }
 
+// GetUsers ... Get all users
+// @Summary Get all users
+// @Description get all users
+// @Tags User
+// @Success 200 {array} models.User
+// @Failure 404 {object} object
+// @Router / [get]
 func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 	users, err := c.usersRepo.GetAll()
 	if err != nil {
@@ -167,13 +182,12 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	update.Email = util.NormalizeEmail(update.Email)
-	if !govalidator.IsEmail(update.Email) {
+	if !govalidator.IsEmail(update.UserName) {
 		return ctx.
 			Status(http.StatusBadRequest).
 			JSON(util.NewJError(util.ErrInvalidEmail))
 	}
-	exists, err := c.usersRepo.GetByEmail(update.Email)
+	exists, err := c.usersRepo.GetByUserName(update.UserName)
 	if err == mgo.ErrNotFound || exists.Id.Hex() == payload.Id {
 		user, err := c.usersRepo.GetById(payload.Id)
 		if err != nil {
@@ -181,7 +195,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
-		user.Email = update.Email
+		user.UserName = update.UserName
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
 		if err != nil {

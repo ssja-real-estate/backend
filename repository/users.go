@@ -14,7 +14,7 @@ type UsersRepository interface {
 	Save(user *models.User) error
 	Update(user *models.User) error
 	GetById(id string) (user *models.User, err error)
-	GetByEmail(email string) (user *models.User, err error)
+	GetByUserName(username string) (user *models.User, err error)
 	GetAll() (users []*models.User, err error)
 	Delete(id string) error
 }
@@ -40,8 +40,8 @@ func (r *usersRepository) GetById(id string) (user *models.User, err error) {
 	return user, err
 }
 
-func (r *usersRepository) GetByEmail(email string) (user *models.User, err error) {
-	err = r.c.Find(bson.M{"email": email}).One(&user)
+func (r *usersRepository) GetByUserName(uasername string) (user *models.User, err error) {
+	err = r.c.Find(bson.M{"user_name": uasername}).One(&user)
 	return user, err
 }
 
