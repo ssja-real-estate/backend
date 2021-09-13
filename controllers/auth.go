@@ -85,6 +85,13 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		JSON(util.NewJError(err))
 }
 
+// Signin ... Login in web api
+// @Summary Signin
+// @Description Signin
+// @Tags User
+// @Success 200 {object} models.User
+// @Failure 404 {object} object
+// @Router /signin [post]
 func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	var input models.User
 	err := ctx.BodyParser(&input)
@@ -130,7 +137,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 // @Success 200 {object} models.User
 // @Param id path int true "Item ID"
 // @Failure 404 {object} object
-// @Router /id [get]
+// @Router /user/id [get]
 func (c *authController) GetUser(ctx *fiber.Ctx) error {
 	payload, err := AuthRequestWithId(ctx)
 	if err != nil {
@@ -155,7 +162,7 @@ func (c *authController) GetUser(ctx *fiber.Ctx) error {
 // @Tags User
 // @Success 200 {array} models.User
 // @Failure 404 {object} object
-// @Router / [get]
+// @Router /users [get]
 func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 	users, err := c.usersRepo.GetAll()
 	if err != nil {

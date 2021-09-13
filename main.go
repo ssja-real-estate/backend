@@ -4,6 +4,9 @@ package main
 // @version 1.0.0
 // @host localhost:8000
 // @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 import (
 	"log"
 	// "net/http"
@@ -69,6 +72,11 @@ func main() {
 	provincecontroller := controllers.NewProvinceController(provincerepo)
 	provinceroutes := routes.NewProvicneRoute(&provincecontroller)
 	provinceroutes.Install(app)
+
+	formrepo := repository.NewFormRepositor(con)
+	formcontroller := controllers.NewFormController(formrepo)
+	formroute := routes.NewFormRoute(formcontroller)
+	formroute.Install(app)
 
 	log.Fatal(app.Listen(":8000"))
 

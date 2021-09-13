@@ -33,9 +33,12 @@ func NewEstateTypeController(esstatetyperepo repository.EstateTypeRepository) es
 // @Summary Create a new EstateType
 // @Description Create a new EstateType
 // @Tags EstateType
+// @body {object} models.EstateType
+// @Param Body body models.EstateType true "The EstateType to create  "
 // @Success 200 {object} models.EstateType
 // @Failure 404 {object} object
 // @Router /EstateType [post]
+// @Security ApiKeyAuth
 func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 	var estatetype models.EstateType
 	err := ctx.BodyParser(&estatetype)
@@ -78,8 +81,10 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 // @Description update Assginmenttype
 // @Tags EstateType
 // @Success 200 {object} models.EstateType
+// @Param Body body models.EstateType true "The EstateType to update  "
 // @Failure 404 {object} object
 // @Router /EstateType/ [put]
+// @Security ApiKeyAuth
 func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 	var estatetype models.EstateType
 	err := ctx.BodyParser(&estatetype)
@@ -124,6 +129,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 // @Param id path string true "Item ID"
 // @Failure 400 {object} object
 // @Router /estatetype/id [get]
+// @Security ApiKeyAuth
 func (r *estatetypeController) GetEstateType(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {
@@ -143,6 +149,7 @@ func (r *estatetypeController) GetEstateType(ctx *fiber.Ctx) error {
 // @Success 200 {array} models.EstateType
 // @Failure 400 {object} object
 // @Router /estatetypes [get]
+// @Security ApiKeyAuth
 func (r *estatetypeController) GetEsatteTypes(ctx *fiber.Ctx) error {
 
 	estatetypes, err := r.esstatetype.GetEstateTypeAll()
@@ -160,6 +167,7 @@ func (r *estatetypeController) GetEsatteTypes(ctx *fiber.Ctx) error {
 // @Param id path string true "Item ID"
 // @Failure 400 {object} object
 // @Router /estatetype/id [delete]
+// @Security ApiKeyAuth
 func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {

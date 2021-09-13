@@ -23,39 +23,29 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/": {
-            "get": {
-                "description": "get all users",
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get all users",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.User"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
         "/EstateType": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new EstateType",
                 "tags": [
                     "EstateType"
                 ],
                 "summary": "Create a new EstateType",
+                "parameters": [
+                    {
+                        "description": "The EstateType to create  ",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EstateType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -74,11 +64,27 @@ var doc = `{
         },
         "/EstateType/": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "update Assginmenttype",
                 "tags": [
                     "EstateType"
                 ],
                 "summary": "update EstateType",
+                "parameters": [
+                    {
+                        "description": "The EstateType to update  ",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EstateType"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -321,6 +327,11 @@ var doc = `{
         },
         "/estatetype/id": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get EstateType by id",
                 "tags": [
                     "EstateType"
@@ -351,6 +362,11 @@ var doc = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete EstateType by id",
                 "tags": [
                     "EstateType"
@@ -383,6 +399,11 @@ var doc = `{
         },
         "/estatetypes": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get All EstateType",
                 "tags": [
                     "EstateType"
@@ -400,38 +421,6 @@ var doc = `{
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/id": {
-            "get": {
-                "description": "get user by id",
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get user by id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "type": "object"
                         }
@@ -589,6 +578,29 @@ var doc = `{
                 }
             }
         },
+        "/signin": {
+            "post": {
+                "description": "Signin",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Signin",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/unit/id": {
             "get": {
                 "description": "Get Unit by id",
@@ -676,6 +688,64 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/user/id": {
+            "get": {
+                "description": "get user by id",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "get all users",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get all users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -683,15 +753,18 @@ var doc = `{
             "type": "object",
             "properties": {
                 "created_at": {
+                    "description": "required: false",
                     "type": "string"
                 },
                 "id": {
+                    "description": "required: false",
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "required: false",
                     "type": "string"
                 }
             }
@@ -711,15 +784,19 @@ var doc = `{
             "type": "object",
             "properties": {
                 "created_at": {
+                    "description": "required: false",
                     "type": "string"
                 },
                 "id": {
+                    "description": "required: false",
                     "type": "string"
                 },
                 "name": {
+                    "description": "The name for a EstateType\nexample: خرید\nrequired: true",
                     "type": "string"
                 },
                 "updated_at": {
+                    "description": "required: false",
                     "type": "string"
                 }
             }
@@ -789,6 +866,13 @@ var doc = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

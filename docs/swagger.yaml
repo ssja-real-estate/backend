@@ -3,12 +3,15 @@ definitions:
   models.AssignmentType:
     properties:
       created_at:
+        description: 'required: false'
         type: string
       id:
+        description: 'required: false'
         type: string
       name:
         type: string
       updated_at:
+        description: 'required: false'
         type: string
     type: object
   models.City:
@@ -21,12 +24,19 @@ definitions:
   models.EstateType:
     properties:
       created_at:
+        description: 'required: false'
         type: string
       id:
+        description: 'required: false'
         type: string
       name:
+        description: |-
+          The name for a EstateType
+          example: خرید
+          required: true
         type: string
       updated_at:
+        description: 'required: false'
         type: string
     type: object
   models.Province:
@@ -78,26 +88,16 @@ info:
   title: User API documentation
   version: 1.0.0
 paths:
-  /:
-    get:
-      description: get all users
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            type: object
-      summary: Get all users
-      tags:
-      - User
   /EstateType:
     post:
       description: Create a new EstateType
+      parameters:
+      - description: 'The EstateType to create  '
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/models.EstateType'
       responses:
         "200":
           description: OK
@@ -107,12 +107,21 @@ paths:
           description: Not Found
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create a new EstateType
       tags:
       - EstateType
   /EstateType/:
     put:
       description: update Assginmenttype
+      parameters:
+      - description: 'The EstateType to update  '
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/models.EstateType'
       responses:
         "200":
           description: OK
@@ -122,6 +131,8 @@ paths:
           description: Not Found
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: update EstateType
       tags:
       - EstateType
@@ -290,6 +301,8 @@ paths:
           description: Bad Request
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete EstateType by id
       tags:
       - EstateType
@@ -310,6 +323,8 @@ paths:
           description: Bad Request
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get EstateType by id
       tags:
       - EstateType
@@ -327,30 +342,11 @@ paths:
           description: Bad Request
           schema:
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get All EstateType
       tags:
       - EstateType
-  /id:
-    get:
-      description: get user by id
-      parameters:
-      - description: Item ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.User'
-        "404":
-          description: Not Found
-          schema:
-            type: object
-      summary: Get user by id
-      tags:
-      - User
   /province/city/id:
     delete:
       description: Delete City in Province
@@ -450,6 +446,21 @@ paths:
       summary: Get All Province
       tags:
       - Province
+  /signin:
+    post:
+      description: Signin
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Signin
+      tags:
+      - User
   /unit/id:
     delete:
       description: Delete Unit by id
@@ -508,4 +519,47 @@ paths:
       summary: Get All Unit
       tags:
       - Unit
+  /user/id:
+    get:
+      description: get user by id
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get user by id
+      tags:
+      - User
+  /users:
+    get:
+      description: get all users
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get all users
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
