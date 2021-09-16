@@ -86,38 +86,37 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 // @Router /EstateType/ [put]
 // @Security ApiKeyAuth
 func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
+
 	var estatetype models.EstateType
 	err := ctx.BodyParser(&estatetype)
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
-
-	dbestatetype, err := r.esstatetype.GetEstateTypeById(estatetype.Id.Hex())
-
-	if err != nil {
-
-		return ctx.
-			Status(http.StatusBadRequest).
-			JSON(util.NewJError(util.ErrNotFound))
-	}
-	exists, err := r.esstatetype.GetEstateTypeByName(estatetype.Name)
-
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEmptyName)
+	if len(estatetype.Name) < 2 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 
-	if strings.TrimSpace(exists.Name) != "" {
+	_, err = r.esstatetype.GetEstateTypeByName(estatetype.Name)
 
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
+	if err == mgo.ErrNotFound {
+		dbestatetype, err := r.esstatetype.GetEstateTypeById(estatetype.Id.Hex())
+		if err != nil {
+			return ctx.
+				Status(http.StatusBadRequest).
+				JSON(util.NewJError(util.ErrNotFound))
+		}
+		dbestatetype.UpdatedAt = time.Now()
+		dbestatetype.Name = estatetype.Name
+		err = r.esstatetype.UpdateEstateType(dbestatetype)
+		if err != nil {
+
+			return ctx.Status(http.StatusInternalServerError).JSON(err)
+		}
+		return ctx.Status(http.StatusOK).JSON(dbestatetype)
+
 	}
 
-	dbestatetype.UpdatedAt = time.Now()
-	dbestatetype.Name = estatetype.Name
-	err = r.esstatetype.UpdateEstateType(dbestatetype)
-	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(err)
-	}
-	return ctx.Status(http.StatusOK).JSON(estatetype)
+	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
 
 }
 

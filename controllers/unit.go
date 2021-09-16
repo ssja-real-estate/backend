@@ -86,33 +86,31 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
-
-	dbunit, err := r.unit.GetUnitById(unit.Id.Hex())
-
-	if err != nil {
-
-		return ctx.
-			Status(http.StatusBadRequest).
-			JSON(util.NewJError(util.ErrNotFound))
-	}
-	exists, err := r.unit.GetUnitByName(unit.Name)
-
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEmptyName)
+	if len(unit.Name) < 2 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 
-	if strings.TrimSpace(exists.Name) != "" {
+	_, err = r.unit.GetUnitByName(unit.Name)
 
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
+	if err == mgo.ErrNotFound {
+		dbunit, err := r.unit.GetUnitById(unit.Id.Hex())
+		if err != nil {
+			return ctx.
+				Status(http.StatusBadRequest).
+				JSON(util.NewJError(util.ErrNotFound))
+		}
+		dbunit.UpdatedAt = time.Now()
+		dbunit.Name = unit.Name
+		err = r.unit.UpdateUnit(dbunit)
+		if err != nil {
+
+			return ctx.Status(http.StatusInternalServerError).JSON(err)
+		}
+		return ctx.Status(http.StatusOK).JSON(dbunit)
+
 	}
 
-	dbunit.UpdatedAt = time.Now()
-	dbunit.Name = unit.Name
-	err = r.unit.UpdateUnit(dbunit)
-	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(err)
-	}
-	return ctx.Status(http.StatusOK).JSON(unit)
+	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
 
 }
 

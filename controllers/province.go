@@ -89,33 +89,31 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
-
-	dbprovince, err := r.province.GetProvinceById(province.Id.Hex())
-
-	if err != nil {
-
-		return ctx.
-			Status(http.StatusBadRequest).
-			JSON(util.NewJError(util.ErrNotFound))
-	}
-	exists, err := r.province.GetProvinceByName(province.Name)
-
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEmptyName)
+	if len(province.Name) < 2 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 
-	if strings.TrimSpace(exists.Name) != "" {
+	_, err = r.province.GetProvinceByName(province.Name)
 
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
+	if err == mgo.ErrNotFound {
+		dbprovince, err := r.province.GetProvinceById(province.Id.Hex())
+		if err != nil {
+			return ctx.
+				Status(http.StatusBadRequest).
+				JSON(util.NewJError(util.ErrNotFound))
+		}
+		dbprovince.UpdatedAt = time.Now()
+		dbprovince.Name = province.Name
+		err = r.province.UpdateProvince(dbprovince)
+		if err != nil {
+
+			return ctx.Status(http.StatusInternalServerError).JSON(err)
+		}
+		return ctx.Status(http.StatusOK).JSON(dbprovince)
+
 	}
 
-	dbprovince.UpdatedAt = time.Now()
-	dbprovince.Name = province.Name
-	err = r.province.UpdateProvince(dbprovince)
-	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(err)
-	}
-	return ctx.Status(http.StatusOK).JSON(province)
+	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
 
 }
 

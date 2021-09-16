@@ -139,13 +139,12 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /user/id [get]
 func (c *authController) GetUser(ctx *fiber.Ctx) error {
-	payload, err := AuthRequestWithId(ctx)
-	if err != nil {
-		return ctx.
-			Status(http.StatusUnauthorized).
-			JSON(util.NewJError(err))
+	id := ctx.Params("id")
+	if !bson.IsObjectIdHex(id) {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
-	user, err := c.usersRepo.GetById(payload.Id)
+
+	user, err := c.usersRepo.GetById(id)
 	if err != nil {
 		return ctx.
 			Status(http.StatusInternalServerError).
@@ -176,14 +175,12 @@ func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 }
 
 func (c *authController) PutUser(ctx *fiber.Ctx) error {
-	payload, err := AuthRequestWithId(ctx)
-	if err != nil {
-		return ctx.
-			Status(http.StatusUnauthorized).
-			JSON(util.NewJError(err))
+	id := ctx.Params("id")
+	if !bson.IsObjectIdHex(id) {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
 	var update models.User
-	err = ctx.BodyParser(&update)
+	err := ctx.BodyParser(&update)
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
@@ -195,14 +192,16 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 			JSON(util.NewJError(util.ErrInvalidEmail))
 	}
 	exists, err := c.usersRepo.GetByUserName(update.UserName)
-	if err == mgo.ErrNotFound || exists.Id.Hex() == payload.Id {
-		user, err := c.usersRepo.GetById(payload.Id)
+	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
+		user, err := c.usersRepo.GetById(id)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
 		user.UserName = update.UserName
+		user.Mobile = update.Mobile
+		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
 		if err != nil {

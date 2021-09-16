@@ -4,6 +4,8 @@ package main
 // @version 1.0.0
 // @host localhost:8000
 // @BasePath /
+// @securityDefinitions.basic BasicAuth
+
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
