@@ -13,7 +13,6 @@ import (
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/asaskevich/govalidator.v9"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -186,10 +185,8 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	if !govalidator.IsEmail(update.UserName) {
-		return ctx.
-			Status(http.StatusBadRequest).
-			JSON(util.NewJError(util.ErrInvalidEmail))
+	if string(update.UserName) == "" {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 	exists, err := c.usersRepo.GetByUserName(update.UserName)
 	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
@@ -224,22 +221,20 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 }
 
 func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
-	payload, err := AuthRequestWithId(ctx)
-	if err != nil {
-		return ctx.
-			Status(http.StatusUnauthorized).
-			JSON(util.NewJError(err))
+	id := ctx.Params("id")
+	if !bson.IsObjectIdHex(id) {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
-	err = c.usersRepo.Delete(payload.Id)
+	err := c.usersRepo.Delete(id)
 	if err != nil {
 		return ctx.
 			Status(http.StatusInternalServerError).
 			JSON(util.NewJError(err))
 	}
-	ctx.Set("Entity", payload.Id)
+	ctx.Set("Entity", id)
 	return ctx.
 		Status(http.StatusOK).
-		JSON(util.ErrEmailAlreadyExists)
+		JSON(util.SuccessDelete)
 	// return ctx.SendStatus(http.StatusNoContent)
 }
 
