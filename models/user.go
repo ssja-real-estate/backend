@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	Id        bson.ObjectId `json:"id" bson:"_id"`
-	UserName  string        `json:"user_name" bson:"user_name"`
+	Name      string        `json:"name" bson:"name"`
 	Password  string        `json:"password" bson:"password"`
 	Mobile    string        `json:"mobile" bson:"mobile"`
 	Role      string        `json:"role" bson:"role"`

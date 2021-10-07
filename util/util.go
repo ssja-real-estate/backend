@@ -1,17 +1,33 @@
 package util
 
-import "strings"
+import (
+	"strings"
+)
 
 type JError struct {
-	Error string `json:"error"`
+	ErrorCode int    `json:"error_code"`
+	Error     string `json:"error"`
+}
+
+type ResultOk struct {
+	Data interface{} `json:"data"`
 }
 
 func NewJError(err error) JError {
-	jerr := JError{"generic error"}
+	jerr := JError{
+		ErrorCode: 0,
+		Error:     "generic error"}
 	if err != nil {
 		jerr.Error = err.Error()
 	}
 	return jerr
+}
+
+func NewRresult(status int, result interface{}) ResultOk {
+	resultok := ResultOk{
+		Data: result,
+	}
+	return resultok
 }
 
 func NormalizeEmail(email string) string {

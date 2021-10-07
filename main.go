@@ -20,6 +20,7 @@ import (
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -36,6 +37,7 @@ func main() {
 	defer con.Close()
 	app := fiber.New()
 	app.Use(logger.New())
+	app.Use(cors.New())
 
 	// app.Get("/", func(c *fiber.Ctx) error {
 	// 	return c.Status(http.StatusOK).JSON(fiber.Map{"message": "hello"})

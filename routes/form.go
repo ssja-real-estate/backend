@@ -15,4 +15,5 @@ func NewFormRoute(formcontroller controllers.FormController) Routes {
 }
 func (r *formRoute) Install(app *fiber.App) {
 	app.Post("/form", AuthRequired, r.formController.CreateForm)
+	app.Get("/form", AuthRequired, r.formController.GetForms)
 }

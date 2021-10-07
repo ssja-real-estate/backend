@@ -48,9 +48,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 	// 		Status(http.StatusBadRequest).
 	// 		JSON(util.NewJError(util.ErrInvalidEmail))
 	// }
-	exists, err := c.usersRepo.GetByUserName(newUser.UserName)
+	exists, err := c.usersRepo.GetByUserName(newUser.Name)
 	if err == mgo.ErrNotFound {
-		if strings.TrimSpace(newUser.UserName) == "" {
+		if strings.TrimSpace(newUser.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
@@ -100,23 +100,23 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			JSON(util.NewJError(err))
 	}
 
-	user, err := c.usersRepo.GetByUserName(input.UserName)
+	user, err := c.usersRepo.GetByMobile(input.Mobile)
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
+		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	err = security.VerifyPassword(user.Password, input.Password)
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
+		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	token, err := security.NewToken(user.Id.Hex())
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
+		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(err))
@@ -185,10 +185,10 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	if string(update.UserName) == "" {
+	if string(update.Name) == "" {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
-	exists, err := c.usersRepo.GetByUserName(update.UserName)
+	exists, err := c.usersRepo.GetByUserName(update.Name)
 	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
 		user, err := c.usersRepo.GetById(id)
 		if err != nil {
@@ -196,8 +196,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
-		user.UserName = update.UserName
-		user.Mobile = update.Mobile
+		user.Name = update.Name
 		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
