@@ -83,11 +83,11 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		return ctx.
 			Status(http.StatusOK).
 			JSON(
-				util.NewRresult(
-					fiber.Map{
-						"user":  newUser,
-						"token": fmt.Sprintf("Bearer %s", token),
-					}))
+
+				fiber.Map{
+					"user":  newUser,
+					"token": fmt.Sprintf("Bearer %s", token),
+				})
 	}
 
 	if exists != nil {
