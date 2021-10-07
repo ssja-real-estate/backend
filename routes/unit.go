@@ -18,7 +18,7 @@ func (r *unitRoutes) Install(app *fiber.App) {
 	app.Post("/unit", AuthRequired, r.unitController.CreateUnit)
 	app.Put("/unit", AuthRequired, r.unitController.UpdateUnit)
 	app.Get("/unit/:id", AuthRequired, r.unitController.GetUnit)
-	app.Get("/units", AuthRequired, r.unitController.GetUnits)
+	app.Get("/unit", AuthRequired, r.unitController.GetUnits)
 	app.Delete("/unit/:id", AuthRequired, r.unitController.DeleteUnit)
 
 }

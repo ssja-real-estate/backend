@@ -18,7 +18,7 @@ func (r *assignmenttyperoutes) Install(app *fiber.App) {
 	app.Post("/assignmenttype", AuthRequired, r.assignmentypecontorller.Create)
 	app.Put("/assignmenttype", AuthRequired, r.assignmentypecontorller.Update)
 	app.Get("/assignmenttype/:id", AuthRequired, r.assignmentypecontorller.GetAssignment)
-	app.Get("/assignmenttypes", AuthRequired, r.assignmentypecontorller.GetAssignments)
+	app.Get("/assignmenttype", AuthRequired, r.assignmentypecontorller.GetAssignments)
 	app.Delete("/assignmenttype/:id", AuthRequired, r.assignmentypecontorller.Delete)
 
 }
