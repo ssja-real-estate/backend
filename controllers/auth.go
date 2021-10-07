@@ -48,7 +48,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 	// 		Status(http.StatusBadRequest).
 	// 		JSON(util.NewJError(util.ErrInvalidEmail))
 	// }
-	exists, err := c.usersRepo.GetByUserName(newUser.Mobile)
+	exists, err := c.usersRepo.GetByMobile(newUser.Mobile)
 	if err == mgo.ErrNotFound {
 		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
