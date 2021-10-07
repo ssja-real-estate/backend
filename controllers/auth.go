@@ -233,7 +233,7 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 	ctx.Set("Entity", id)
 	return ctx.
 		Status(http.StatusOK).
-		JSON(util.SuccessDelete)
+		JSON(util.NewRresult(util.SuccessDelete))
 	// return ctx.SendStatus(http.StatusNoContent)
 }
 

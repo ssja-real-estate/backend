@@ -45,6 +45,9 @@ func (r *estateTypeRepository) GetEstateTypeByName(name string) (estatetype *mod
 }
 func (r *estateTypeRepository) GetEstateTypeAll() (estatetypes []*models.EstateType, err error) {
 	err = r.c.Find(bson.M{}).All(&estatetypes)
+	if estatetypes == nil {
+		estatetypes = make([]*models.EstateType, 0)
+	}
 	return estatetypes, err
 }
 func (r *estateTypeRepository) DeleteEstateType(id string) error {

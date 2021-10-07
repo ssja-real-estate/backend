@@ -167,5 +167,5 @@ func (r *unitController) DeleteUnit(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.SuccessDelete)
+	return ctx.Status(http.StatusOK).JSON(util.NewRresult(util.SuccessDelete))
 }

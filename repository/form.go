@@ -27,6 +27,9 @@ func (r *formRepository) SaveForm(form *models.Form) error {
 }
 func (r *formRepository) GetForms() (forms []models.Form, err error) {
 	err = r.c.Find(bson.M{}).All(&forms)
+	if forms == nil {
+		forms = make([]models.Form, 0)
+	}
 	return forms, err
 }
 

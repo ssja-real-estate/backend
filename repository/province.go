@@ -49,6 +49,9 @@ func (r *provinceRepository) GetProvinceByName(name string) (province *models.Pr
 }
 func (r *provinceRepository) GetProvinceAll() (provinces []*models.Province, err error) {
 	err = r.c.Find(bson.M{}).All(&provinces)
+	if provinces == nil {
+		provinces = make([]*models.Province, 0)
+	}
 	return provinces, err
 }
 func (r *provinceRepository) DeleteProvince(id string) error {

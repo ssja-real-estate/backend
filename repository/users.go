@@ -53,6 +53,10 @@ func (r *usersRepository) GetByUserName(uasername string) (user *models.User, er
 
 func (r *usersRepository) GetAll() (users []*models.User, err error) {
 	err = r.c.Find(bson.M{}).All(&users)
+	if users == nil {
+		users = make([]*models.User, 0)
+
+	}
 	return users, err
 }
 
