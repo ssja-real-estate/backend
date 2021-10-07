@@ -30,7 +30,7 @@ func NewFormController(formrepo repository.FormRepository) FormController {
 // @Summary  Get Forms
 // @Description Get Forms
 // @Tags Froms
-// @Success 200 {array} models.Froms
+// @Success 200 {array} models.Form
 // @Failure 404 {object} object
 // @Router /forms/ [get]
 func (r *formController) GetForms(ctx *fiber.Ctx) error {
@@ -63,9 +63,10 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 // @Summary  Get Form
 // @Description Get Form
 // @Tags Froms
-// @Success 200 {object} models.From
+// @Success 200 {object} models.Form
 // @Failure 404 {object} object
-// @Router /forms/ [get]
+// @Param id path string true "Item ID"
+// @Router /form/id [get]
 func (r *formController) GetForm(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	form, err := r.form.GetForm(id)
@@ -80,9 +81,9 @@ func (r *formController) GetForm(ctx *fiber.Ctx) error {
 // @Summary  Delete Form
 // @Description Delete Form
 // @Tags Froms
-// @Success 200 {object} models.From
+// @Success 200 {object} models.Form
 // @Failure 404 {object} object
-// @Router /forms/ [Delete]
+// @Router /form/ [Delete]
 func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	err := r.form.DeleteForm(id)
@@ -92,13 +93,13 @@ func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(util.NewRresult(util.SuccessDelete))
 }
 
-// Delete From ... Delete a Form
-// @Summary  Delete Form
-// @Description Delete Form
+// update From ... update a Form
+// @Summary  update Form
+// @Description update Form
 // @Tags Froms
-// @Success 200 {object} models.From
+// @Success 200 {object} models.Form
 // @Failure 404 {object} object
-// @Router /forms/ [Delete]
+// @Router /form/ [put]
 func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 	var form models.Form
 	id := ctx.Params("id")
