@@ -14,4 +14,5 @@ var (
 	ErrNotFound           = errors.New("آیتم مورد نظر شما پیدا نشد ")
 	ErrNotMobile          = errors.New("این شماره موبایل وجود ندارد")
 	SuccessDelete         = "گزینه مورد نظر با موفقیت حذف شد"
+	SuccessUpdate         = "آیتم مورد نظر با موفقیت اپدیت شد."
 )

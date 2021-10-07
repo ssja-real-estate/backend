@@ -14,6 +14,8 @@ type FormRepository interface {
 	SaveForm(form *models.Form) error
 	GetForms() ([]models.Form, error)
 	GetForm(id string) (form models.Form, err error)
+	DeleteForm(id string) (err error)
+	UpdateForm(id string, form *models.Form) error
 }
 type formRepository struct {
 	c *mgo.Collection
@@ -36,4 +38,13 @@ func (r *formRepository) GetForms() (forms []models.Form, err error) {
 func (r *formRepository) GetForm(id string) (form models.Form, err error) {
 	err = r.c.Find(bson.M{"_id": id}).One(&form)
 	return form, err
+}
+
+func (r *formRepository) DeleteForm(id string) (err error) {
+	return r.c.RemoveId(bson.ObjectIdHex(id))
+
+}
+
+func (r *formRepository) UpdateForm(id string, form *models.Form) error {
+	return r.c.UpdateId(bson.ObjectIdHex(id), form)
 }
