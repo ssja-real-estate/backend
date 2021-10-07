@@ -380,7 +380,7 @@ paths:
       summary: Get All EstateType
       tags:
       - EstateType
-  /form/:
+  /form:
     delete:
       description: Delete Form
       responses:
@@ -394,7 +394,37 @@ paths:
             type: object
       summary: Delete Form
       tags:
-      - Froms
+      - Form
+    get:
+      description: Get Forms
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Form'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get Forms
+      tags:
+      - Form
+    post:
+      description: Create New Form
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Create New Form
+      tags:
+      - Form
     put:
       description: update Form
       responses:
@@ -408,7 +438,7 @@ paths:
             type: object
       summary: update Form
       tags:
-      - Froms
+      - Form
   /form/id:
     get:
       description: Get Form
@@ -429,24 +459,7 @@ paths:
             type: object
       summary: Get Form
       tags:
-      - Froms
-  /forms/:
-    get:
-      description: Get Forms
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Form'
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            type: object
-      summary: Get Forms
-      tags:
-      - Froms
+      - Form
   /province/city/id:
     delete:
       description: Delete City in Province

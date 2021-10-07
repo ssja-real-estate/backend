@@ -428,13 +428,58 @@ var doc = `{
                 }
             }
         },
-        "/form/": {
+        "/form": {
+            "get": {
+                "description": "Get Forms",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get Forms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Form"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "update Form",
                 "tags": [
-                    "Froms"
+                    "Form"
                 ],
                 "summary": "update Form",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Form"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create New Form",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Create New Form",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -453,7 +498,7 @@ var doc = `{
             "delete": {
                 "description": "Delete Form",
                 "tags": [
-                    "Froms"
+                    "Form"
                 ],
                 "summary": "Delete Form",
                 "responses": {
@@ -476,7 +521,7 @@ var doc = `{
             "get": {
                 "description": "Get Form",
                 "tags": [
-                    "Froms"
+                    "Form"
                 ],
                 "summary": "Get Form",
                 "parameters": [
@@ -493,32 +538,6 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Form"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/forms/": {
-            "get": {
-                "description": "Get Forms",
-                "tags": [
-                    "Froms"
-                ],
-                "summary": "Get Forms",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Form"
-                            }
                         }
                     },
                     "404": {
