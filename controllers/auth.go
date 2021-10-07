@@ -48,9 +48,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 	// 		Status(http.StatusBadRequest).
 	// 		JSON(util.NewJError(util.ErrInvalidEmail))
 	// }
-	exists, err := c.usersRepo.GetByUserName(newUser.Name)
+	exists, err := c.usersRepo.GetByUserName(newUser.Mobile)
 	if err == mgo.ErrNotFound {
-		if strings.TrimSpace(newUser.Name) == "" {
+		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
@@ -70,13 +70,25 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
+		token, err := security.NewToken(newUser.Id.Hex())
+		if err != nil {
+			log.Printf("%s signin failed: %v\n", newUser.Name, err.Error())
+			return ctx.
+				Status(http.StatusUnauthorized).
+				JSON(util.NewJError(err))
+		}
 		return ctx.
-			Status(http.StatusCreated).
-			JSON(newUser)
+			Status(http.StatusOK).
+			JSON(
+				util.NewRresult(
+					fiber.Map{
+						"user":  newUser,
+						"token": fmt.Sprintf("Bearer %s", token),
+					}))
 	}
 
 	if exists != nil {
-		err = util.ErrEmailAlreadyExists
+		err = util.ErrMobileAlreadyExists
 	}
 
 	return ctx.
@@ -99,7 +111,9 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-
+	if input.Role == 0 {
+		input.Role = 3
+	}
 	user, err := c.usersRepo.GetByMobile(input.Mobile)
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
@@ -185,10 +199,10 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	if string(update.Name) == "" {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
-	}
-	exists, err := c.usersRepo.GetByUserName(update.Name)
+	// if string(update.Mobile) == "" {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyMobile))
+	// }
+	exists, err := c.usersRepo.GetByUserName(update.Mobile)
 	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
 		user, err := c.usersRepo.GetById(id)
 		if err != nil {
@@ -197,6 +211,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(err))
 		}
 		user.Name = update.Name
+
 		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
@@ -211,7 +226,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 
 	if exists != nil {
-		err = util.ErrEmailAlreadyExists
+		err = util.ErrMobileAlreadyExists
 	}
 
 	return ctx.

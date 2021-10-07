@@ -5,8 +5,7 @@ import (
 )
 
 type JError struct {
-	ErrorCode int    `json:"error_code"`
-	Error     string `json:"error"`
+	Error string `json:"error"`
 }
 
 type ResultOk struct {
@@ -15,8 +14,8 @@ type ResultOk struct {
 
 func NewJError(err error) JError {
 	jerr := JError{
-		ErrorCode: 0,
-		Error:     "generic error"}
+
+		Error: "generic error"}
 	if err != nil {
 		jerr.Error = err.Error()
 	}
