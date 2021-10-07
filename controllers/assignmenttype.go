@@ -147,6 +147,9 @@ func (r *assignmenttypeController) GetAssignments(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+	if assignmenttypes == nil {
+		assignmenttypes = make([]*models.AssignmentType, 0)
+	}
 	return ctx.Status(http.StatusOK).JSON(assignmenttypes)
 }
 
@@ -167,5 +170,5 @@ func (r *assignmenttypeController) Delete(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.SuccessDelete)
+	return ctx.Status(http.StatusOK).JSON(util.NewRresult(util.SuccessDelete))
 }

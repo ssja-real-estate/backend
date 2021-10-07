@@ -28,7 +28,7 @@ func (r *formController) GetForms(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.NewRresult(http.StatusOK, forms))
+	return ctx.Status(http.StatusOK).JSON(util.NewRresult(forms))
 }
 
 func (r *formController) CreateForm(ctx *fiber.Ctx) error {
@@ -46,5 +46,5 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusCreated).JSON(util.NewRresult(http.StatusOK, form))
+	return ctx.Status(http.StatusCreated).JSON(util.NewRresult(form))
 }

@@ -23,7 +23,7 @@ func NewJError(err error) JError {
 	return jerr
 }
 
-func NewRresult(status int, result interface{}) ResultOk {
+func NewRresult(result interface{}) ResultOk {
 	resultok := ResultOk{
 		Data: result,
 	}

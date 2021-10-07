@@ -13,8 +13,8 @@ const formcollection = "forms"
 type FormRepository interface {
 	SaveForm(form *models.Form) error
 	GetForms() ([]models.Form, error)
+	GetForm(id string) (form models.Form, err error)
 }
-
 type formRepository struct {
 	c *mgo.Collection
 }
@@ -22,11 +22,15 @@ type formRepository struct {
 func NewFormRepositor(conn db.Connection) FormRepository {
 	return &formRepository{conn.DB().C(formcollection)}
 }
-
 func (r *formRepository) SaveForm(form *models.Form) error {
 	return r.c.Insert(form)
 }
 func (r *formRepository) GetForms() (forms []models.Form, err error) {
 	err = r.c.Find(bson.M{}).All(&forms)
 	return forms, err
+}
+
+func (r *formRepository) GetForm(id string) (form models.Form, err error) {
+	err = r.c.Find(bson.M{"_id": id}).One(&form)
+	return form, err
 }
