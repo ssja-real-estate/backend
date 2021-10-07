@@ -62,6 +62,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(err))
 		}
 		newUser.CreatedAt = time.Now()
+		if newUser.Role == 0 {
+			newUser.Role = 3
+		}
 		newUser.UpdatedAt = newUser.CreatedAt
 		newUser.Id = bson.NewObjectId()
 		err = c.usersRepo.Save(&newUser)
@@ -111,9 +114,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	if input.Role == 0 {
-		input.Role = 3
-	}
+
 	user, err := c.usersRepo.GetByMobile(input.Mobile)
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
