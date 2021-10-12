@@ -21,5 +21,6 @@ func (r *authRoutes) Install(app *fiber.App) {
 	app.Get("/user/:id", AuthRequired, r.authController.GetUser)
 	app.Put("/user/:id", AuthRequired, r.authController.PutUser)
 	app.Delete("/user/:id", AuthRequired, r.authController.DeleteUser)
+	app.Post("/user/verify/:mobile", r.authController.Verify)
 
 }

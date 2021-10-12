@@ -38,7 +38,7 @@ func (r *formController) GetForms(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.NewRresult(forms))
+	return ctx.Status(http.StatusOK).JSON(forms)
 }
 
 // Create From ... Create a new Froms
@@ -63,7 +63,7 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusCreated).JSON(util.NewRresult(form))
+	return ctx.Status(http.StatusCreated).JSON(form)
 }
 
 // Get From ... Get a new Froms
@@ -80,7 +80,7 @@ func (r *formController) GetForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.NewRresult(form))
+	return ctx.Status(http.StatusOK).JSON(form)
 
 }
 
@@ -97,7 +97,7 @@ func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.NewRresult(util.SuccessDelete))
+	return ctx.Status(http.StatusOK).JSON(util.SuccessDelete)
 }
 
 // update From ... update a Form
@@ -106,6 +106,7 @@ func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
 // @Tags Form
 // @Success 200 {object} models.Form
 // @Failure 404 {object} object
+// @Param id path string true "Item ID"
 // @Router /form [put]
 func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 	var form models.Form
@@ -118,5 +119,5 @@ func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
-	return ctx.Status(http.StatusOK).JSON(util.NewRresult(util.SuccessUpdate))
+	return ctx.Status(http.StatusOK).JSON(util.SuccessUpdate)
 }

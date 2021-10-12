@@ -12,6 +12,7 @@ require (
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/gofiber/fiber/v2 v2.18.0
 	github.com/gofiber/jwt/v2 v2.1.0
+	github.com/ippanel/go-rest-sdk v1.0.1 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/klauspost/compress v1.13.5 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

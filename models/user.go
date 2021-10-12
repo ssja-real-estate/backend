@@ -12,7 +12,8 @@ type User struct {
 	Password string        `json:"password" bson:"password"`
 	Mobile   string        `json:"mobile" bson:"mobile"`
 	// owner 1 Admin 2 User 3
-	Role      int       `json:"role"  bson:"role"`
-	CreatedAt time.Time `json:"-" bson:"created_at"`
-	UpdatedAt time.Time `json:"-" bson:"updated_at"`
+	Role       int       `json:"role"  bson:"role"`
+	VerifyCode int64    `json:"-" bson:"verify_code"`
+	CreatedAt  time.Time `json:"-" bson:"created_at"`
+	UpdatedAt  time.Time `json:"-" bson:"updated_at"`
 }

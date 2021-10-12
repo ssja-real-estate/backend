@@ -13,6 +13,7 @@ var (
 	ErrUnauthorized        = errors.New("اول باید لاگین کنید")
 	ErrNotFound            = errors.New("آیتم مورد نظر شما پیدا نشد ")
 	ErrNotMobile           = errors.New("این شماره موبایل وجود ندارد")
+	ErrBadRole             = errors.New("رول داده شده به این کاربر درست نمی باشد")
 	SuccessDelete          = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate          = "آیتم مورد نظر با موفقیت اپدیت شد."
 )

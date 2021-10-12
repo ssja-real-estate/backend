@@ -39,15 +39,6 @@ func main() {
 	app.Use(logger.New())
 	app.Use(cors.New())
 
-	// app.Get("/", func(c *fiber.Ctx) error {
-	// 	return c.Status(http.StatusOK).JSON(fiber.Map{"message": "hello"})
-	// })
-	// r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// app.Get("/swagger",func(c *fiber.Ctx) error {
-	// 	return swaggerFiles.Handler
-	// })
-
 	app.Get("/swagger/*", swagger.New(swagger.Config{ // custom
 		URL:         "/swagger/doc.json",
 		DeepLinking: false,

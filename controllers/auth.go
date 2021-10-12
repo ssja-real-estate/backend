@@ -24,6 +24,7 @@ type AuthController interface {
 	GetUsers(ctx *fiber.Ctx) error
 	PutUser(ctx *fiber.Ctx) error
 	DeleteUser(ctx *fiber.Ctx) error
+	Verify(ctx *fiber.Ctx) error
 }
 
 type authController struct {
@@ -188,6 +189,18 @@ func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 		JSON(users)
 }
 
+func (c *authController) Verify(ctx *fiber.Ctx) error {
+	mobile := ctx.Params("mobile")
+	fmt.Print(mobile)
+	verfiycode, err := c.usersRepo.Verify(mobile)
+	if err != nil {
+		return ctx.Status(http.StatusBadGateway).JSON(util.ErrNotMobile)
+	}
+	fmt.Print(verfiycode)
+	return ctx.Status(http.StatusOK).JSON(util.SuccessUpdate)
+
+}
+
 func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {
@@ -195,14 +208,16 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 	var update models.User
 	err := ctx.BodyParser(&update)
+
+	if update.Role < 1 && update.Role > 3 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrBadRole))
+	}
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	// if string(update.Mobile) == "" {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyMobile))
-	// }
+
 	exists, err := c.usersRepo.GetByUserName(update.Mobile)
 	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
 		user, err := c.usersRepo.GetById(id)
@@ -212,7 +227,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(err))
 		}
 		user.Name = update.Name
-
+		user.Role = update.Role
 		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
@@ -249,7 +264,7 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 	ctx.Set("Entity", id)
 	return ctx.
 		Status(http.StatusOK).
-		JSON(util.NewRresult(util.SuccessDelete))
+		JSON(util.SuccessDelete)
 	// return ctx.SendStatus(http.StatusNoContent)
 }
 
