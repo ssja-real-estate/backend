@@ -6,14 +6,14 @@ type Valuetype interface{}
 type Field struct {
 	Id bson.ObjectId `json:"id" bson:"_id"`
 	// Name      string        `json:"name" bson:"name"`
-	Title     string    `json:"title" bson:"title"`
-	Value     Valuetype `json:"value" bson:"value"`
-	Min       float64   `json:"min" bson:"min"`
-	Max       float64   `json:"max" bson:"max"`
-	Optional  bool      `json:"optional" bson:"optional"`
-	Options   []string  `json:"option" bson:"option"`
-	Fields    []Field   `json:"fileds" bson:"fileds"`
-	Fieldtype string    `json:"fieldtype" bson:"fieldtype"`
+	Title    string    `json:"title" bson:"title"`
+	Value    Valuetype `json:"value" bson:"value"`
+	Min      float64   `json:"min" bson:"min"`
+	Max      float64   `json:"max" bson:"max"`
+	Optional bool      `json:"optional" bson:"optional"`
+	Options  []string  `json:"option" bson:"option"`
+	Fields   []Field   `json:"fileds" bson:"fileds"`
+	Type     int       `json:"type"  bson:"type"`
 }
 
 func (field *Field) updateid() {
