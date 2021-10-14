@@ -459,6 +459,15 @@ var doc = `{
                     "Form"
                 ],
                 "summary": "update Form",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -909,9 +918,6 @@ var doc = `{
         "models.Field": {
             "type": "object",
             "properties": {
-                "fieldtype": {
-                    "type": "string"
-                },
                 "fileds": {
                     "type": "array",
                     "items": {
@@ -940,6 +946,9 @@ var doc = `{
                     "description": "Name      string        ` + "`" + `json:\"name\" bson:\"name\"` + "`" + `",
                     "type": "string"
                 },
+                "type": {
+                    "type": "integer"
+                },
                 "value": {
                     "$ref": "#/definitions/models.Valuetype"
                 }
@@ -948,6 +957,12 @@ var doc = `{
         "models.Form": {
             "type": "object",
             "properties": {
+                "assignment_type_id": {
+                    "type": "string"
+                },
+                "estate_type_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -958,7 +973,7 @@ var doc = `{
                     }
                 },
                 "title": {
-                    "description": "Name string        ` + "`" + `json:\"name\" bson:\"name\"` + "`" + `\nSections []map[string]interface{} ` + "`" + `json:\"sections\" bson:\"sections\"` + "`" + `",
+                    "description": "Sections []map[string]interface{} ` + "`" + `json:\"sections\" bson:\"sections\"` + "`" + `",
                     "type": "string"
                 }
             }
@@ -966,7 +981,7 @@ var doc = `{
         "models.Province": {
             "type": "object",
             "properties": {
-                "cites": {
+                "cities": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.City"
@@ -1001,9 +1016,6 @@ var doc = `{
         "models.Unit": {
             "type": "object",
             "properties": {
-                "- bson:": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -1028,7 +1040,7 @@ var doc = `{
                     "type": "string"
                 },
                 "role": {
-                    "description": "owner 0 Admin 1 User 2",
+                    "description": "owner 1 Admin 2 User 3",
                     "type": "integer"
                 }
             }

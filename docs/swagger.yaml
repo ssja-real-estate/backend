@@ -29,8 +29,6 @@ definitions:
     type: object
   models.Field:
     properties:
-      fieldtype:
-        type: string
       fileds:
         items:
           $ref: '#/definitions/models.Field'
@@ -50,11 +48,17 @@ definitions:
       title:
         description: Name      string        `json:"name" bson:"name"`
         type: string
+      type:
+        type: integer
       value:
         $ref: '#/definitions/models.Valuetype'
     type: object
   models.Form:
     properties:
+      assignment_type_id:
+        type: string
+      estate_type_id:
+        type: string
       id:
         type: string
       sections:
@@ -62,14 +66,12 @@ definitions:
           $ref: '#/definitions/models.Section'
         type: array
       title:
-        description: |-
-          Name string        `json:"name" bson:"name"`
-          Sections []map[string]interface{} `json:"sections" bson:"sections"`
+        description: Sections []map[string]interface{} `json:"sections" bson:"sections"`
         type: string
     type: object
   models.Province:
     properties:
-      cites:
+      cities:
         items:
           $ref: '#/definitions/models.City'
         type: array
@@ -92,8 +94,6 @@ definitions:
     type: object
   models.Unit:
     properties:
-      '- bson:':
-        type: string
       id:
         type: string
       name:
@@ -110,7 +110,7 @@ definitions:
       password:
         type: string
       role:
-        description: owner 0 Admin 1 User 2
+        description: owner 1 Admin 2 User 3
         type: integer
     type: object
   models.Valuetype:
@@ -427,6 +427,12 @@ paths:
       - Form
     put:
       description: update Form
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
       responses:
         "200":
           description: OK
