@@ -10,7 +10,6 @@ package main
 // @in header
 // @name Authorization
 import (
-	"crypto/tls"
 	"log"
 
 	// "net/http"
@@ -75,18 +74,18 @@ func main() {
 	formroute := routes.NewFormRoute(formcontroller)
 	formroute.Install(app)
 
-	cer, err := tls.LoadX509KeyPair("tls/cert.pem", "tls/key.pem")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// cer, err := tls.LoadX509KeyPair("tls/cert.pem", "tls/key.pem")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	config := &tls.Config{Certificates: []tls.Certificate{cer}}
+	// config := &tls.Config{Certificates: []tls.Certificate{cer}}
 
-	// Create custom listener
-	ln, err := tls.Listen("tcp", ":443", config)
-	if err != nil {
-		panic(err)
-	}
-	log.Fatal(app.Listener(ln))
+	// // Create custom listener
+	// ln, err := tls.Listen("tcp", ":443", config)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	log.Fatal(app.Listen(":8000"))
 
 }
