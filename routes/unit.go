@@ -15,10 +15,11 @@ func NewUnitRoute(unitcontroller controllers.UnitController) Routes {
 }
 
 func (r *unitRoutes) Install(app *fiber.App) {
-	app.Post("/unit", AuthRequired, r.unitController.CreateUnit)
-	app.Put("/unit", AuthRequired, r.unitController.UpdateUnit)
-	app.Get("/unit/:id", AuthRequired, r.unitController.GetUnit)
-	app.Get("/unit", AuthRequired, r.unitController.GetUnits)
-	app.Delete("/unit/:id", AuthRequired, r.unitController.DeleteUnit)
+	api := app.Group("/api")
+	api.Post("/unit", AuthRequired, r.unitController.CreateUnit)
+	api.Put("/unit", AuthRequired, r.unitController.UpdateUnit)
+	api.Get("/unit/:id", AuthRequired, r.unitController.GetUnit)
+	api.Get("/unit", AuthRequired, r.unitController.GetUnits)
+	api.Delete("/unit/:id", AuthRequired, r.unitController.DeleteUnit)
 
 }
