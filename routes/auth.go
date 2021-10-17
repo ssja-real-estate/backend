@@ -15,7 +15,7 @@ func NewAuthRoutes(authController controllers.AuthController) Routes {
 }
 
 func (r *authRoutes) Install(app *fiber.App) {
-	app.Group("api")
+	app.Group("/api")
 	app.Post("/signup", r.authController.SignUp)
 	app.Post("/signin", r.authController.SignIn)
 	app.Get("/user", AuthRequired, r.authController.GetUsers)
