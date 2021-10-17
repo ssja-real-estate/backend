@@ -10,7 +10,9 @@ package main
 // @in header
 // @name Authorization
 import (
+
 	"log"
+
 
 	// "net/http"
 	"realstate/controllers"
@@ -23,6 +25,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+
 )
 
 // func init() {
@@ -73,6 +76,19 @@ func main() {
 	formcontroller := controllers.NewFormController(formrepo)
 	formroute := routes.NewFormRoute(formcontroller)
 	formroute.Install(app)
+	// certManager := autocert.Manager{
+    //     Prompt:     autocert.AcceptTOS,
+    //     HostPolicy: autocert.HostWhitelist("ssja.ir"), //Your domain here
+    //     Cache:      autocert.DirCache("tls"),            //Folder for storing certificates
+    // }
+	// server := &http.Server{
+    //     Addr: ":https",
+    //     TLSConfig: &tls.Config{
+    //         GetCertificate: certManager.GetCertificate,
+    //     },
+    // }
+
+
 
 	// cer, err := tls.LoadX509KeyPair("tls/cert.pem", "tls/key.pem")
 	// if err != nil {
@@ -86,6 +102,7 @@ func main() {
 	// if err != nil {
 	// 	panic(err)
 	// }
+
 	log.Fatal(app.Listen(":8000"))
 
 }
