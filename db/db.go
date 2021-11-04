@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"log"
 
 	"gopkg.in/mgo.v2"
@@ -18,10 +17,19 @@ type conn struct {
 func NewConnection() Connection {
 	var c conn
 	var err error
-	c.session, err = mgo.Dial(getUrl())
+	// info := &mgo.DialInfo{
+	// 	Addrs:    []string{"mongodb:27017"},
+	// 	Database: "Amlak",
+	// 	Username: "amanc",
+	// 	Password: "Amanc1101!",
+	// }
+	// c.session, err = mgo.DialWithInfo(info)
+	c.session, err = mgo.Dial("mongodb:27017")
 	if err != nil {
+
 		log.Println(err.Error())
 	}
+
 	return &c
 }
 
@@ -40,14 +48,15 @@ func getUrl() string {
 	// 	log.Println("error in load os.getenv", err.Error())
 	// 	port = 2707
 	// }
-	port := 27017
-	return fmt.Sprintf("mongodb://localhost:%d", port)
-	// return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", os.Getenv("DATABASE_USER"),
+	// port := 27017
+	// return fmt.Sprintf("mongodb://mongodb:%d", port)
+	return "mongodb://amanc:Amanc1101!@mongodb:27017/Amlak"
+	// return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", "amanc",
 
-	// 	os.Getenv("DATABASE_PASS"),
-	// 	os.Getenv("DATABASE_HOST"),
+	// 	"Amanc1101!",
+	// 	"127.0.0.1",
 	// 	port,
-	// 	os.Getenv("DATABASE_NAME"),
+	// 	"Amlak",
 	// )
 
 }
