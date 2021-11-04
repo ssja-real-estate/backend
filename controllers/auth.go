@@ -93,7 +93,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 // @Router /signin [post]
 func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	var input models.User
+	fmt.Println("pass1")
 	err := ctx.BodyParser(&input)
+	fmt.Println("pass2")
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
@@ -101,6 +103,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	}
 
 	user, err := c.usersRepo.GetByUserName(input.UserName)
+	fmt.Println("pass4")
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
 		return ctx.

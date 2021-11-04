@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"realstate/db"
 	"realstate/models"
 
@@ -41,7 +42,9 @@ func (r *usersRepository) GetById(id string) (user *models.User, err error) {
 }
 
 func (r *usersRepository) GetByUserName(uasername string) (user *models.User, err error) {
+	fmt.Println("pass 3")
 	err = r.c.Find(bson.M{"user_name": uasername}).One(&user)
+	fmt.Println("pass 3.5")
 	return user, err
 }
 
