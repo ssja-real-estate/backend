@@ -21,7 +21,6 @@ type ProvinceRepository interface {
 	GetCityByName(name string, id string) (int, error)
 	DeleteCityByID(city models.City, proviceid string) error
 }
-
 type provinceRepository struct {
 	c *mgo.Collection
 }
@@ -33,6 +32,7 @@ func NewProvinceRepository(conn db.Connection) ProvinceRepository {
 func (r *provinceRepository) SaveProvince(province *models.Province) error {
 	return r.c.Insert(province)
 }
+
 func (r *provinceRepository) UpdateProvince(province *models.Province) error {
 	return r.c.UpdateId(province.Id, province)
 
@@ -49,6 +49,9 @@ func (r *provinceRepository) GetProvinceByName(name string) (province *models.Pr
 }
 func (r *provinceRepository) GetProvinceAll() (provinces []*models.Province, err error) {
 	err = r.c.Find(bson.M{}).All(&provinces)
+	if provinces == nil {
+		provinces = make([]*models.Province, 0)
+	}
 	return provinces, err
 }
 func (r *provinceRepository) DeleteProvince(id string) error {
@@ -63,12 +66,10 @@ func (r *provinceRepository) AddCity(city models.City, id string) error {
 	return r.c.Update(provice, _city)
 
 }
-
 func (r *provinceRepository) GetCityByName(name string, id string) (int, error) {
-
 	return r.c.Find(bson.M{"cities.name": name}).Count()
-
 }
+
 func (r *provinceRepository) DeleteCityByID(city models.City, proviceid string) error {
 	_city := bson.M{"$pull": bson.M{"cities": city}}
 

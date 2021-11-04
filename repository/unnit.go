@@ -45,6 +45,9 @@ func (r *unitRepository) GetUnitByName(name string) (unit *models.Unit, err erro
 }
 func (r *unitRepository) GetUnitAll() (units []*models.Unit, err error) {
 	err = r.c.Find(bson.M{}).All(&units)
+	if units == nil {
+		units = make([]*models.Unit, 0)
+	}
 	return units, err
 }
 func (r *unitRepository) DeleteUnit(id string) error {

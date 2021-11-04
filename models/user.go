@@ -7,11 +7,13 @@ import (
 )
 
 type User struct {
-	Id        bson.ObjectId `json:"id" bson:"_id"`
-	UserName  string        `json:"user_name" bson:"user_name"`
-	Password  string        `json:"password" bson:"password"`
-	Mobile    string        `json:"mobile" bson:"mobile"`
-	Role      string        `json:"role" bson:"role"`
-	CreatedAt time.Time     `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at" bson:"updated_at"`
+	Id       bson.ObjectId `json:"id" bson:"_id"`
+	Name     string        `json:"name" bson:"name"`
+	Password string        `json:"password" bson:"password"`
+	Mobile   string        `json:"mobile" bson:"mobile"`
+	// owner 1 Admin 2 User 3
+	Role       int       `json:"role"  bson:"role"`
+	VerifyCode int64    `json:"-" bson:"verify_code"`
+	CreatedAt  time.Time `json:"-" bson:"created_at"`
+	UpdatedAt  time.Time `json:"-" bson:"updated_at"`
 }

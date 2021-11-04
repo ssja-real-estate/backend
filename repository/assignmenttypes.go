@@ -45,7 +45,11 @@ func (r *assignmentTypeRepository) GetByName(name string) (assignmenttype *model
 	return assignmenttype, err
 }
 func (r *assignmentTypeRepository) GetAll() (assignments []*models.AssignmentType, err error) {
+
 	err = r.c.Find(bson.M{}).All(&assignments)
+	if assignments == nil {
+		assignments = make([]*models.AssignmentType, 0)
+	}
 	return assignments, err
 }
 func (r *assignmentTypeRepository) Delete(id string) error {

@@ -2,16 +2,10 @@ basePath: /
 definitions:
   models.AssignmentType:
     properties:
-      created_at:
-        description: 'required: false'
-        type: string
       id:
         description: 'required: false'
         type: string
       name:
-        type: string
-      updated_at:
-        description: 'required: false'
         type: string
     type: object
   models.City:
@@ -23,9 +17,6 @@ definitions:
     type: object
   models.EstateType:
     properties:
-      created_at:
-        description: 'required: false'
-        type: string
       id:
         description: 'required: false'
         type: string
@@ -35,52 +26,94 @@ definitions:
           example: خرید
           required: true
         type: string
-      updated_at:
-        description: 'required: false'
+    type: object
+  models.Field:
+    properties:
+      fileds:
+        items:
+          $ref: '#/definitions/models.Field'
+        type: array
+      id:
+        type: string
+      max:
+        type: number
+      min:
+        type: number
+      option:
+        items:
+          type: string
+        type: array
+      optional:
+        type: boolean
+      title:
+        description: Name      string        `json:"name" bson:"name"`
+        type: string
+      type:
+        type: integer
+      value:
+        $ref: '#/definitions/models.Valuetype'
+    type: object
+  models.Form:
+    properties:
+      assignment_type_id:
+        type: string
+      estate_type_id:
+        type: string
+      id:
+        type: string
+      sections:
+        items:
+          $ref: '#/definitions/models.Section'
+        type: array
+      title:
+        description: Sections []map[string]interface{} `json:"sections" bson:"sections"`
         type: string
     type: object
   models.Province:
     properties:
-      cites:
+      cities:
         items:
           $ref: '#/definitions/models.City'
         type: array
-      created_at:
-        type: string
       id:
         type: string
       name:
         type: string
-      updated_at:
+    type: object
+  models.Section:
+    properties:
+      fields:
+        items:
+          $ref: '#/definitions/models.Field'
+        type: array
+      id:
+        type: string
+      title:
+        description: Name   string        `json:"name" bson:"name"`
         type: string
     type: object
   models.Unit:
     properties:
-      created_at:
-        type: string
       id:
         type: string
       name:
         type: string
-      updated_at:
-        type: string
     type: object
   models.User:
     properties:
-      created_at:
-        type: string
       id:
         type: string
       mobile:
         type: string
+      name:
+        type: string
       password:
         type: string
       role:
-        type: string
-      updated_at:
-        type: string
-      user_name:
-        type: string
+        description: owner 1 Admin 2 User 3
+        type: integer
+    type: object
+  models.Valuetype:
     type: object
 host: localhost:8000
 info:
@@ -347,6 +380,92 @@ paths:
       summary: Get All EstateType
       tags:
       - EstateType
+  /form:
+    delete:
+      description: Delete Form
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Delete Form
+      tags:
+      - Form
+    get:
+      description: Get Forms
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Form'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get Forms
+      tags:
+      - Form
+    post:
+      description: Create New Form
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Create New Form
+      tags:
+      - Form
+    put:
+      description: update Form
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: update Form
+      tags:
+      - Form
+  /form/id:
+    get:
+      description: Get Form
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: Get Form
+      tags:
+      - Form
   /province/city/id:
     delete:
       description: Delete City in Province
@@ -562,4 +681,6 @@ securityDefinitions:
     in: header
     name: Authorization
     type: apiKey
+  BasicAuth:
+    type: basic
 swagger: "2.0"

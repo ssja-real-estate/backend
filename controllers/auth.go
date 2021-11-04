@@ -24,6 +24,7 @@ type AuthController interface {
 	GetUsers(ctx *fiber.Ctx) error
 	PutUser(ctx *fiber.Ctx) error
 	DeleteUser(ctx *fiber.Ctx) error
+	Verify(ctx *fiber.Ctx) error
 }
 
 type authController struct {
@@ -48,9 +49,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 	// 		Status(http.StatusBadRequest).
 	// 		JSON(util.NewJError(util.ErrInvalidEmail))
 	// }
-	exists, err := c.usersRepo.GetByUserName(newUser.UserName)
+	exists, err := c.usersRepo.GetByMobile(newUser.Mobile)
 	if err == mgo.ErrNotFound {
-		if strings.TrimSpace(newUser.UserName) == "" {
+		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
@@ -62,6 +63,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(err))
 		}
 		newUser.CreatedAt = time.Now()
+		if newUser.Role == 0 {
+			newUser.Role = 3
+		}
 		newUser.UpdatedAt = newUser.CreatedAt
 		newUser.Id = bson.NewObjectId()
 		err = c.usersRepo.Save(&newUser)
@@ -70,13 +74,25 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
+		token, err := security.NewToken(newUser.Id.Hex())
+		if err != nil {
+			log.Printf("%s signin failed: %v\n", newUser.Name, err.Error())
+			return ctx.
+				Status(http.StatusUnauthorized).
+				JSON(util.NewJError(err))
+		}
 		return ctx.
-			Status(http.StatusCreated).
-			JSON(newUser)
+			Status(http.StatusOK).
+			JSON(
+
+				fiber.Map{
+					"user":  newUser,
+					"token": fmt.Sprintf("Bearer %s", token),
+				})
 	}
 
 	if exists != nil {
-		err = util.ErrEmailAlreadyExists
+		err = util.ErrMobileAlreadyExists
 	}
 
 	return ctx.
@@ -102,24 +118,25 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			JSON(util.NewJError(err))
 	}
 
-	user, err := c.usersRepo.GetByUserName(input.UserName)
-	fmt.Println("pass4")
+
+	user, err := c.usersRepo.GetByMobile(input.Mobile)
+
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
+		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	err = security.VerifyPassword(user.Password, input.Password)
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
+		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	token, err := security.NewToken(user.Id.Hex())
 	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.UserName, err.Error())
+		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(err))
@@ -176,6 +193,18 @@ func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 		JSON(users)
 }
 
+func (c *authController) Verify(ctx *fiber.Ctx) error {
+	mobile := ctx.Params("mobile")
+	fmt.Print(mobile)
+	verfiycode, err := c.usersRepo.Verify(mobile)
+	if err != nil {
+		return ctx.Status(http.StatusBadGateway).JSON(util.ErrNotMobile)
+	}
+	fmt.Print(verfiycode)
+	return ctx.Status(http.StatusOK).JSON(util.SuccessUpdate)
+
+}
+
 func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {
@@ -183,15 +212,17 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 	var update models.User
 	err := ctx.BodyParser(&update)
+
+	if update.Role < 1 && update.Role > 3 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrBadRole))
+	}
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	if string(update.UserName) == "" {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
-	}
-	exists, err := c.usersRepo.GetByUserName(update.UserName)
+
+	exists, err := c.usersRepo.GetByUserName(update.Mobile)
 	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
 		user, err := c.usersRepo.GetById(id)
 		if err != nil {
@@ -199,8 +230,8 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
-		user.UserName = update.UserName
-		user.Mobile = update.Mobile
+		user.Name = update.Name
+		user.Role = update.Role
 		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
@@ -215,7 +246,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 
 	if exists != nil {
-		err = util.ErrEmailAlreadyExists
+		err = util.ErrMobileAlreadyExists
 	}
 
 	return ctx.

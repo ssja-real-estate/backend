@@ -147,6 +147,7 @@ func (r *assignmenttypeController) GetAssignments(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	return ctx.Status(http.StatusOK).JSON(assignmenttypes)
 }
 

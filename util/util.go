@@ -1,18 +1,26 @@
 package util
 
-import "strings"
+import (
+	"strings"
+)
 
 type JError struct {
 	Error string `json:"error"`
 }
 
+
+
 func NewJError(err error) JError {
-	jerr := JError{"generic error"}
+	jerr := JError{
+
+		Error: "generic error"}
 	if err != nil {
 		jerr.Error = err.Error()
 	}
 	return jerr
 }
+
+
 
 func NormalizeEmail(email string) string {
 	return strings.TrimSpace(strings.ToLower(email))

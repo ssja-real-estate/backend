@@ -242,5 +242,5 @@ func (r *provinceController) DeleteCity(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(city)
+	return ctx.Status(http.StatusOK).JSON(util.SuccessDelete)
 }

@@ -428,6 +428,136 @@ var doc = `{
                 }
             }
         },
+        "/form": {
+            "get": {
+                "description": "Get Forms",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get Forms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Form"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update Form",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "update Form",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Form"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create New Form",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Create New Form",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Form"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Form",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Delete Form",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Form"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/form/id": {
+            "get": {
+                "description": "Get Form",
+                "tags": [
+                    "Form"
+                ],
+                "summary": "Get Form",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Form"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/province/city/id": {
             "post": {
                 "description": "Add City to Province",
@@ -752,19 +882,11 @@ var doc = `{
         "models.AssignmentType": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "description": "required: false",
-                    "type": "string"
-                },
                 "id": {
                     "description": "required: false",
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "required: false",
                     "type": "string"
                 }
             }
@@ -783,10 +905,6 @@ var doc = `{
         "models.EstateType": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "description": "required: false",
-                    "type": "string"
-                },
                 "id": {
                     "description": "required: false",
                     "type": "string"
@@ -794,9 +912,68 @@ var doc = `{
                 "name": {
                     "description": "The name for a EstateType\nexample: خرید\nrequired: true",
                     "type": "string"
+                }
+            }
+        },
+        "models.Field": {
+            "type": "object",
+            "properties": {
+                "fileds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Field"
+                    }
                 },
-                "updated_at": {
-                    "description": "required: false",
+                "id": {
+                    "type": "string"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "min": {
+                    "type": "number"
+                },
+                "option": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "optional": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "description": "Name      string        ` + "`" + `json:\"name\" bson:\"name\"` + "`" + `",
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "value": {
+                    "$ref": "#/definitions/models.Valuetype"
+                }
+            }
+        },
+        "models.Form": {
+            "type": "object",
+            "properties": {
+                "assignment_type_id": {
+                    "type": "string"
+                },
+                "estate_type_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Section"
+                    }
+                },
+                "title": {
+                    "description": "Sections []map[string]interface{} ` + "`" + `json:\"sections\" bson:\"sections\"` + "`" + `",
                     "type": "string"
                 }
             }
@@ -804,22 +981,34 @@ var doc = `{
         "models.Province": {
             "type": "object",
             "properties": {
-                "cites": {
+                "cities": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.City"
                     }
-                },
-                "created_at": {
-                    "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Section": {
+            "type": "object",
+            "properties": {
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Field"
+                    }
                 },
-                "updated_at": {
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Name   string        ` + "`" + `json:\"name\" bson:\"name\"` + "`" + `",
                     "type": "string"
                 }
             }
@@ -827,16 +1016,10 @@ var doc = `{
         "models.Unit": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }
@@ -844,28 +1027,26 @@ var doc = `{
         "models.User": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "mobile": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user_name": {
-                    "type": "string"
+                    "description": "owner 1 Admin 2 User 3",
+                    "type": "integer"
                 }
             }
+        },
+        "models.Valuetype": {
+            "type": "object"
         }
     },
     "securityDefinitions": {
@@ -873,6 +1054,9 @@ var doc = `{
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
+        },
+        "BasicAuth": {
+            "type": "basic"
         }
     }
 }`
