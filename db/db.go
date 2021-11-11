@@ -6,6 +6,13 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+const (
+	hosts    = "mongodb:27017"
+	database = "Amlak"
+	username = "admin"
+	password = "admin"
+)
+
 type Connection interface {
 	Close()
 	DB() *mgo.Database
@@ -18,13 +25,14 @@ func NewConnection() Connection {
 	var c conn
 	var err error
 	// info := &mgo.DialInfo{
-	// 	Addrs:    []string{"mongodb:27017"},
-	// 	Database: "Amlak",
-	// 	Username: "amanc",
-	// 	Password: "Amanc1101!",
+	// 	Addrs:    []string{hosts},
+	// 	Timeout:  60 * time.Second,
+	// 	Database: database,
+	// 	Username: username,
+	// 	Password: password,
 	// }
 	// c.session, err = mgo.DialWithInfo(info)
-	c.session, err = mgo.Dial("mongodb:27017")
+	c.session, err = mgo.Dial(getUrl())
 	if err != nil {
 
 		log.Println(err.Error())
@@ -50,7 +58,7 @@ func getUrl() string {
 	// }
 	// port := 27017
 	// return fmt.Sprintf("mongodb://mongodb:%d", port)
-	return "mongodb://amanc:Amanc1101!@mongodb:27017/Amlak"
+	return "mongodb:27017"
 	// return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", "amanc",
 
 	// 	"Amanc1101!",

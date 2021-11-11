@@ -2,9 +2,8 @@ package security
 
 import (
 	"fmt"
-	"realstate/util"
-
 	"os"
+	"realstate/util"
 	"time"
 
 	jwt "github.com/form3tech-oss/jwt-go"

@@ -36,8 +36,10 @@ func sendsms(mobile string, veryfiycode int) (int64, error) {
 	sms := ippanel.New(apiKey)
 	mobiles := make([]string, 1)
 	mobiles = append(mobiles, "989147256898")
-	fmt.Println(mobiles)
-	bulkid, err := sms.Send("+983000505", []string{"989147256898"}, "پیام تستی ارسال شد")
+	patternValues := map[string]string{
+		"verification-code": "433636"}
+
+	bulkid, err := sms.SendPattern("g0eepccptg", "+983000505", "989147256898", patternValues)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
@@ -55,8 +57,11 @@ func (r *usersRepository) Verify(mobile string) (int64, error) {
 	user.UpdatedAt = time.Now()
 	user.VerifyCode = rand.Int63n(99000)
 
-	sendsms(mobile, int(user.VerifyCode))
-	return user.VerifyCode, r.c.Insert()
+	_, err := sendsms(mobile, int(user.VerifyCode))
+	if err != nil {
+		return 0, err
+	}
+	return user.VerifyCode, err
 }
 func (r *usersRepository) Save(user *models.User) error {
 	return r.c.Insert(user)
@@ -77,9 +82,8 @@ func (r *usersRepository) GetById(id string) (user *models.User, err error) {
 }
 
 func (r *usersRepository) GetByUserName(uasername string) (user *models.User, err error) {
-	fmt.Println("pass 3")
+
 	err = r.c.Find(bson.M{"user_name": uasername}).One(&user)
-	fmt.Println("pass 3.5")
 	return user, err
 }
 

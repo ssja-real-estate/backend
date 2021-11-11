@@ -5,7 +5,8 @@ services:
      container_name: mongodb
      image : mongo
      ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
+    
      environment:
       - MONGO_INITDB_ROOT_USERNAME=admin 
       - MONGO_INITDB_ROOT_PASSWORD=admin
@@ -13,11 +14,14 @@ services:
      volumes: 
       -  ./mongo-volume:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    
               
-  app:  
+  app: 
+     image: sajaweb/realestate_app
+     container_name: realestateapp 
      build: .
      ports: 
       - "8080:8000"
      depends_on:
       - mongo
-
+ 
