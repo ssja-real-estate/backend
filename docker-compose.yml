@@ -19,7 +19,9 @@ services:
   app: 
      image: sajaweb/realestate_app
      container_name: realestateapp 
-     build: .
+     build:  
+        context: .
+        dockerfile: Dockerfile    
      ports: 
       - "8080:8000"
      depends_on:
