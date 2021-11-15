@@ -227,8 +227,10 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 		if update.Name != "" {
 			user.Name = update.Name
 		}
+		if update.Role != 0 {
+			user.Role = update.Role
+		}
 
-		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
 		if err != nil {
