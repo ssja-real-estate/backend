@@ -224,7 +224,10 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(err))
 		}
-		user.Name = update.Name
+		if update.Name != "" {
+			user.Name = update.Name
+		}
+
 		user.Role = update.Role
 		user.UpdatedAt = time.Now()
 		err = c.usersRepo.Update(user)
