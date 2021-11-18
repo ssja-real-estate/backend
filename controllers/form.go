@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"realstate/db"
 	"realstate/models"
 	"realstate/repository"
 	"realstate/util"
@@ -54,6 +55,27 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		return ctx.Status(http.StatusBadGateway).JSON(util.NewJError(err))
+	}
+	// to do check assignnent type and estatetype
+
+	con := db.NewConnection()
+	defer con.Close()
+	assignmentrepo := repository.NewAssignmentTypesRepository(con)
+	assignmentContoller := NewAssignmentTypeController(assignmentrepo)
+	_, assignmentexisterr := assignmentContoller.assignmenttyperepo.GetById(string(form.AssignmentTypeID))
+
+	estaterepo := repository.NewEstateTypesRepository(con)
+	estateController := NewEstateTypeController(estaterepo)
+	_, estateerr := estateController.esstatetype.GetEstateTypeById(string(form.EstateTypeID))
+
+	if assignmentexisterr != nil && estateerr != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateIDAssignID)
+	}
+	if assignmentexisterr != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentType)
+	}
+	if estateerr != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateID)
 	}
 
 	form.Updateid()

@@ -49,7 +49,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
-				JSON(util.NewJError(util.ErrEmptyName))
+				JSON(util.NewJError(util.ErrEmptyMobile))
 		}
 		newUser.Password, err = security.EncryptPassword(newUser.Password)
 		if err != nil {
@@ -189,7 +189,6 @@ func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 
 func (c *authController) Verify(ctx *fiber.Ctx) error {
 	mobile := ctx.Params("mobile")
-
 	verfiycode, err := c.usersRepo.Verify(mobile)
 	if err != nil {
 		return ctx.Status(http.StatusBadGateway).JSON(util.ErrNotMobile)
@@ -206,7 +205,6 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 	var update models.User
 	err := ctx.BodyParser(&update)
-
 	if update.Role < 1 && update.Role > 3 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrBadRole))
 	}

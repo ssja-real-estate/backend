@@ -43,7 +43,6 @@ func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
 	exists, err := c.assignmenttyperepo.GetByName(assignmenttype.Name)
-
 	if err == mgo.ErrNotFound {
 		if strings.TrimSpace(assignmenttype.Name) == "" {
 			return ctx.
@@ -89,9 +88,7 @@ func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
 	if len(assignmenttype.Name) < 2 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
-
 	_, err = r.assignmenttyperepo.GetByName(assignmenttype.Name)
-
 	if err == mgo.ErrNotFound {
 		dbassignmenttype, err := r.assignmenttyperepo.GetById(assignmenttype.Id.Hex())
 		if err != nil {
@@ -103,11 +100,9 @@ func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
 		dbassignmenttype.Name = assignmenttype.Name
 		err = r.assignmenttyperepo.Update(dbassignmenttype)
 		if err != nil {
-
 			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
 		return ctx.Status(http.StatusOK).JSON(dbassignmenttype)
-
 	}
 
 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
