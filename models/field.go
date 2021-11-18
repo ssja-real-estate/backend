@@ -34,7 +34,6 @@ func (field *Field) updateid() {
 		for i := 0; i < len(field.Fields); i++ {
 			field.Fields[i].updateid()
 			field.setValue()
-
 		}
 	}
 }
@@ -45,12 +44,15 @@ func (field *Field) setValue() {
 		field.Value = ""
 	case Number:
 		field.Value = 0
-	case Select:
-		field.Value = make([]string, 0)
+	// case Select:
+	// 	field.Value =
 	case Bool:
 		field.Value = false
 	case Conditional:
-		field.Value = ""
+		{
+			field.Value = ""
+		}
+
 	case Image:
 		field.Value = ""
 	case Range:

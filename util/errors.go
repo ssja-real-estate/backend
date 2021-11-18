@@ -17,7 +17,10 @@ var (
 	ErrBadRole             = errors.New("رول داده شده به این کاربر درست نمی باشد")
 	ErrEstateIDAssignID    = errors.New("نوع ملک و نوع واگذاری اشتباه است")
 	ErrEstateID            = errors.New("نوع ملک اشتباه می باشد")
+	ErrVeryfiyCodeNotValid = errors.New("کد فعال سازی نادرست می باشد")
 	ErrAssignmentType      = errors.New("نوع واگذاری اشتباه می باشد")
+	ErrSignup              = errors.New("روند فعال سازی شما با مشکل مواجه شد لطفا دوباره تلاش نمایید")
 	SuccessDelete          = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate          = "آیتم مورد نظر با موفقیت اپدیت شد."
+	SuccessSendSms         = "کد فعال سازی با موفقیت ارسال شد"
 )
