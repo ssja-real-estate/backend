@@ -79,7 +79,8 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 	}
 
 	exists, err := c.usersRepo.GetByMobile(newUser.Mobile)
-	if err == mgo.ErrNotFound || exists.Verify == false {
+
+	if err == mgo.ErrNotFound {
 		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -99,12 +100,8 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		newUser.Verify = false
 		newUser.VerifyCode = strconv.FormatInt(rand.Int63n(99000), 10)
 
-		if exists.Mobile != "" {
-			newUser.Id = bson.NewObjectId()
-			err = c.usersRepo.Save(&newUser)
-		} else {
-			err = c.usersRepo.Update(&newUser)
-		}
+		newUser.Id = bson.NewObjectId()
+		err = c.usersRepo.Save(&newUser)
 
 		if err != nil {
 			return ctx.
