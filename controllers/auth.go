@@ -145,7 +145,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 
 	user, err := c.usersRepo.GetByMobile(input.Mobile)
 
-	if err != nil || user.Verify == false {
+	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
