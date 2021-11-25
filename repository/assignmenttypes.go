@@ -14,6 +14,7 @@ type AssignmentTypeRepository interface {
 	Save(assignmenttype *models.AssignmentType) error
 	Update(assignmenttype *models.AssignmentType) error
 	GetById(id string) (assignmenttype *models.AssignmentType, err error)
+	GetByHexdId(id bson.ObjectId) (assignmenttype *models.AssignmentType, err error)
 	GetByName(name string) (assignmenttype *models.AssignmentType, err error)
 	GetAll() (assigmenttypes []*models.AssignmentType, err error)
 	Delete(id string) error
@@ -37,6 +38,10 @@ func (r *assignmentTypeRepository) Update(assignmenttype *models.AssignmentType)
 
 func (r *assignmentTypeRepository) GetById(id string) (assignmenttype *models.AssignmentType, err error) {
 	err = r.c.FindId(bson.ObjectIdHex(id)).One(&assignmenttype)
+	return assignmenttype, err
+}
+func (r *assignmentTypeRepository) GetByHexdId(id bson.ObjectId) (assignmenttype *models.AssignmentType, err error) {
+	err = r.c.FindId(id).One(&assignmenttype)
 	return assignmenttype, err
 }
 

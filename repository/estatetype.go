@@ -14,6 +14,7 @@ type EstateTypeRepository interface {
 	SaveEstateType(estatetype *models.EstateType) error
 	UpdateEstateType(estatetype *models.EstateType) error
 	GetEstateTypeById(id string) (estatetype *models.EstateType, err error)
+	GetEstateTypeByHexId(id bson.ObjectId) (estatetype *models.EstateType, err error)
 	GetEstateTypeByName(name string) (estatetype *models.EstateType, err error)
 	GetEstateTypeAll() (estatetypes []*models.EstateType, err error)
 	DeleteEstateType(id string) error
@@ -36,6 +37,11 @@ func (r *estateTypeRepository) UpdateEstateType(estatetype *models.EstateType) e
 
 func (r *estateTypeRepository) GetEstateTypeById(id string) (estatetype *models.EstateType, err error) {
 	err = r.c.FindId(bson.ObjectIdHex(id)).One(&estatetype)
+	return estatetype, err
+}
+
+func (r *estateTypeRepository) GetEstateTypeByHexId(id bson.ObjectId) (estatetype *models.EstateType, err error) {
+	err = r.c.FindId(id).One(&estatetype)
 	return estatetype, err
 }
 

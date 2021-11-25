@@ -62,11 +62,19 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	defer con.Close()
 	assignmentrepo := repository.NewAssignmentTypesRepository(con)
 	assignmentContoller := NewAssignmentTypeController(assignmentrepo)
-	_, assignmentexisterr := assignmentContoller.assignmenttyperepo.GetById(string(form.AssignmentTypeID))
+
+	if !form.AssignmentTypeID.Valid() {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrAssignmentTypeIdFailed))
+	}
+
+	_, assignmentexisterr := assignmentContoller.assignmenttyperepo.GetByHexdId(form.AssignmentTypeID)
 
 	estaterepo := repository.NewEstateTypesRepository(con)
 	estateController := NewEstateTypeController(estaterepo)
-	_, estateerr := estateController.esstatetype.GetEstateTypeById(string(form.EstateTypeID))
+	if !form.EstateTypeID.Valid() {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEstatTypeIdFailed))
+	}
+	_, estateerr := estateController.esstatetype.GetEstateTypeByHexId(form.EstateTypeID)
 
 	if assignmentexisterr != nil && estateerr != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateIDAssignID)

@@ -135,8 +135,10 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /signin [post]
 func (c *authController) SignIn(ctx *fiber.Ctx) error {
+
 	var input models.User
 	err := ctx.BodyParser(&input)
+
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
@@ -151,6 +153,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
+	fmt.Println(user)
 	err = security.VerifyPassword(user.Password, input.Password)
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
