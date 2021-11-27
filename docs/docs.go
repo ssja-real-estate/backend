@@ -325,6 +325,52 @@ var doc = `{
                 }
             }
         },
+        "/changepassword": {
+            "post": {
+                "description": "change password for login",
+                "tags": [
+                    "User"
+                ],
+                "summary": "change login password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item current_password",
+                        "name": "current_password",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Item new_password",
+                        "name": "new_password",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Item confirm_password",
+                        "name": "confirm_password",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/estatetype/id": {
             "get": {
                 "security": [

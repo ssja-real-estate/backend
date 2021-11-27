@@ -7,6 +7,7 @@ import (
 	"time"
 
 	jwt "github.com/form3tech-oss/jwt-go"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -44,4 +45,11 @@ func ParseToken(tokenString string) (*jwt.StandardClaims, error) {
 		return nil, util.ErrInvalidAuthToken
 	}
 	return claims, nil
+}
+func GetUserByToken(ctx *fiber.Ctx) (id string, err error) {
+
+	token := ctx.Locals("user").(*jwt.Token)
+	payload, err := ParseToken(token.Raw)
+	return payload.Id, err
+
 }

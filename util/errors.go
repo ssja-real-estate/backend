@@ -23,7 +23,11 @@ var (
 	ErrSignup                 = errors.New("روند فعال سازی شما با مشکل مواجه شد لطفا دوباره تلاش نمایید")
 	ErrAssignmentTypeIdFailed = errors.New("ای دی نوع واگذاری اشتباه می باشد")
 	ErrEstatTypeIdFailed      = errors.New("ای دی نوع ملک اشتباه می باشد")
-	SuccessDelete             = "گزینه مورد نظر با موفقیت حذف شد"
-	SuccessUpdate             = "آیتم مورد نظر با موفقیت اپدیت شد."
-	SuccessSendSms            = "کد فعال سازی با موفقیت ارسال شد"
+	ErrNotCompatablePassword  = errors.New("رمز های جدید با هم مطابقت ندارند")
+	ErrNoMatchPassword        = errors.New("رمز جاری شما نادرست است")
+	ErroNotUserUpdate         = errors.New("مشکل در ذخیره کردن تغییرات")
+
+	SuccessDelete  = "گزینه مورد نظر با موفقیت حذف شد"
+	SuccessUpdate  = "آیتم مورد نظر با موفقیت اپدیت شد."
+	SuccessSendSms = "کد فعال سازی با موفقیت ارسال شد"
 )

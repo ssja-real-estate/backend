@@ -27,6 +27,7 @@ type AuthController interface {
 	PutUser(ctx *fiber.Ctx) error
 	DeleteUser(ctx *fiber.Ctx) error
 	VeryfiyMobile(ctx *fiber.Ctx) error
+	Changepassword(ctx *fiber.Ctx) error
 }
 
 type authController struct {
@@ -332,6 +333,59 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 		Status(http.StatusOK).
 		JSON(util.SuccessDelete)
 	// return ctx.SendStatus(http.StatusNoContent)
+}
+
+// ChangePassword ... Change login password
+// @Summary change login password
+// @Description change password for login
+// @Tags User
+// @Success 200 {string} success change password
+// @Param current_password path string true "Item current_password"
+// @Param new_password path string true "Item new_password"
+// @Param confirm_password path string true "Item confirm_password"
+// @Failure 404 {object} object
+// @Router /changepassword [post]
+func (c *authController) Changepassword(ctx *fiber.Ctx) error {
+	currentpassword := ctx.Query("current_password")
+	newpassowrd := ctx.Query("new_password")
+	confirm_password := ctx.Query("confirm_password")
+	fmt.Println(currentpassword, "-", newpassowrd, "-", confirm_password)
+
+	if newpassowrd != confirm_password {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotCompatablePassword)
+	}
+	id, err := security.GetUserByToken(ctx)
+	if err != nil {
+		return ctx.Status(http.StatusUnauthorized).JSON(util.ErrInvalidAuthToken)
+	}
+	fmt.Println(id)
+
+	user, err := c.usersRepo.GetById(id)
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrInvalidAuthToken)
+	}
+	fmt.Print(user.Name)
+
+	err = security.VerifyPassword(user.Password, currentpassword)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNoMatchPassword)
+	}
+	fmt.Println(user.Password)
+
+	user.Password, err = security.EncryptPassword(newpassowrd)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(err)
+	}
+	fmt.Println("user update")
+	err = c.usersRepo.Update(user)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErroNotUserUpdate)
+	}
+	fmt.Println("user update done")
+
+	return ctx.Status(http.StatusOK).JSON(util.SuccessUpdate)
+
 }
 
 func AuthRequestWithId(ctx *fiber.Ctx) (*jwt.StandardClaims, error) {

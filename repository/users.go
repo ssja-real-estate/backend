@@ -30,7 +30,6 @@ type usersRepository struct {
 }
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
-
 	apiKey := os.Getenv("SMS_KEY")
 	smsPatern := os.Getenv("SMS_PATTERN")
 	smsSendNumber := os.Getenv("SMS_SENDNUMBER")

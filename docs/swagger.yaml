@@ -313,6 +313,37 @@ paths:
       summary: Get All AssignmentType
       tags:
       - AssignmentType
+  /changepassword:
+    post:
+      description: change password for login
+      parameters:
+      - description: Item current_password
+        in: path
+        name: current_password
+        required: true
+        type: string
+      - description: Item new_password
+        in: path
+        name: new_password
+        required: true
+        type: string
+      - description: Item confirm_password
+        in: path
+        name: confirm_password
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: object
+      summary: change login password
+      tags:
+      - User
   /estatetype/id:
     delete:
       description: Delete EstateType by id
