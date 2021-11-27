@@ -32,6 +32,6 @@ jobs:
             cd backend
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker pull sajaweb/realestate_app
-            docker-compose --env-file .env up -d 
+            docker-compose --env-file .env up --build -d 
             docker logout
             

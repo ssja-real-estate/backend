@@ -34,6 +34,9 @@ func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, err
 	smsPatern := os.Getenv("SMS_PATTERN")
 	smsSendNumber := os.Getenv("SMS_SENDNUMBER")
 	sms := ippanel.New(apiKey)
+	fmt.Println("++++++++++++++++++++++++++++++")
+	fmt.Println(apiKey)
+	fmt.Println("++++++++++++++++++++++++++++++")
 	patternValues := map[string]string{
 		"verification-code": veryfiycode}
 

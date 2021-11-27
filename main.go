@@ -19,18 +19,20 @@ import (
 	"realstate/repository"
 	"realstate/routes"
 
+	"github.com/joho/godotenv"
+
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-// func init() {
-// 	err:=godotenv.Load()
-// 	if err!=nil {
-// 		log.Println(err)
-// 	}
-// }
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(err)
+	}
+}
 
 func main() {
 

@@ -14,7 +14,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.18.0
 	github.com/gofiber/jwt/v2 v2.1.0
 	github.com/ippanel/go-rest-sdk v1.0.1 // indirect
-	github.com/joho/godotenv v1.3.0
+	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.13.5 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/maxwellhealth/go-dotaccess v0.0.0-20190924013105-74ea4f4ca4eb // indirect
