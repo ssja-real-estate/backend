@@ -532,12 +532,19 @@ var doc = `{
                 "tags": [
                     "Form"
                 ],
-                "summary": "Get Form",
+                "summary": "Get Form by assignmenttypeid and estatetypeid",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Item ID",
-                        "name": "id",
+                        "description": "Item assignment_type_id",
+                        "name": "assignment_type_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Item estate_type_id",
+                        "name": "estate_type_id",
                         "in": "path",
                         "required": true
                     }
@@ -876,6 +883,45 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/verify": {
+            "get": {
+                "description": "Signin",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Verify User",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item mobile",
+                        "name": "mobile",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Item verify_code",
+                        "name": "verify_code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -949,9 +995,7 @@ var doc = `{
                 "type": {
                     "type": "integer"
                 },
-                "value": {
-                    "$ref": "#/definitions/models.Valuetype"
-                }
+                "value": {}
             }
         },
         "models.Form": {
@@ -1044,9 +1088,6 @@ var doc = `{
                     "type": "integer"
                 }
             }
-        },
-        "models.Valuetype": {
-            "type": "object"
         }
     },
     "securityDefinitions": {
@@ -1112,5 +1153,5 @@ func (s *s) ReadDoc() string {
 }
 
 func init() {
-	swag.Register(swag.Name, &s{})
+	swag.Register("swagger", &s{})
 }

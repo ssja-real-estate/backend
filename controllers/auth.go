@@ -37,19 +37,32 @@ func NewAuthController(usersRepo repository.UsersRepository) AuthController {
 	return &authController{usersRepo}
 }
 
+// Verify ... Verify user
+// @Summary Verify User
+// @Description Signin
+// @Tags User
+// @Success 200 {object} models.User
+// @Param mobile path string true "Item mobile"
+// @Param verify_code path string true "Item verify_code"
+// @Failure 404 {object} object
+// @Router /verify [Get]
 func (c *authController) VeryfiyMobile(ctx *fiber.Ctx) error {
-	mobile := ctx.Params("mobile")
-	veryfiyCode := ctx.Params("veryfiycode")
+
+	mobile := ctx.Query("mobile")
+	veryfiyCode := ctx.Query("verify_code")
 	exists, err := c.usersRepo.GetByMobile(mobile)
 	if err != nil || exists.Mobile != mobile {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
-
 	}
+
 	if exists.VerifyCode != veryfiyCode {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrVeryfiyCodeNotValid)
 	}
+
 	exists.Verify = true
+
 	err = c.usersRepo.Update(exists)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrSignup)
 	}
@@ -98,7 +111,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		}
 		newUser.UpdatedAt = newUser.CreatedAt
 		newUser.Verify = false
-		newUser.VerifyCode = strconv.FormatInt(rand.Int63n(99000), 10)
+		newUser.VerifyCode = strconv.FormatInt(int64(rand.Intn(89000)+10000), 10)
 
 		newUser.Id = bson.NewObjectId()
 		err = c.usersRepo.Save(&newUser)
@@ -116,6 +129,32 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 
 		return ctx.Status(http.StatusOK).JSON(util.SuccessSendSms)
 
+	}
+	if !exists.Verify {
+		exists.Password, err = security.EncryptPassword(newUser.Password)
+		if err != nil {
+			return ctx.
+				Status(http.StatusBadRequest).
+				JSON(util.NewJError(err))
+		}
+		exists.UpdatedAt = time.Now()
+		exists.Role = 3
+		exists.VerifyCode = strconv.FormatInt(int64(rand.Intn(89000)+10000), 10)
+
+		err = c.usersRepo.Update(exists)
+
+		if err != nil {
+			return ctx.
+				Status(http.StatusBadRequest).
+				JSON(util.NewJError(err))
+		}
+
+		_, err = c.usersRepo.SendSms(exists.Mobile, exists.VerifyCode)
+		if err != nil {
+			ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		}
+
+		return ctx.Status(http.StatusOK).JSON(util.SuccessSendSms)
 	}
 
 	if exists != nil {
@@ -147,13 +186,18 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 
 	user, err := c.usersRepo.GetByMobile(input.Mobile)
 
-	if err != nil {
-		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
+	if !user.Verify {
 		return ctx.
 			Status(http.StatusUnauthorized).
+			JSON(util.NewJError(util.ErrNotVerifyed))
+	}
+
+	if err != nil {
+		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
+		return ctx.Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
-	fmt.Println(user)
+
 	err = security.VerifyPassword(user.Password, input.Password)
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Name, err.Error())

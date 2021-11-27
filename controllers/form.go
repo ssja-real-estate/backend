@@ -14,6 +14,7 @@ import (
 type FormController interface {
 	CreateForm(ctx *fiber.Ctx) error
 	GetForms(cts *fiber.Ctx) error
+	GetFormById(ctx *fiber.Ctx) error
 	GetForm(ctx *fiber.Ctx) error
 	DeleteForm(ctx *fiber.Ctx) error
 	UpdateForm(ctx *fiber.Ctx) error
@@ -104,14 +105,40 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Param id path string true "Item ID"
 // @Router /form/id [get]
-func (r *formController) GetForm(ctx *fiber.Ctx) error {
+func (r *formController) GetFormById(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	form, err := r.form.GetForm(id)
+	form, err := r.form.GetFormById(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	return ctx.Status(http.StatusOK).JSON(form)
 
+}
+
+// Get From ... Get a new Froms
+// @Summary  Get Form by assignmenttypeid and estatetypeid
+// @Description Get Form
+// @Tags Form
+// @Success 200 {object} models.Form
+// @Failure 404 {object} object
+// @Param assignment_type_id path string true "Item assignment_type_id"
+// @Param estate_type_id path string true "Item estate_type_id"
+// @Router /form/id [get]
+func (r *formController) GetForm(ctx *fiber.Ctx) error {
+	asignmenttypdid := ctx.Query("assignment_type_id")
+	estateTypeId := ctx.Query("estate_type_id")
+	if !bson.IsObjectIdHex(asignmenttypdid) {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
+	}
+	if !bson.IsObjectIdHex(estateTypeId) {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateID)
+	}
+
+	form, err := r.form.GetForm(bson.ObjectId(asignmenttypdid), bson.ObjectId(estateTypeId))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
+	}
+	return ctx.Status(http.StatusOK).JSON(form)
 }
 
 // Delete From ... Delete a Form

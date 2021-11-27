@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"os"
 
 	"realstate/db"
 	"realstate/models"
@@ -29,12 +30,15 @@ type usersRepository struct {
 }
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
-	apiKey := "xa6nMhNisMZP92-0giaTIJeFQz0VIm6o7UQTbYK2L7Q="
+
+	apiKey := os.Getenv("SMS_KEY")
+	smsPatern := os.Getenv("SMS_PATTERN")
+	smsSendNumber := os.Getenv("SMS_SENDNUMBER")
 	sms := ippanel.New(apiKey)
 	patternValues := map[string]string{
 		"verification-code": veryfiycode}
 
-	bulkid, err := sms.SendPattern("g0eepccptg", "+983000505", mobile, patternValues)
+	bulkid, err := sms.SendPattern(smsPatern, smsSendNumber, mobile, patternValues)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err

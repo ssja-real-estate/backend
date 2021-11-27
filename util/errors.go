@@ -11,6 +11,7 @@ var (
 	ErrEmptyMobile            = errors.New("شماره موبایل را وارد نمایید")
 	ErrInvalidAuthToken       = errors.New("توکن شما معتبر نمی باشد")
 	ErrInvalidCredentials     = errors.New("ورودی شما معتبر نیست")
+	ErrNotVerifyed            = errors.New("کاربری شما فعال نشده است")
 	ErrUnauthorized           = errors.New("اول باید لاگین کنید")
 	ErrNotFound               = errors.New("آیتم مورد نظر شما پیدا نشد ")
 	ErrNotMobile              = errors.New("این شماره موبایل وجود ندارد")

@@ -13,7 +13,8 @@ const formcollection = "forms"
 type FormRepository interface {
 	SaveForm(form *models.Form) error
 	GetForms() ([]models.Form, error)
-	GetForm(id string) (form models.Form, err error)
+	GetFormById(id string) (form models.Form, err error)
+	GetForm(assignmenttypeid bson.ObjectId, estatetypeid bson.ObjectId) (form models.Form, err error)
 	DeleteForm(id string) (err error)
 	UpdateForm(id string, form *models.Form) error
 }
@@ -27,6 +28,11 @@ func NewFormRepositor(conn db.Connection) FormRepository {
 func (r *formRepository) SaveForm(form *models.Form) error {
 	return r.c.Insert(form)
 }
+
+func (r *formRepository) GetForm(assignmenttypeid bson.ObjectId, estatetypeid bson.ObjectId) (form models.Form, err error) {
+	err = r.c.Find(bson.M{"_assignment_type_id": assignmenttypeid, "_estate_type_id": estatetypeid}).One(&form)
+	return form, err
+}
 func (r *formRepository) GetForms() (forms []models.Form, err error) {
 	err = r.c.Find(bson.M{}).All(&forms)
 	if forms == nil {
@@ -35,7 +41,7 @@ func (r *formRepository) GetForms() (forms []models.Form, err error) {
 	return forms, err
 }
 
-func (r *formRepository) GetForm(id string) (form models.Form, err error) {
+func (r *formRepository) GetFormById(id string) (form models.Form, err error) {
 	err = r.c.Find(bson.M{"_id": id}).One(&form)
 	return form, err
 }
