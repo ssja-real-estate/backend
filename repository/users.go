@@ -3,11 +3,13 @@ package repository
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"realstate/db"
 	"realstate/models"
 
 	ippanel "github.com/ippanel/go-rest-sdk"
+	"github.com/joho/godotenv"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -30,6 +32,15 @@ type usersRepository struct {
 }
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return 0, err
+	}
+	environmentPath := filepath.Join(dir, ".env")
+	err = godotenv.Load(environmentPath)
+	if err != nil {
+		return 0, err
+	}
 	apiKey := os.Getenv("SMS_KEY")
 	smsPatern := os.Getenv("SMS_PATTERN")
 	smsSendNumber := os.Getenv("SMS_SENDNUMBER")
