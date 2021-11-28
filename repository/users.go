@@ -36,6 +36,7 @@ func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, err
 	if err != nil {
 		return 0, err
 	}
+	fmt.Println(os.Args[0])
 	environmentPath := filepath.Join(dir, ".env")
 	err = godotenv.Load(environmentPath)
 	if err != nil {
