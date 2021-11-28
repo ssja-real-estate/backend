@@ -187,7 +187,9 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	}
 
 	user, err = c.usersRepo.GetByMobile(input.Mobile)
-	fmt.Println(user)
+	if user == nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
+	}
 	if !user.Verify {
 		return ctx.
 			Status(http.StatusUnauthorized).
