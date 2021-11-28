@@ -3,8 +3,6 @@ package repository
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-
 	"realstate/db"
 	"realstate/models"
 
@@ -32,13 +30,8 @@ type usersRepository struct {
 }
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		return 0, err
-	}
-	fmt.Println(os.Args[0])
-	environmentPath := filepath.Join(dir, ".env")
-	err = godotenv.Load(environmentPath)
+
+	err := godotenv.Load()
 	if err != nil {
 		return 0, err
 	}
