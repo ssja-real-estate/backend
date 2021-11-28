@@ -31,12 +31,11 @@ type usersRepository struct {
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
 
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	if err != nil {
 		return 0, err
 	}
 	fmt.Println("-------------------------")
-	fmt.Println()
 	apiKey := os.Getenv("SMS_KEY")
 	fmt.Println("-------------------------")
 	fmt.Println(apiKey)
