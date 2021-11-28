@@ -177,16 +177,17 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 func (c *authController) SignIn(ctx *fiber.Ctx) error {
 
 	var input models.User
+	var user *models.User
 	err := ctx.BodyParser(&input)
-
+    
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-
-	user, err := c.usersRepo.GetByMobile(input.Mobile)
-
+    
+	user , err = c.usersRepo.GetByMobile(input.Mobile)
+   
 	if !user.Verify {
 		return ctx.
 			Status(http.StatusUnauthorized).
