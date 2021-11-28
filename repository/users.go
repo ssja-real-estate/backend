@@ -41,7 +41,12 @@ func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, err
 	if err != nil {
 		return 0, err
 	}
+	fmt.Println("-------------------------")
+	fmt.Println()
 	apiKey := os.Getenv("SMS_KEY")
+	fmt.Println("-------------------------")
+	fmt.Println(apiKey)
+	fmt.Println("----------------------------")
 	smsPatern := os.Getenv("SMS_PATTERN")
 	smsSendNumber := os.Getenv("SMS_SENDNUMBER")
 	sms := ippanel.New(apiKey)
