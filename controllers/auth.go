@@ -123,9 +123,9 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(err))
 		}
 
-		_, err = c.usersRepo.SendSms(newUser.Mobile, newUser.VerifyCode)
+		_, err := c.usersRepo.SendSms(newUser.Mobile, newUser.VerifyCode)
 		if err != nil {
-			ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 
 		return ctx.Status(http.StatusOK).JSON(util.SuccessSendSms)
