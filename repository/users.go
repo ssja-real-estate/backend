@@ -7,7 +7,6 @@ import (
 	"realstate/models"
 
 	ippanel "github.com/ippanel/go-rest-sdk"
-	"github.com/joho/godotenv"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -31,10 +30,6 @@ type usersRepository struct {
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		return 0, err
-	}
 	fmt.Println("-------------------------")
 	apiKey := os.Getenv("SMS_KEY")
 	fmt.Println("-------------------------")
