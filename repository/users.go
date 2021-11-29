@@ -31,17 +31,14 @@ type usersRepository struct {
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
 
 	fmt.Println("-------------------------")
-	apiKey := os.Getenv("SMS_KEY")
+	apiKey := os.Getenv("API_KEY")
 	fmt.Println("-------------------------")
-	fmt.Println(apiKey)
-	fmt.Println("----------------------------")
-	smsPatern := os.Getenv("SMS_PATTERN")
-	smsSendNumber := os.Getenv("SMS_SENDNUMBER")
+
 	sms := ippanel.New(apiKey)
 	patternValues := map[string]string{
 		"verification-code": veryfiycode}
 
-	bulkid, err := sms.SendPattern(smsPatern, smsSendNumber, mobile, patternValues)
+	bulkid, err := sms.SendPattern("g0eepccptg", "+983000505", mobile, patternValues)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err

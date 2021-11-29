@@ -22,8 +22,7 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        with:
-          host: ${{ secrets.SERVER_HOST }}
+          SMS_KEY:         ${{secrets.SMS_KEY}}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
@@ -32,6 +31,6 @@ jobs:
             cd backend
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker pull sajaweb/realestate_app
-            docker-compose --env-file .env up  -d 
+            docker-compose -e API_KEY=$SMS_KEY  up  -d 
             docker logout
             
