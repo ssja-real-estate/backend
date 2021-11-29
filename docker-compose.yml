@@ -14,8 +14,8 @@ services:
   app: 
      image: sajaweb/realestate_app
      container_name: realestateapp
-     env_file:
-      - .env  
+     environment:
+       - APIKEY=${SMS_KEY}  
      build:  
         context: .
         dockerfile: Dockerfile    
