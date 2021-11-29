@@ -26,7 +26,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          envs: DOCKER_USERNAME,DOCKER_PASSWORD
+          envs: DOCKER_USERNAME,DOCKER_PASSWORD,SMS_KEY
           script: |
             cd backend
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
