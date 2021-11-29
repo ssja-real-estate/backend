@@ -31,7 +31,7 @@ type usersRepository struct {
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load("")
 	if err != nil {
 		return 0, err
 	}
