@@ -30,9 +30,9 @@ type usersRepository struct {
 
 func (r *usersRepository) SendSms(mobile string, veryfiycode string) (int64, error) {
 
-	fmt.Println("-------------------------")
+	
 	apiKey := os.Getenv("API_KEY")
-	fmt.Println("-------------------------")
+	
 
 	sms := ippanel.New(apiKey)
 	patternValues := map[string]string{
