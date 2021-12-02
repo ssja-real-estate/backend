@@ -5,8 +5,8 @@ import "gopkg.in/mgo.v2/bson"
 type Form struct {
 	Id bson.ObjectId `json:"id" bson:"_id"`
 	Title            string        `json:"title" bson:"title"`
-	AssignmentTypeID bson.ObjectId `json:"assignment_type_id" bson:"assignment_type_id"`
-	EstateTypeID     bson.ObjectId `json:"estate_type_id" bson:"estate_type_id"`
+	AssignmentTypeID bson.ObjectId `json:"assignmentTypeId" bson:"assignmentTypeId"`
+	EstateTypeID     bson.ObjectId `json:"estateTypeId" bson:"estateTypeId"`
 	Sections         []Section     `json:"sections" bson:"sections"`
 }
 

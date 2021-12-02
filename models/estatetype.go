@@ -15,7 +15,7 @@ type EstateType struct {
 	// required: true
 	Name string `json:"name" bson:"name"`
 	// required: false
-	CreatedAt time.Time `json:"-" bson:"created_at"`
+	CreatedAt time.Time `json:"-" bson:"createdAt"`
 	// required: false
-	UpdatedAt time.Time `json:"-" bson:"updated_at"`
+	UpdatedAt time.Time `json:"-" bson:"updatedAt"`
 }

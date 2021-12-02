@@ -13,8 +13,8 @@ type User struct {
 	Mobile   string        `json:"mobile" bson:"mobile"`
 	// owner 1 Admin 2 User 3
 	Role       int       `json:"role"  bson:"role"`
-	VerifyCode string    `json:"-" bson:"verify_code"`
+	VerifyCode string    `json:"-" bson:"verifyCode"`
 	Verify     bool      `json:"-" bson:"verify"`
-	CreatedAt  time.Time `json:"-" bson:"created_at"`
-	UpdatedAt  time.Time `json:"-" bson:"updated_at"`
+	CreatedAt  time.Time `json:"-" bson:"createdAt"`
+	UpdatedAt  time.Time `json:"-" bson:"updatedAt"`
 }
