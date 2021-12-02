@@ -87,6 +87,11 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateID)
 	}
 
+	_, err = r.form.GetForm(form.AssignmentTypeID, form.EstateTypeID)
+	if err == nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrFormExists)
+	}
+
 	form.Updateid()
 	form.Id = bson.NewObjectId()
 

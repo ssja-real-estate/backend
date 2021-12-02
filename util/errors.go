@@ -26,6 +26,7 @@ var (
 	ErrNotCompatablePassword  = errors.New("رمز های جدید با هم مطابقت ندارند")
 	ErrNoMatchPassword        = errors.New("رمز جاری شما نادرست است")
 	ErroNotUserUpdate         = errors.New("مشکل در ذخیره کردن تغییرات")
+	ErrFormExists             = errors.New("این فرم قبلا ثبت شده است")
 
 	SuccessDelete  = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate  = "آیتم مورد نظر با موفقیت اپدیت شد."
