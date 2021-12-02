@@ -125,8 +125,8 @@ func (r *formController) GetFormById(ctx *fiber.Ctx) error {
 // @Param estate_type_id path string true "Item estate_type_id"
 // @Router /form/id [get]
 func (r *formController) GetForm(ctx *fiber.Ctx) error {
-	asignmenttypdid := ctx.Query("assignment_type_id")
-	estateTypeId := ctx.Query("estate_type_id")
+	asignmenttypdid := ctx.Query("assignmentTypeId")
+	estateTypeId := ctx.Query("estateTypeId")
 	if !bson.IsObjectIdHex(asignmenttypdid) {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
 	}
