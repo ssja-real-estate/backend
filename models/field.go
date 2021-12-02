@@ -22,8 +22,8 @@ type Field struct {
 	Min      float64   `json:"min" bson:"min"`
 	Max      float64   `json:"max" bson:"max"`
 	Optional bool      `json:"optional" bson:"optional"`
-	Options  []string  `json:"option" bson:"option"`
-	Fields   []Field   `json:"fileds" bson:"fileds"`
+	Options  []string  `json:"options" bson:"options"`
+	Fields   []Field   `json:"fields" bson:"fields"`
 	Type     int       `json:"type"  bson:"type"`
 }
 

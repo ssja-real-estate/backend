@@ -28,6 +28,7 @@ type AuthController interface {
 	DeleteUser(ctx *fiber.Ctx) error
 	VeryfiyMobile(ctx *fiber.Ctx) error
 	Changepassword(ctx *fiber.Ctx) error
+	ForgetPassword(ctx *fiber.Ctx) error
 }
 
 type authController struct {
@@ -81,6 +82,39 @@ func (c *authController) VeryfiyMobile(ctx *fiber.Ctx) error {
 				"user":  exists,
 				"token": fmt.Sprintf("Bearer %s", token),
 			})
+
+}
+
+// ForgetPassword ... ForgetPassword
+// @Summary ForgetPassword
+// @Description ForgetPassword
+// @Tags User
+// @Success 200 {string} send verifycode
+// @Param mobile path string true "Item mobile"
+// @Failure 404 {object} object
+// @Router /verify [Post]
+func (c *authController) ForgetPassword(ctx *fiber.Ctx) error {
+	mobile := ctx.Params("mobile")
+	if mobile == "" {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEmptyMobile)
+	}
+	user, err := c.usersRepo.GetByMobile(mobile)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
+	}
+	if err == mgo.ErrNotFound {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
+	}
+	if !user.Verify {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotVerifyed)
+	}
+	user.VerifyCode = strconv.FormatInt(int64(rand.Intn(89000)+10000), 10)
+	_, err = c.usersRepo.SendSms(user.Mobile, user.VerifyCode)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(util.SuccessSendSms)
 
 }
 func (c *authController) SignUp(ctx *fiber.Ctx) error {

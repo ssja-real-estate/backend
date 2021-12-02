@@ -8,7 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-const formcollection = "forms"
+const formcollection  = "forms"
 
 type FormRepository interface {
 	SaveForm(form *models.Form) error
