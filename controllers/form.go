@@ -132,17 +132,22 @@ func (r *formController) GetFormById(ctx *fiber.Ctx) error {
 func (r *formController) GetForm(ctx *fiber.Ctx) error {
 	asignmenttypdid := ctx.Query("assignmentTypeId")
 	estateTypeId := ctx.Query("estateTypeId")
+
 	if !bson.IsObjectIdHex(asignmenttypdid) {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
 	}
 	if !bson.IsObjectIdHex(estateTypeId) {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateID)
 	}
 
-	form, err := r.form.GetForm(bson.ObjectId(asignmenttypdid), bson.ObjectId(estateTypeId))
+	form, err := r.form.GetForm(bson.ObjectIdHex(asignmenttypdid), bson.ObjectIdHex(estateTypeId))
 	if err != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
+
 	return ctx.Status(http.StatusOK).JSON(form)
 }
 
