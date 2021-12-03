@@ -182,6 +182,7 @@ func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
+	form.Updateid()
 	err = r.form.UpdateForm(id, &form)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrInvalidCredentials))

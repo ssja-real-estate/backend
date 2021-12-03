@@ -29,6 +29,7 @@ type Field struct {
 
 // to do set value from type by enum
 func (field *Field) updateid() {
+	if !field.Id.Valid() {
 	field.Id = bson.NewObjectId()
 	if len(field.Fields) > 0 {
 		for i := 0; i < len(field.Fields); i++ {
@@ -36,6 +37,7 @@ func (field *Field) updateid() {
 			field.setValue()
 		}
 	}
+}
 }
 
 func (field *Field) setValue() {

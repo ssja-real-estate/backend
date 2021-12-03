@@ -11,9 +11,12 @@ type Section struct {
 
 func (section *Section) updateid() {
 
+	if !section.Id.Valid() {
 	section.Id = bson.NewObjectId()
+	}
 	for i := 0; i < len(section.Fileds); i++ {
 		section.Fileds[i].updateid()
 
 	}
+
 }
