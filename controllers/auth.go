@@ -51,7 +51,7 @@ func NewAuthController(usersRepo repository.UsersRepository) AuthController {
 func (c *authController) VeryfiyMobile(ctx *fiber.Ctx) error {
 
 	mobile := ctx.Query("mobile")
-	veryfiyCode := ctx.Query("verify_code")
+	veryfiyCode := ctx.Query("code")
 	exists, err := c.usersRepo.GetByMobile(mobile)
 	if err != nil || exists.Mobile != mobile {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
@@ -383,14 +383,10 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /changepassword [post]
 func (c *authController) Changepassword(ctx *fiber.Ctx) error {
-	currentpassword := ctx.Query("current_password")
-	newpassowrd := ctx.Query("new_password")
-	confirm_password := ctx.Query("confirm_password")
-	fmt.Println(currentpassword, "-", newpassowrd, "-", confirm_password)
-
-	if newpassowrd != confirm_password {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotCompatablePassword)
-	}
+	currentpassword := ctx.Query("currentPassword")
+	newpassowrd := ctx.Query("newPassword")
+	
+	
 	id, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusUnauthorized).JSON(util.ErrInvalidAuthToken)

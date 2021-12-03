@@ -14,6 +14,8 @@ services:
   app: 
      image: sajaweb/realestate_app
      container_name: realestateapp
+     volumes: 
+      - ./app:/appimages
      environment:
        - APIKEY=${SMS_KEY}  
      build:  

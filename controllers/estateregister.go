@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 	"realstate/models"
 	"realstate/repository"
 	"time"
@@ -23,16 +24,24 @@ func NewEstateRegisterController(estateregisterrepo repository.EstateRegisterRep
 }
 
 func (r *estateRegisterController) CreateEstateRegister(ctx *fiber.Ctx) error {
-	 var formregister models.EstateRegister
-	 err:=ctx.BodyParser(&formregister)
-	 if err!=nil {
-		 return ctx.Status(http.StatusBadRequest).JSON(err)
-	 }
-	 formregister.Id=bson.NewObjectId()
-	 formregister.CreatedAt=time.Now()
-	 formregister.UpdatedAt=time.Now()
-	 formregister.Accept=false
-	 
-    
-	 return nil
+	var formregister models.EstateRegister
+	err := ctx.BodyParser(&formregister)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+	file1, err1 := ctx.FormFile("image")
+	path, err := os.Getwd()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+	if err1 != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+	ctx.SaveFile(file1, path)
+	formregister.Id = bson.NewObjectId()
+	formregister.CreatedAt = time.Now()
+	formregister.UpdatedAt = time.Now()
+	formregister.Accept = false
+
+	return nil
 }
