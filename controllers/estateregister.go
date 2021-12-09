@@ -1,14 +1,13 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"realstate/models"
 	"realstate/repository"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type EstateRegisterController interface {
@@ -30,6 +29,8 @@ func (r *estateRegisterController) CreateEstateRegister(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
 	file1, err1 := ctx.FormFile("image")
+	fmt.Println(file1.Filename)
+	fmt.Println(file1.Size)
 	path, err := os.Getwd()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
@@ -37,11 +38,18 @@ func (r *estateRegisterController) CreateEstateRegister(ctx *fiber.Ctx) error {
 	if err1 != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}
-	ctx.SaveFile(file1, path)
-	formregister.Id = bson.NewObjectId()
-	formregister.CreatedAt = time.Now()
-	formregister.UpdatedAt = time.Now()
-	formregister.Accept = false
+	fmt.Println(path)
 
-	return nil
+	err = ctx.SaveFile(file1, path+"/"+file1.Filename)
+	if err != nil {
+		fmt.Println(err)
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+	// 	formregister.Id = bson.NewObjectId()
+	// 	formregister.CreatedAt = time.Now()
+	// 	formregister.UpdatedAt = time.Now()
+	// 	formregister.Accept = false
+
+	// 	return nil
 }

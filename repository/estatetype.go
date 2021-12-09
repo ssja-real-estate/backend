@@ -18,6 +18,7 @@ type EstateTypeRepository interface {
 	GetEstateTypeByName(name string) (estatetype *models.EstateType, err error)
 	GetEstateTypeAll() (estatetypes []*models.EstateType, err error)
 	DeleteEstateType(id string) error
+	
 }
 
 type estateTypeRepository struct {

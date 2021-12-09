@@ -172,6 +172,7 @@ func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
 	if !bson.IsObjectIdHex(id) {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
+	
 	err := r.esstatetype.DeleteEstateType(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))

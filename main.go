@@ -74,6 +74,11 @@ func main() {
 	formroute := routes.NewFormRoute(formcontroller)
 	formroute.Install(app)
 
+	estateregisterrepo := repository.NewEstateRegisterRepository(con)
+	estateregistercontroller := controllers.NewEstateRegisterController(estateregisterrepo)
+	estateregisterroute := routes.NewEstateRegisterRoute(estateregistercontroller)
+	estateregisterroute.Install(app)
+
 	log.Fatal(app.Listen(":8000"))
 
 }
