@@ -167,7 +167,7 @@ func (r *assignmenttypeController) Delete(ctx *fiber.Ctx) error {
 	defer con.Close()
 	formrepo := repository.NewFormRepositor(con)
 
-	count, err = formrepo.IsExitAssignmentTypeId(bson.ObjectId(id))
+	count, err = formrepo.IsExitAssignmentTypeId(bson.ObjectIdHex(id))
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))

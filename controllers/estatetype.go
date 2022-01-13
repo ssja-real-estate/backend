@@ -179,7 +179,7 @@ func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
 	defer con.Close()
 	formrepo := repository.NewFormRepositor(con)
 
-	count, err = formrepo.IsEstateTypeId(bson.ObjectId(id))
+	count, err = formrepo.IsEstateTypeId(bson.ObjectIdHex(id))
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))

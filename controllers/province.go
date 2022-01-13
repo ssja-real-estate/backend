@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"realstate/models"
 	"realstate/repository"
@@ -206,7 +205,6 @@ func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	if count > 0 {
-		fmt.Println(count)
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
 	}
 	city.Id = bson.NewObjectId()
