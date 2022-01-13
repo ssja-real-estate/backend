@@ -145,7 +145,7 @@ func (r *formController) GetForm(ctx *fiber.Ctx) error {
 	form, err := r.form.GetForm(bson.ObjectIdHex(asignmenttypdid), bson.ObjectIdHex(estateTypeId))
 	if err != nil {
 
-		return ctx.Status(http.StatusOK).JSON(models.Form{})
+		return ctx.Status(http.StatusOK).JSON(nil)
 	}
 
 	return ctx.Status(http.StatusOK).JSON(form)
