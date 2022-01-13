@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"realstate/db"
 	"realstate/models"
 	"realstate/repository"
 	"realstate/util"
@@ -155,11 +156,26 @@ func (r *assignmenttypeController) GetAssignments(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /assignmenttype/id [delete]
 func (r *assignmenttypeController) Delete(ctx *fiber.Ctx) error {
+	var err error
+	var count int
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	err := r.assignmenttyperepo.Delete(id)
+
+	con := db.NewConnection()
+	defer con.Close()
+	formrepo := repository.NewFormRepositor(con)
+
+	count, err = formrepo.IsExitAssignmentTypeId(bson.ObjectId(id))
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	if count > 0 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotDeleteAssignmentType)
+	}
+	err = r.assignmenttyperepo.Delete(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

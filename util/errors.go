@@ -28,7 +28,7 @@ var (
 	ErroNotUserUpdate          = errors.New("مشکل در ذخیره کردن تغییرات")
 	ErrFormExists              = errors.New("این فرم قبلا ثبت شده است")
 	ErrNotDeleteAssignmentType = errors.New("این نوع واگذاری قابل حذف نیست")
-	ErrNotEstateType           = errors.New("این نوع ملک قابل حذف نیست")
+	ErrNotDeleteEstateType     = errors.New("این نوع ملک قابل حذف نیست")
 
 	SuccessDelete  = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate  = "آیتم مورد نظر با موفقیت اپدیت شد."
