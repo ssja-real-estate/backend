@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"realstate/db"
 	"realstate/models"
 	"realstate/repository"
 	"realstate/util"
@@ -168,12 +169,25 @@ func (r *estatetypeController) GetEsatteTypes(ctx *fiber.Ctx) error {
 // @Router /estatetype/id [delete]
 // @Security ApiKeyAuth
 func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
+	var err error
+	var count int
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	
-	err := r.esstatetype.DeleteEstateType(id)
+	con := db.NewConnection()
+	defer con.Close()
+	formrepo := repository.NewFormRepositor(con)
+
+	count, err = formrepo.IsEstateTypeId(bson.ObjectId(id))
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	if count > 0 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotDeleteEstateType)
+	}
+	err = r.esstatetype.DeleteEstateType(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

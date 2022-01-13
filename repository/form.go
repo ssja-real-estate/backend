@@ -3,6 +3,7 @@ package repository
 import (
 	"realstate/db"
 	"realstate/models"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -16,6 +17,8 @@ type FormRepository interface {
 	GetForm(assignmenttypeid bson.ObjectId, estatetypeid bson.ObjectId) (form models.Form, err error)
 	DeleteForm(id string) (err error)
 	UpdateForm(id string, form *models.Form) error
+	IsExitAssignmentTypeId(assignmenttypeid bson.ObjectId) (int, error)
+	IsEstateTypeId(estatetypeid bson.ObjectId) (int, error)
 }
 type formRepository struct {
 	c *mgo.Collection
@@ -52,4 +55,14 @@ func (r *formRepository) DeleteForm(id string) (err error) {
 
 func (r *formRepository) UpdateForm(id string, form *models.Form) error {
 	return r.c.UpdateId(bson.ObjectIdHex(id), form)
+}
+
+func (r *formRepository) IsExitAssignmentTypeId(assignmenttypeid bson.ObjectId) (int, error) {
+
+	return r.c.Find(bson.M{"assignmentTypeId": assignmenttypeid}).Count()
+
+}
+
+func (r *formRepository) IsEstateTypeId(estatetypeid bson.ObjectId) (int, error) {
+	return r.c.Find(bson.M{"estateTypeId": estatetypeid}).Count()
 }

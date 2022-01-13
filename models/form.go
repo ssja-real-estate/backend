@@ -3,7 +3,7 @@ package models
 import "gopkg.in/mgo.v2/bson"
 
 type Form struct {
-	Id bson.ObjectId `json:"id" bson:"_id"`
+	Id               bson.ObjectId `json:"id" bson:"_id"`
 	Title            string        `json:"title" bson:"title"`
 	AssignmentTypeID bson.ObjectId `json:"assignmentTypeId" bson:"assignmentTypeId"`
 	EstateTypeID     bson.ObjectId `json:"estateTypeId" bson:"estateTypeId"`
