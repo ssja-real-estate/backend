@@ -27,6 +27,7 @@ type formRepository struct {
 func NewFormRepositor(conn db.Connection) FormRepository {
 	return &formRepository{conn.DB().C(formcollection)}
 }
+
 func (r *formRepository) SaveForm(form *models.Form) error {
 	return r.c.Insert(form)
 }
@@ -58,11 +59,11 @@ func (r *formRepository) UpdateForm(id string, form *models.Form) error {
 }
 
 func (r *formRepository) IsExitAssignmentTypeId(assignmenttypeid bson.ObjectId) (int, error) {
-
-	return r.c.Find(bson.M{"assignmentTypeId": assignmenttypeid}).Count()
-
+	n, err := r.c.Find(bson.M{"assignmentTypeId": assignmenttypeid}).Count()
+	return n, err
 }
 
 func (r *formRepository) IsEstateTypeId(estatetypeid bson.ObjectId) (int, error) {
-	return r.c.Find(bson.M{"estateTypeId": estatetypeid}).Count()
+	n, err := r.c.Find(bson.M{"estateTypeId": estatetypeid}).Count()
+	return n, err
 }
