@@ -3,6 +3,7 @@ package repository
 import (
 	"realstate/db"
 	"realstate/models"
+	"realstate/util"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -20,6 +21,7 @@ type ProvinceRepository interface {
 	AddCity(city models.City, id string) error
 	GetCityByName(name string, id string) (int, error)
 	DeleteCityByID(city models.City, proviceid string) error
+	IsProvinceDelete(provinceid bson.ObjectId) (int, error)
 }
 type provinceRepository struct {
 	c *mgo.Collection
@@ -55,6 +57,14 @@ func (r *provinceRepository) GetProvinceAll() (provinces []*models.Province, err
 	return provinces, err
 }
 func (r *provinceRepository) DeleteProvince(id string) error {
+
+	count, err := r.IsProvinceDelete(bson.ObjectIdHex(id))
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return util.ErrNotDeleteProvince
+	}
 	return r.c.RemoveId(bson.ObjectIdHex(id))
 }
 func (r *provinceRepository) AddCity(city models.City, id string) error {
@@ -75,5 +85,15 @@ func (r *provinceRepository) DeleteCityByID(city models.City, proviceid string) 
 
 	provice := bson.M{"_id": bson.ObjectIdHex(proviceid)}
 	return r.c.Update(provice, _city)
+
+}
+
+func (r *provinceRepository) IsProvinceDelete(provinceid bson.ObjectId) (int, error) {
+	var province models.Province
+	err := r.c.Find(bson.M{"_id": provinceid}).One(&province)
+	if err != nil {
+		return 0, err
+	}
+	return len(province.Cities), nil
 
 }

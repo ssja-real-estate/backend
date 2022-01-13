@@ -161,6 +161,7 @@ func (r *provinceController) GetProvinces(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /province/id [delete]
 func (r *provinceController) DeleteProvince(ctx *fiber.Ctx) error {
+
 	id := ctx.Params("id")
 	if !bson.IsObjectIdHex(id) {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
