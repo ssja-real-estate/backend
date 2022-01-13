@@ -65,5 +65,6 @@ func (r *formRepository) IsExitAssignmentTypeId(assignmenttypeid bson.ObjectId) 
 
 func (r *formRepository) IsEstateTypeId(estatetypeid bson.ObjectId) (int, error) {
 	n, err := r.c.Find(bson.M{"estateTypeId": estatetypeid}).Count()
+
 	return n, err
 }

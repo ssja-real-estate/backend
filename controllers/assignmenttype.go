@@ -173,7 +173,7 @@ func (r *assignmenttypeController) Delete(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	if count > 0 {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotDeleteAssignmentType)
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotDeleteAssignmentType))
 	}
 	err = r.assignmenttyperepo.Delete(id)
 	if err != nil {

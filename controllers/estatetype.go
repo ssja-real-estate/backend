@@ -185,7 +185,7 @@ func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	if count > 0 {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotDeleteEstateType)
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotDeleteEstateType))
 	}
 	err = r.esstatetype.DeleteEstateType(id)
 	if err != nil {
