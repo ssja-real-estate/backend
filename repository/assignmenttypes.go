@@ -26,7 +26,7 @@ type assignmentTypeRepository struct {
 }
 
 func NewAssignmentTypesRepository(DB *mongo.Client) AssignmentTypeRepository {
-	return &assignmentTypeRepository{db.GetCollection(DB, estateCollection)}
+	return &assignmentTypeRepository{db.GetCollection(DB, settingCollection)}
 }
 
 func (r *assignmentTypeRepository) Save(assignmenmenttype *models.AssignmentType) error {

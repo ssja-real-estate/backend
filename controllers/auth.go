@@ -149,7 +149,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 			newUser.Role = 3
 		}
 		newUser.UpdatedAt = newUser.CreatedAt
-		newUser.Verify = false
+		newUser.Verify = true
 		newUser.VerifyCode = strconv.FormatInt(int64(rand.Intn(89000)+10000), 10)
 
 		newUser.Id = primitive.NewObjectID()
@@ -161,10 +161,10 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(err))
 		}
 
-		_, err := c.usersRepo.SendSms(newUser.Mobile, newUser.VerifyCode)
-		if err != nil {
-			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-		}
+		// _, err := c.usersRepo.SendSms(newUser.Mobile, newUser.VerifyCode)
+		// if err != nil {
+		// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		// }
 
 		return ctx.Status(http.StatusOK).JSON(util.SuccessSendSms)
 

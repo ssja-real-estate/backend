@@ -230,16 +230,16 @@ func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /province/city/id [delete]
 func (r *provinceController) DeleteCity(ctx *fiber.Ctx) error {
-	var city models.City
-	err := ctx.BodyParser(&city)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+
+	provinceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrUnauthorized))
 	}
-	err = r.province.DeleteCityByID(city, id)
+	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrUnauthorized))
+	}
+	err = r.province.DeleteCityByID(provinceid, cityid)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

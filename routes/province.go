@@ -23,9 +23,9 @@ func (r *provinceRoutes) Install(app *fiber.App) {
 	api.Delete("/province/:id", AuthRequired, r.provinceController.DeleteProvince)
 	api.Post("/province/:id/city", AuthRequired, r.provinceController.AddCity)
 	api.Put("/province/:id/city", AuthRequired, r.provinceController.AddCity)
-	api.Delete("/province/city/:id", AuthRequired, r.provinceController.DeleteCity)
+	api.Delete("/province/:provinceId/city/:cityId", AuthRequired, r.provinceController.DeleteCity)
 	api.Post("/province/:provinceId/city/:cityId/neighborhood", AuthRequired, r.provinceController.AddNeighborhood)
 	api.Put("/province/:provinceId/city/:cityId/neighborhood/:neighborhoodId", AuthRequired, r.provinceController.EditNeighborhood)
-	api.Delete("/province/:province-id/city/city-id/neighborhood/neighborhood-id", AuthRequired, r.provinceController.DeleteNeighborhood)
+	api.Delete("/province/:provinceId/city/:cityId/neighborhood/:neighborhoodId", AuthRequired, r.provinceController.DeleteNeighborhood)
 
 }

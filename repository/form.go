@@ -32,7 +32,7 @@ func NewFormRepositor(DB *mongo.Client) FormRepository {
 }
 
 func (r *formRepository) SaveForm(form *models.Form) error {
-	_, err := r.c.InsertOne(context.TODO(), form)
+	_, err := r.c.InsertOne(context.TODO(), &form)
 	return err
 }
 

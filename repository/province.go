@@ -22,7 +22,7 @@ type ProvinceRepository interface {
 	DeleteProvince(id primitive.ObjectID) error
 	AddCity(city models.City, id primitive.ObjectID) error
 	GetCityByName(name string, id primitive.ObjectID) (int64, error)
-	DeleteCityByID(city models.City, proviceid primitive.ObjectID) error
+	DeleteCityByID(proviceid primitive.ObjectID, cityid primitive.ObjectID) error
 	IsProvinceDelete(provinceid primitive.ObjectID) (int64, error)
 	AddNeighborhood(models.Neighborhood, primitive.ObjectID, primitive.ObjectID) error
 	EditNeighborhood(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID, neighborhood models.Neighborhood) error
@@ -118,9 +118,9 @@ func (r *provinceRepository) GetCityByName(name string, id primitive.ObjectID) (
 
 }
 
-func (r *provinceRepository) DeleteCityByID(city models.City, proviceid primitive.ObjectID) error {
+func (r *provinceRepository) DeleteCityByID(proviceid primitive.ObjectID, cityid primitive.ObjectID) error {
 	province := bson.M{"_id": proviceid}
-	action := bson.M{"$pull": bson.M{"cities": bson.M{"_id": city.Id}}}
+	action := bson.M{"$pull": bson.M{"cities": bson.M{"_id": cityid}}}
 	_, err := r.c.UpdateOne(context.TODO(), province, action)
 	return err
 
