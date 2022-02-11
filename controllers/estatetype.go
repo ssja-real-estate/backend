@@ -48,7 +48,7 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 	}
 	exists, err := c.esstatetype.GetEstateTypeByName(estatetype.Name)
 
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		if strings.TrimSpace(estatetype.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -99,7 +99,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 
 	_, err = r.esstatetype.GetEstateTypeByName(estatetype.Name)
 
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		dbestatetype, err := r.esstatetype.GetEstateTypeById(estatetype.Id)
 		if err != nil {
 			return ctx.

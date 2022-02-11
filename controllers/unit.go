@@ -44,7 +44,7 @@ func (c *unitController) CreateUnit(ctx *fiber.Ctx) error {
 	}
 	exists, err := c.unit.GetUnitByName(unit.Name)
 
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		if strings.TrimSpace(unit.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -92,7 +92,7 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 
 	_, err = r.unit.GetUnitByName(unit.Name)
 
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		dbunit, err := r.unit.GetUnitById(unit.Id)
 		if err != nil {
 			return ctx.

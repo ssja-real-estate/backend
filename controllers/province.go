@@ -50,7 +50,7 @@ func (c *provinceController) CreateProvince(ctx *fiber.Ctx) error {
 	}
 	exists, err := c.province.GetProvinceByName(province.Name)
 
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		if strings.TrimSpace(province.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -98,7 +98,7 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 
 	_, err = r.province.GetProvinceByName(province.Name)
 
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		dbprovince, err := r.province.GetProvinceById(province.Id)
 		if err != nil {
 			return ctx.

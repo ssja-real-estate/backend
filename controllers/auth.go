@@ -102,7 +102,7 @@ func (c *authController) ForgetPassword(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
 	}
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNoDocuments {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
 	if !user.Verify {
@@ -118,23 +118,21 @@ func (c *authController) ForgetPassword(ctx *fiber.Ctx) error {
 
 }
 func (c *authController) SignUp(ctx *fiber.Ctx) error {
-	fmt.Println("1")
+
 	var newUser models.User
-	fmt.Println("2")
+
 	err := ctx.BodyParser(&newUser)
-	fmt.Println("3")
+
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-	fmt.Println("4")
+
 	exists, err := c.usersRepo.GetByMobile(newUser.Mobile)
-	fmt.Println("5")
-	fmt.Println(err)
-	fmt.Println("----------------------------------------------")
+
 	if err == mongo.ErrNoDocuments {
-		fmt.Println("6")
+
 		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -325,7 +323,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 
 	exists, err := c.usersRepo.GetByMobile(update.Mobile)
-	if err == mongo.ErrNilDocument || exists.Id == id {
+	if err == mongo.ErrNoDocuments || exists.Id == id {
 		user, err := c.usersRepo.GetById(id)
 		if err != nil {
 			return ctx.

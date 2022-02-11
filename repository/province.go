@@ -67,7 +67,7 @@ func (r *provinceRepository) GetProvinceAll() ([]models.Province, error) {
 	defer result.Close(context.TODO())
 	for result.Next(context.TODO()) {
 		var province models.Province
-		if err = result.Decode(province); err != nil {
+		if err = result.Decode(&province); err != nil {
 			return make([]models.Province, 0), err
 		}
 		provinces = append(provinces, province)
