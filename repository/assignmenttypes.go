@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"context"
 	"realstate/db"
 	"realstate/models"
 
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const settingCollection = "settings"
@@ -13,50 +15,64 @@ const settingCollection = "settings"
 type AssignmentTypeRepository interface {
 	Save(assignmenttype *models.AssignmentType) error
 	Update(assignmenttype *models.AssignmentType) error
-	GetById(id string) (assignmenttype *models.AssignmentType, err error)
-	GetByHexdId(id bson.ObjectId) (assignmenttype *models.AssignmentType, err error)
+	GetById(id primitive.ObjectID) (assignmenttype *models.AssignmentType, err error)
 	GetByName(name string) (assignmenttype *models.AssignmentType, err error)
-	GetAll() (assigmenttypes []*models.AssignmentType, err error)
-	Delete(id string) error
+	GetAll() ([]models.AssignmentType, error)
+	Delete(id primitive.ObjectID) error
 }
 
 type assignmentTypeRepository struct {
-	c *mgo.Collection
+	c *mongo.Collection
 }
 
-func NewAssignmentTypesRepository(conn db.Connection) AssignmentTypeRepository {
-	return &assignmentTypeRepository{conn.DB().C(settingCollection)}
+func NewAssignmentTypesRepository(DB *mongo.Client) AssignmentTypeRepository {
+	return &assignmentTypeRepository{db.GetCollection(DB, estateCollection)}
 }
 
 func (r *assignmentTypeRepository) Save(assignmenmenttype *models.AssignmentType) error {
-	return r.c.Insert(assignmenmenttype)
+	_, err := r.c.InsertOne(context.TODO(), assignmenmenttype)
+	return err
 
 }
 func (r *assignmentTypeRepository) Update(assignmenttype *models.AssignmentType) error {
-	return r.c.UpdateId(assignmenttype.Id, assignmenttype)
+	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": assignmenttype.Id}, assignmenttype)
+	return err
 }
 
-func (r *assignmentTypeRepository) GetById(id string) (assignmenttype *models.AssignmentType, err error) {
-	err = r.c.FindId(bson.ObjectIdHex(id)).One(&assignmenttype)
-	return assignmenttype, err
-}
-func (r *assignmentTypeRepository) GetByHexdId(id bson.ObjectId) (assignmenttype *models.AssignmentType, err error) {
-	err = r.c.FindId(id).One(&assignmenttype)
+func (r *assignmentTypeRepository) GetById(id primitive.ObjectID) (assignmenttype *models.AssignmentType, err error) {
+	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&assignmenttype)
+
 	return assignmenttype, err
 }
 
 func (r *assignmentTypeRepository) GetByName(name string) (assignmenttype *models.AssignmentType, err error) {
-	err = r.c.Find(bson.M{"name": name}).One(&assignmenttype)
+	err = r.c.FindOne(context.TODO(), bson.M{"name": name}).Decode(assignmenttype)
+
 	return assignmenttype, err
 }
-func (r *assignmentTypeRepository) GetAll() (assignments []*models.AssignmentType, err error) {
+func (r *assignmentTypeRepository) GetAll() ([]models.AssignmentType, error) {
+	var assignments []models.AssignmentType
 
-	err = r.c.Find(bson.M{}).All(&assignments)
+	restult, err := r.c.Find(context.TODO(), bson.M{})
+
+	if err != nil {
+		return make([]models.AssignmentType, 0), err
+
+	}
+	defer restult.Close(context.TODO())
+	for restult.Next(context.TODO()) {
+		var newassigment models.AssignmentType
+		if err = restult.Decode(&newassigment); err != nil {
+			return make([]models.AssignmentType, 0), err
+		}
+		assignments = append(assignments, newassigment)
+	}
 	if assignments == nil {
-		assignments = make([]*models.AssignmentType, 0)
+		assignments = make([]models.AssignmentType, 0)
 	}
 	return assignments, err
 }
-func (r *assignmentTypeRepository) Delete(id string) error {
-	return r.c.RemoveId(bson.ObjectIdHex(id))
+func (r *assignmentTypeRepository) Delete(id primitive.ObjectID) error {
+	_, err := r.c.DeleteOne(context.TODO(), bson.M{"_id": id})
+	return err
 }

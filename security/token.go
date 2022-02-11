@@ -8,6 +8,7 @@ import (
 
 	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
@@ -46,10 +47,11 @@ func ParseToken(tokenString string) (*jwt.StandardClaims, error) {
 	}
 	return claims, nil
 }
-func GetUserByToken(ctx *fiber.Ctx) (id string, err error) {
+func GetUserByToken(ctx *fiber.Ctx) (id primitive.ObjectID, err error) {
 
 	token := ctx.Locals("user").(*jwt.Token)
 	payload, err := ParseToken(token.Raw)
-	return payload.Id, err
+	hexid, err := primitive.ObjectIDFromHex(payload.Id)
+	return hexid, err
 
 }

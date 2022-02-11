@@ -1,9 +1,11 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Section struct {
-	Id bson.ObjectId `json:"id" bson:"_id"`
+	Id primitive.ObjectID `json:"id" bson:"_id"`
 	// Name   string        `json:"name" bson:"name"`
 	Title  string  `json:"title" bson:"title"`
 	Fileds []Field `json:"fields" bson:"fields"`
@@ -11,12 +13,19 @@ type Section struct {
 
 func (section *Section) updateid() {
 
-	if !section.Id.Valid() {
-	section.Id = bson.NewObjectId()
-	}
+	section.Id = primitive.NewObjectID()
+
 	for i := 0; i < len(section.Fileds); i++ {
 		section.Fileds[i].updateid()
-
 	}
+}
+func (section *Section) Validate() error {
 
+	for _, item := range section.Fileds {
+		err := item.Validate()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

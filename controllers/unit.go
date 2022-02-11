@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UnitController interface {
@@ -44,7 +44,7 @@ func (c *unitController) CreateUnit(ctx *fiber.Ctx) error {
 	}
 	exists, err := c.unit.GetUnitByName(unit.Name)
 
-	if err == mgo.ErrNotFound {
+	if err == mongo.ErrNilDocument {
 		if strings.TrimSpace(unit.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -52,7 +52,7 @@ func (c *unitController) CreateUnit(ctx *fiber.Ctx) error {
 		}
 		unit.CreatedAt = time.Now()
 		unit.UpdatedAt = time.Now()
-		unit.Id = bson.NewObjectId()
+		unit.Id = primitive.NewObjectID()
 		err = c.unit.SaveUnit(&unit)
 		if err != nil {
 			return ctx.
@@ -92,8 +92,8 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 
 	_, err = r.unit.GetUnitByName(unit.Name)
 
-	if err == mgo.ErrNotFound {
-		dbunit, err := r.unit.GetUnitById(unit.Id.Hex())
+	if err == mongo.ErrNilDocument {
+		dbunit, err := r.unit.GetUnitById(unit.Id)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -123,8 +123,8 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /unit/id [get]
 func (r *unitController) GetUnit(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	unit, err := r.unit.GetUnitById(id)
@@ -159,11 +159,11 @@ func (r *unitController) GetUnits(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /unit/id [delete]
 func (r *unitController) DeleteUnit(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	err := r.unit.DeleteUnit(id)
+	err = r.unit.DeleteUnit(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

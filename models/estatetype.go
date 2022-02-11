@@ -3,13 +3,13 @@ package models
 import (
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // swagger:model
 type EstateType struct {
 	// required: false
-	Id bson.ObjectId `json:"id" bson:"_id"`
+	Id primitive.ObjectID `json:"id" bson:"_id"`
 	// The name for a EstateType
 	// example: خرید
 	// required: true

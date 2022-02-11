@@ -1,6 +1,11 @@
 package models
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"errors"
+	"fmt"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Valuetype interface{}
 
@@ -15,29 +20,47 @@ const (
 )
 
 type Field struct {
-	Id bson.ObjectId `json:"id" bson:"_id"`
-	// Name      string        `json:"name" bson:"name"`
-	Title    string    `json:"title" bson:"title"`
-	Value    Valuetype `json:"value" bson:"value"`
-	Min      float64   `json:"min" bson:"min"`
-	Max      float64   `json:"max" bson:"max"`
-	Optional bool      `json:"optional" bson:"optional"`
-	Options  []string  `json:"options" bson:"options"`
-	Fields   []Field   `json:"fields" bson:"fields"`
-	Type     int       `json:"type"  bson:"type"`
+	Id       primitive.ObjectID `json:"id" bson:"_id"`
+	Title    string             `json:"title" bson:"title"`
+	Value    Valuetype          `json:"value" bson:"value"`
+	Min      float64            `json:"min" bson:"min"`
+	Max      float64            `json:"max" bson:"max"`
+	Optional bool               `json:"optional" bson:"optional"`
+	Options  []string           `json:"options" bson:"options"`
+	Fields   []Field            `json:"fields" bson:"fields"`
+	Type     int                `json:"type"  bson:"type"`
 }
 
 // to do set value from type by enum
 func (field *Field) updateid() {
-	if !field.Id.Valid() {
-	field.Id = bson.NewObjectId()
+
+	field.Id = primitive.NewObjectID()
 	if len(field.Fields) > 0 {
 		for i := 0; i < len(field.Fields); i++ {
 			field.Fields[i].updateid()
 			field.setValue()
 		}
 	}
+
 }
+
+func (filed *Field) Validate() error {
+	if filed.Optional == true {
+		return nil
+	}
+	if filed.Value == nil {
+		return errors.New(fmt.Sprint("فیلد ", filed.Title, " نباید خالی باشد"))
+	}
+	if filed.Fields != nil {
+		for _, item := range filed.Fields {
+			err := item.Validate()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+
 }
 
 func (field *Field) setValue() {
@@ -54,7 +77,6 @@ func (field *Field) setValue() {
 		{
 			field.Value = ""
 		}
-
 	case Image:
 		field.Value = ""
 	case Range:
@@ -64,5 +86,4 @@ func (field *Field) setValue() {
 			field.Min = 0
 		}
 	}
-
 }

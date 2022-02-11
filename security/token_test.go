@@ -5,18 +5,18 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestNewToken(t *testing.T) {
-	id := bson.NewObjectId()
+	id := primitive.NewObjectID()
 	token, err := NewToken(id.Hex())
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
 }
 
 func TestParseToken(t *testing.T) {
-	id := bson.NewObjectId()
+	id := primitive.NewObjectID()
 	token, err := NewToken(id.Hex())
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)

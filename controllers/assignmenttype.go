@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AssignmentTypeController interface {
@@ -39,12 +39,17 @@ func NewAssignmentTypeController(assignmenttyperepo repository.AssignmentTypeRep
 // @Router /assignmenttype/ [post]
 func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 	var assignmenttype models.AssignmentType
+
 	err := ctx.BodyParser(&assignmenttype)
 	if err != nil {
+
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
+
 	exists, err := c.assignmenttyperepo.GetByName(assignmenttype.Name)
-	if err == mgo.ErrNotFound {
+
+	if err == mongo.ErrNoDocuments {
+
 		if strings.TrimSpace(assignmenttype.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -52,7 +57,7 @@ func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 		}
 		assignmenttype.CreatedAt = time.Now()
 		assignmenttype.UpdatedAt = time.Now()
-		assignmenttype.Id = bson.NewObjectId()
+		assignmenttype.Id = primitive.NewObjectID()
 		err = c.assignmenttyperepo.Save(&assignmenttype)
 		if err != nil {
 			return ctx.
@@ -90,8 +95,8 @@ func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 	_, err = r.assignmenttyperepo.GetByName(assignmenttype.Name)
-	if err == mgo.ErrNotFound {
-		dbassignmenttype, err := r.assignmenttyperepo.GetById(assignmenttype.Id.Hex())
+	if err == mongo.ErrNoDocuments {
+		dbassignmenttype, err := r.assignmenttyperepo.GetById(assignmenttype.Id)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -119,8 +124,8 @@ func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /assignmenttype/id [get]
 func (r *assignmenttypeController) GetAssignment(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	assignmenttype, err := r.assignmenttyperepo.GetById(id)
@@ -156,19 +161,15 @@ func (r *assignmenttypeController) GetAssignments(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /assignmenttype/id [delete]
 func (r *assignmenttypeController) Delete(ctx *fiber.Ctx) error {
-	var err error
-	var count int
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+
+	var count int64
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 
-	con := db.NewConnection()
-	defer con.Close()
-	formrepo := repository.NewFormRepositor(con)
-
-	count, err = formrepo.IsExitAssignmentTypeId(bson.ObjectIdHex(id))
-
+	formrepo := repository.NewFormRepositor(db.DB)
+	count, err = formrepo.IsExitAssignmentTypeId(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

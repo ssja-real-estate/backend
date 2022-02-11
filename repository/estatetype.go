@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"context"
 	"realstate/db"
 	"realstate/models"
 
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const estateCollection = "estatetype"
@@ -13,50 +15,64 @@ const estateCollection = "estatetype"
 type EstateTypeRepository interface {
 	SaveEstateType(estatetype *models.EstateType) error
 	UpdateEstateType(estatetype *models.EstateType) error
-	GetEstateTypeById(id string) (estatetype *models.EstateType, err error)
-	GetEstateTypeByHexId(id bson.ObjectId) (estatetype *models.EstateType, err error)
+	GetEstateTypeById(id primitive.ObjectID) (estatetype *models.EstateType, err error)
 	GetEstateTypeByName(name string) (estatetype *models.EstateType, err error)
-	GetEstateTypeAll() (estatetypes []*models.EstateType, err error)
-	DeleteEstateType(id string) error
-	
+	GetEstateTypeAll() ([]models.EstateType, error)
+	DeleteEstateType(id primitive.ObjectID) error
 }
 
 type estateTypeRepository struct {
-	c *mgo.Collection
+	c *mongo.Collection
 }
 
-func NewEstateTypesRepository(conn db.Connection) EstateTypeRepository {
-	return &estateTypeRepository{conn.DB().C(estateCollection)}
+func NewEstateTypesRepository(Db *mongo.Client) EstateTypeRepository {
+	return &estateTypeRepository{db.GetCollection(Db, estateCollection)}
 }
 
 func (r *estateTypeRepository) SaveEstateType(estatetype *models.EstateType) error {
-	return r.c.Insert(estatetype)
+	_, err := r.c.InsertOne(context.TODO(), estatetype)
+	return err
 }
 func (r *estateTypeRepository) UpdateEstateType(estatetype *models.EstateType) error {
-	return r.c.UpdateId(estatetype.Id, estatetype)
+	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": estatetype.Id}, estatetype)
+	return err
 }
 
-func (r *estateTypeRepository) GetEstateTypeById(id string) (estatetype *models.EstateType, err error) {
-	err = r.c.FindId(bson.ObjectIdHex(id)).One(&estatetype)
-	return estatetype, err
-}
-
-func (r *estateTypeRepository) GetEstateTypeByHexId(id bson.ObjectId) (estatetype *models.EstateType, err error) {
-	err = r.c.FindId(id).One(&estatetype)
+func (r *estateTypeRepository) GetEstateTypeById(id primitive.ObjectID) (estatetype *models.EstateType, err error) {
+	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&estatetype)
 	return estatetype, err
 }
 
 func (r *estateTypeRepository) GetEstateTypeByName(name string) (estatetype *models.EstateType, err error) {
-	err = r.c.Find(bson.M{"name": name}).One(&estatetype)
+	err = r.c.FindOne(context.TODO(), bson.M{"name": name}).Decode(&estatetype)
 	return estatetype, err
 }
-func (r *estateTypeRepository) GetEstateTypeAll() (estatetypes []*models.EstateType, err error) {
-	err = r.c.Find(bson.M{}).All(&estatetypes)
-	if estatetypes == nil {
-		estatetypes = make([]*models.EstateType, 0)
+func (r *estateTypeRepository) GetEstateTypeAll() ([]models.EstateType, error) {
+
+	var estattypes []models.EstateType
+	result, err := r.c.Find(context.TODO(), bson.M{})
+
+	if err != nil {
+		return make([]models.EstateType, 0), err
 	}
-	return estatetypes, err
+
+	defer result.Close(context.TODO())
+
+	for result.Next(context.TODO()) {
+		var estatetype models.EstateType
+		if err = result.Decode(&estatetype); err != nil {
+			return make([]models.EstateType, 0), err
+		}
+		estattypes = append(estattypes, estatetype)
+
+	}
+	if estattypes == nil {
+		estattypes = make([]models.EstateType, 0)
+	}
+
+	return estattypes, err
 }
-func (r *estateTypeRepository) DeleteEstateType(id string) error {
-	return r.c.RemoveId(bson.ObjectIdHex(id))
+func (r *estateTypeRepository) DeleteEstateType(id primitive.ObjectID) error {
+	_, err := r.c.DeleteOne(context.TODO(), bson.M{"_id": id})
+	return err
 }

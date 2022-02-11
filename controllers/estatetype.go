@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type EstateTypeController interface {
@@ -48,7 +48,7 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 	}
 	exists, err := c.esstatetype.GetEstateTypeByName(estatetype.Name)
 
-	if err == mgo.ErrNotFound {
+	if err == mongo.ErrNilDocument {
 		if strings.TrimSpace(estatetype.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -56,7 +56,7 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 		}
 		estatetype.CreatedAt = time.Now()
 		estatetype.UpdatedAt = time.Now()
-		estatetype.Id = bson.NewObjectId()
+		estatetype.Id = primitive.NewObjectID()
 		err = c.esstatetype.SaveEstateType(&estatetype)
 		if err != nil {
 			return ctx.
@@ -99,8 +99,8 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 
 	_, err = r.esstatetype.GetEstateTypeByName(estatetype.Name)
 
-	if err == mgo.ErrNotFound {
-		dbestatetype, err := r.esstatetype.GetEstateTypeById(estatetype.Id.Hex())
+	if err == mongo.ErrNilDocument {
+		dbestatetype, err := r.esstatetype.GetEstateTypeById(estatetype.Id)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -131,8 +131,8 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 // @Router /estatetype/id [get]
 // @Security ApiKeyAuth
 func (r *estatetypeController) GetEstateType(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	estatetype, err := r.esstatetype.GetEstateTypeById(id)
@@ -170,15 +170,14 @@ func (r *estatetypeController) GetEsatteTypes(ctx *fiber.Ctx) error {
 // @Security ApiKeyAuth
 func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
 	var err error
-	var count int
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	var count int64
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	con := db.NewConnection()
-	defer con.Close()
-	formrepo := repository.NewFormRepositor(con)
-	count, err = formrepo.IsEstateTypeId(bson.ObjectIdHex(id))
+
+	formrepo := repository.NewFormRepositor(db.DB)
+	count, err = formrepo.IsEstateTypeId(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

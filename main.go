@@ -34,8 +34,6 @@ import (
 
 func main() {
 
-	con := db.NewConnection()
-	defer con.Close()
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New())
@@ -44,40 +42,42 @@ func main() {
 		URL:         "/swagger/doc.json",
 		DeepLinking: false,
 	}))
-	usersRepo := repository.NewUsersRepository(con)
+
+	db.ConnectDB()
+	usersRepo := repository.NewUsersRepository(db.DB)
 	authController := controllers.NewAuthController(usersRepo)
 	authRoutes := routes.NewAuthRoutes(authController)
 	authRoutes.Install(app)
 
-	assignmenttyperepo := repository.NewAssignmentTypesRepository(con)
+	assignmenttyperepo := repository.NewAssignmentTypesRepository(db.DB)
 	assignmenttypecontoller := controllers.NewAssignmentTypeController(assignmenttyperepo)
 	assignmenttyperoutes := routes.NewAssignmenttpeoute(&assignmenttypecontoller)
 	assignmenttyperoutes.Install(app)
 
-	estatetyperepo := repository.NewEstateTypesRepository(con)
+	estatetyperepo := repository.NewEstateTypesRepository(db.DB)
 	estatetypecontroller := controllers.NewEstateTypeController(estatetyperepo)
 	estatetyperoutes := routes.NewEstatetypeRoute(&estatetypecontroller)
 	estatetyperoutes.Install(app)
 
-	unitrepo := repository.NewUnitRepository(con)
+	unitrepo := repository.NewUnitRepository(db.DB)
 	unitcontroller := controllers.NewUnitController(unitrepo)
 	unitroutes := routes.NewUnitRoute(&unitcontroller)
 	unitroutes.Install(app)
 
-	provincerepo := repository.NewProvinceRepository(con)
+	provincerepo := repository.NewProvinceRepository(db.DB)
 	provincecontroller := controllers.NewProvinceController(provincerepo)
 	provinceroutes := routes.NewProvicneRoute(&provincecontroller)
 	provinceroutes.Install(app)
 
-	formrepo := repository.NewFormRepositor(con)
+	formrepo := repository.NewFormRepositor(db.DB)
 	formcontroller := controllers.NewFormController(formrepo)
 	formroute := routes.NewFormRoute(formcontroller)
 	formroute.Install(app)
 
-	estateregisterrepo := repository.NewEstateRegisterRepository(con)
-	estateregistercontroller := controllers.NewEstateRegisterController(estateregisterrepo)
-	estateregisterroute := routes.NewEstateRegisterRoute(estateregistercontroller)
-	estateregisterroute.Install(app)
+	estaterepo := repository.NewEstateRepository(db.DB)
+	estateregistercontroller := controllers.NewEstateController(estaterepo)
+	estateroute := routes.NewEstateRoute(estateregistercontroller)
+	estateroute.Install(app)
 
 	log.Fatal(app.Listen(":8000"))
 

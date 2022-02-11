@@ -8,7 +8,7 @@ import (
 	"realstate/util"
 
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type FormController interface {
@@ -59,23 +59,21 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	}
 	// to do check assignnent type and estatetype
 
-	con := db.NewConnection()
-	defer con.Close()
-	assignmentrepo := repository.NewAssignmentTypesRepository(con)
+	assignmentrepo := repository.NewAssignmentTypesRepository(db.DB)
 	assignmentContoller := NewAssignmentTypeController(assignmentrepo)
 
-	if !form.AssignmentTypeID.Valid() {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrAssignmentTypeIdFailed))
-	}
+	// if !form.AssignmentTypeID.Valid() {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrAssignmentTypeIdFailed))
+	// }
 
-	_, assignmentexisterr := assignmentContoller.assignmenttyperepo.GetByHexdId(form.AssignmentTypeID)
+	_, assignmentexisterr := assignmentContoller.assignmenttyperepo.GetById(form.AssignmentTypeID)
 
-	estaterepo := repository.NewEstateTypesRepository(con)
+	estaterepo := repository.NewEstateTypesRepository(db.DB)
 	estateController := NewEstateTypeController(estaterepo)
-	if !form.EstateTypeID.Valid() {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEstatTypeIdFailed))
-	}
-	_, estateerr := estateController.esstatetype.GetEstateTypeByHexId(form.EstateTypeID)
+	// if !form.EstateTypeID.Valid() {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEstatTypeIdFailed))
+	// }
+	_, estateerr := estateController.esstatetype.GetEstateTypeById(form.EstateTypeID)
 
 	if assignmentexisterr != nil && estateerr != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateIDAssignID)
@@ -93,7 +91,7 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	}
 
 	form.Updateid()
-	form.Id = bson.NewObjectId()
+	form.Id = primitive.NewObjectID()
 
 	err = r.form.SaveForm(&form)
 	if err != nil {
@@ -111,7 +109,7 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 // @Param id path string true "Item ID"
 // @Router /form/id [get]
 func (r *formController) GetFormById(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 	form, err := r.form.GetFormById(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
@@ -130,19 +128,19 @@ func (r *formController) GetFormById(ctx *fiber.Ctx) error {
 // @Param estate_type_id path string true "Item estate_type_id"
 // @Router /form/id [get]
 func (r *formController) GetForm(ctx *fiber.Ctx) error {
-	asignmenttypdid := ctx.Query("assignmentTypeId")
-	estateTypeId := ctx.Query("estateTypeId")
-
-	if !bson.IsObjectIdHex(asignmenttypdid) {
+	asignmenttypdid, err := primitive.ObjectIDFromHex(ctx.Query("assignmentTypeId"))
+	if err != nil {
 
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
 	}
-	if !bson.IsObjectIdHex(estateTypeId) {
+	estateTypeId, err := primitive.ObjectIDFromHex(ctx.Query("estateTypeId"))
 
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateID)
+	if err != nil {
+
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
 	}
 
-	form, err := r.form.GetForm(bson.ObjectIdHex(asignmenttypdid), bson.ObjectIdHex(estateTypeId))
+	form, err := r.form.GetForm(asignmenttypdid, estateTypeId)
 	if err != nil {
 
 		return ctx.Status(http.StatusOK).JSON(nil)
@@ -159,8 +157,12 @@ func (r *formController) GetForm(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /form [Delete]
 func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	err := r.form.DeleteForm(id)
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
+
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
+	}
+	err = r.form.DeleteForm(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
@@ -177,8 +179,12 @@ func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
 // @Router /form [put]
 func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 	var form models.Form
-	id := ctx.Params("id")
-	err := ctx.BodyParser(&form)
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
+
+		return ctx.Status(http.StatusBadRequest).JSON(util.ErrAssignmentTypeIdFailed)
+	}
+	err = ctx.BodyParser(&form)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrInvalidCredentials))
 	}

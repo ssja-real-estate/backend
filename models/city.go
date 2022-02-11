@@ -1,10 +1,12 @@
 package models
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type City struct {
-	Id   bson.ObjectId `json:"id" bson:"_id"`
-	Name string        `json:"name" bson:"name"`
+	Id            primitive.ObjectID `json:"id" bson:"_id"`
+	Name          string             `json:"name" bson:"name"`
+	MapInfo       mapInfo            `json:"mapinfo" bson:"mapinfo"`
+	Neighborhoods []Neighborhood     `json:"neighborhoods" bson:"neighborhoods"`
 }

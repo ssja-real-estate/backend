@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"context"
 	"realstate/db"
 	"realstate/models"
 
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const formcollection = "forms"
@@ -13,58 +15,77 @@ const formcollection = "forms"
 type FormRepository interface {
 	SaveForm(form *models.Form) error
 	GetForms() ([]models.Form, error)
-	GetFormById(id string) (form models.Form, err error)
-	GetForm(assignmenttypeid bson.ObjectId, estatetypeid bson.ObjectId) (form models.Form, err error)
-	DeleteForm(id string) (err error)
-	UpdateForm(id string, form *models.Form) error
-	IsExitAssignmentTypeId(assignmenttypeid bson.ObjectId) (int, error)
-	IsEstateTypeId(estatetypeid bson.ObjectId) (int, error)
+	GetFormById(id primitive.ObjectID) (form models.Form, err error)
+	GetForm(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (form models.Form, err error)
+	DeleteForm(id primitive.ObjectID) (err error)
+	UpdateForm(id primitive.ObjectID, form *models.Form) error
+	IsExitAssignmentTypeId(assignmenttypeid primitive.ObjectID) (int64, error)
+	IsEstateTypeId(estatetypeid primitive.ObjectID) (int64, error)
 }
 type formRepository struct {
-	c *mgo.Collection
+	c *mongo.Collection
 }
 
-func NewFormRepositor(conn db.Connection) FormRepository {
-	return &formRepository{conn.DB().C(formcollection)}
+func NewFormRepositor(DB *mongo.Client) FormRepository {
+	return &formRepository{db.GetCollection(DB, formcollection)}
 }
 
 func (r *formRepository) SaveForm(form *models.Form) error {
-	return r.c.Insert(form)
+	_, err := r.c.InsertOne(context.TODO(), form)
+	return err
 }
 
-func (r *formRepository) GetForm(assignmenttypeid bson.ObjectId, estatetypeid bson.ObjectId) (form models.Form, err error) {
-	err = r.c.Find(bson.M{"assignmentTypeId": assignmenttypeid, "estateTypeId": estatetypeid}).One(&form)
+func (r *formRepository) GetForm(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (form models.Form, err error) {
+	err = r.c.FindOne(context.TODO(), bson.M{"assignmentTypeId": assignmenttypeid, "estateTypeId": estatetypeid}).Decode(&form)
 	return form, err
 }
-func (r *formRepository) GetForms() (forms []models.Form, err error) {
-	err = r.c.Find(bson.M{}).All(&forms)
+func (r *formRepository) GetForms() ([]models.Form, error) {
+
+	result, err := r.c.Find(context.TODO(), bson.M{})
+	var forms []models.Form
+	if err != nil {
+		return make([]models.Form, 0), err
+	}
+
+	defer result.Close(context.TODO())
+	for result.Next(context.TODO()) {
+		var form models.Form
+		if err = result.Decode(&form); err != nil {
+			return make([]models.Form, 0), err
+		}
+		forms = append(forms, form)
+	}
 	if forms == nil {
 		forms = make([]models.Form, 0)
 	}
 	return forms, err
 }
 
-func (r *formRepository) GetFormById(id string) (form models.Form, err error) {
-	err = r.c.Find(bson.M{"_id": id}).One(&form)
+func (r *formRepository) GetFormById(id primitive.ObjectID) (form models.Form, err error) {
+	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&form)
 	return form, err
 }
 
-func (r *formRepository) DeleteForm(id string) (err error) {
-	return r.c.RemoveId(bson.ObjectIdHex(id))
-
+func (r *formRepository) DeleteForm(id primitive.ObjectID) error {
+	_, err := r.c.DeleteOne(context.TODO(), bson.M{"_id": id})
+	return err
 }
 
-func (r *formRepository) UpdateForm(id string, form *models.Form) error {
-	return r.c.UpdateId(bson.ObjectIdHex(id), form)
+func (r *formRepository) UpdateForm(id primitive.ObjectID, form *models.Form) error {
+	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": id}, form)
+	return err
 }
 
-func (r *formRepository) IsExitAssignmentTypeId(assignmenttypeid bson.ObjectId) (int, error) {
-	n, err := r.c.Find(bson.M{"assignmentTypeId": assignmenttypeid}).Count()
-	return n, err
+func (r *formRepository) IsExitAssignmentTypeId(assignmenttypeid primitive.ObjectID) (int64, error) {
+	result, err := r.c.CountDocuments(context.TODO(), bson.M{"assignmentTypeId": assignmenttypeid})
+	if err != nil {
+		return 0, err
+	}
+
+	return result, err
 }
 
-func (r *formRepository) IsEstateTypeId(estatetypeid bson.ObjectId) (int, error) {
-	n, err := r.c.Find(bson.M{"estateTypeId": estatetypeid}).Count()
-
+func (r *formRepository) IsEstateTypeId(estatetypeid primitive.ObjectID) (int64, error) {
+	n, err := r.c.CountDocuments(context.TODO(), bson.M{"estateTypeId": estatetypeid})
 	return n, err
 }

@@ -3,14 +3,14 @@ package models
 import (
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type User struct {
-	Id       bson.ObjectId `json:"id" bson:"_id"`
-	Name     string        `json:"name" bson:"name"`
-	Password string        `json:"password" bson:"password"`
-	Mobile   string        `json:"mobile" bson:"mobile"`
+	Id       primitive.ObjectID `json:"id" bson:"_id"`
+	Name     string             `json:"name" bson:"name"`
+	Password string             `json:"password" bson:"password"`
+	Mobile   string             `json:"mobile" bson:"mobile"`
 	// owner 1 Admin 2 User 3
 	Role       int       `json:"role"  bson:"role"`
 	VerifyCode string    `json:"-" bson:"verifyCode"`

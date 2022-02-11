@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ProvinceController interface {
@@ -20,7 +20,11 @@ type ProvinceController interface {
 	GetProvinces(ctx *fiber.Ctx) error
 	DeleteProvince(ctx *fiber.Ctx) error
 	AddCity(ctx *fiber.Ctx) error
+	EditCity(ctx *fiber.Ctx) error
 	DeleteCity(ctx *fiber.Ctx) error
+	AddNeighborhood(ctx *fiber.Ctx) error
+	EditNeighborhood(ctx *fiber.Ctx) error
+	DeleteNeighborhood(ctx *fiber.Ctx) error
 }
 
 type provinceController struct {
@@ -46,7 +50,7 @@ func (c *provinceController) CreateProvince(ctx *fiber.Ctx) error {
 	}
 	exists, err := c.province.GetProvinceByName(province.Name)
 
-	if err == mgo.ErrNotFound {
+	if err == mongo.ErrNilDocument {
 		if strings.TrimSpace(province.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -54,7 +58,7 @@ func (c *provinceController) CreateProvince(ctx *fiber.Ctx) error {
 		}
 		province.CreatedAt = time.Now()
 		province.UpdatedAt = time.Now()
-		province.Id = bson.NewObjectId()
+		province.Id = primitive.NewObjectID()
 		err = c.province.SaveProvince(&province)
 		if err != nil {
 			return ctx.
@@ -94,8 +98,8 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 
 	_, err = r.province.GetProvinceByName(province.Name)
 
-	if err == mgo.ErrNotFound {
-		dbprovince, err := r.province.GetProvinceById(province.Id.Hex())
+	if err == mongo.ErrNilDocument {
+		dbprovince, err := r.province.GetProvinceById(province.Id)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -125,8 +129,8 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /province/id [get]
 func (r *provinceController) GetProvince(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	province, err := r.province.GetProvinceById(id)
@@ -162,11 +166,11 @@ func (r *provinceController) GetProvinces(ctx *fiber.Ctx) error {
 // @Router /province/id [delete]
 func (r *provinceController) DeleteProvince(ctx *fiber.Ctx) error {
 
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-	err := r.province.DeleteProvince(id)
+	err = r.province.DeleteProvince(id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -182,13 +186,13 @@ func (r *provinceController) DeleteProvince(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /province/city/id [post]
 func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 
-	if !bson.IsObjectIdHex(id) {
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	var city models.City
-	err := ctx.BodyParser(&city)
+	err = ctx.BodyParser(&city)
 	if err != nil {
 
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -208,7 +212,7 @@ func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
 	if count > 0 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
 	}
-	city.Id = bson.NewObjectId()
+	city.Id = primitive.NewObjectID()
 	err = r.province.AddCity(city, id)
 
 	if err != nil {
@@ -228,18 +232,110 @@ func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
 func (r *provinceController) DeleteCity(ctx *fiber.Ctx) error {
 	var city models.City
 	err := ctx.BodyParser(&city)
-
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrUnauthorized))
 	}
-
 	err = r.province.DeleteCityByID(city, id)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(util.SuccessDelete)
+}
+
+func (r *provinceController) AddNeighborhood(ctx *fiber.Ctx) error {
+	proviceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	var neighborhood models.Neighborhood
+	err = ctx.BodyParser(&neighborhood)
+	if err != nil {
+
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	neighborhood.Id = primitive.NewObjectID()
+	err = r.province.AddNeighborhood(neighborhood, cityid, proviceid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+}
+
+func (r *provinceController) EditCity(ctx *fiber.Ctx) error {
+	proviceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceid"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityid"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	var neighborhood models.Neighborhood
+	err = ctx.BodyParser(&neighborhood)
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	err = r.province.AddNeighborhood(neighborhood, cityid, proviceid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+}
+
+func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
+	proviceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	neighborhoodid, err := primitive.ObjectIDFromHex(ctx.Params("neighborhoodId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	var neighborhood models.Neighborhood
+	err = ctx.BodyParser(&neighborhood)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	err = r.province.EditNeighborhood(proviceid, cityid, neighborhoodid, neighborhood)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+}
+
+func (r *provinceController) DeleteNeighborhood(ctx *fiber.Ctx) error {
+	proviceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceid"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityid"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	var neighborhood models.Neighborhood
+	err = ctx.BodyParser(&neighborhood)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	err = r.province.AddNeighborhood(neighborhood, cityid, proviceid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
 }

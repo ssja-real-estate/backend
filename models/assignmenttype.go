@@ -3,13 +3,13 @@ package models
 import (
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AssignmentType struct {
 	// required: false
-	Id   bson.ObjectId `json:"id" bson:"_id"`
-	Name string        `json:"name" bson:"name"`
+	Id   primitive.ObjectID `json:"id" bson:"_id"`
+	Name string             `json:"name" bson:"name"`
 	// required: false
 	CreatedAt time.Time `json:"-" bson:"createdAt" `
 	// required: false

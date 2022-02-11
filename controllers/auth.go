@@ -15,8 +15,8 @@ import (
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AuthController interface {
@@ -102,7 +102,7 @@ func (c *authController) ForgetPassword(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
 	}
-	if err == mgo.ErrNotFound {
+	if err == mongo.ErrNilDocument {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
 	if !user.Verify {
@@ -118,17 +118,23 @@ func (c *authController) ForgetPassword(ctx *fiber.Ctx) error {
 
 }
 func (c *authController) SignUp(ctx *fiber.Ctx) error {
+	fmt.Println("1")
 	var newUser models.User
+	fmt.Println("2")
 	err := ctx.BodyParser(&newUser)
+	fmt.Println("3")
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(err))
 	}
-
+	fmt.Println("4")
 	exists, err := c.usersRepo.GetByMobile(newUser.Mobile)
-
-	if err == mgo.ErrNotFound {
+	fmt.Println("5")
+	fmt.Println(err)
+	fmt.Println("----------------------------------------------")
+	if err == mongo.ErrNoDocuments {
+		fmt.Println("6")
 		if strings.TrimSpace(newUser.Mobile) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -148,7 +154,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		newUser.Verify = false
 		newUser.VerifyCode = strconv.FormatInt(int64(rand.Intn(89000)+10000), 10)
 
-		newUser.Id = bson.NewObjectId()
+		newUser.Id = primitive.NewObjectID()
 		err = c.usersRepo.Save(&newUser)
 
 		if err != nil {
@@ -267,8 +273,8 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /user/id [get]
 func (c *authController) GetUser(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
 
@@ -303,12 +309,12 @@ func (c *authController) GetUsers(ctx *fiber.Ctx) error {
 }
 
 func (c *authController) PutUser(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
 	var update models.User
-	err := ctx.BodyParser(&update)
+	err = ctx.BodyParser(&update)
 	if update.Role < 1 && update.Role > 3 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrBadRole))
 	}
@@ -319,7 +325,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 	}
 
 	exists, err := c.usersRepo.GetByMobile(update.Mobile)
-	if err == mgo.ErrNotFound || exists.Id.Hex() == id {
+	if err == mongo.ErrNilDocument || exists.Id == id {
 		user, err := c.usersRepo.GetById(id)
 		if err != nil {
 			return ctx.
@@ -355,17 +361,17 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 }
 
 func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
 	}
-	err := c.usersRepo.Delete(id)
+	err = c.usersRepo.Delete(id)
 	if err != nil {
 		return ctx.
 			Status(http.StatusInternalServerError).
 			JSON(util.NewJError(err))
 	}
-	ctx.Set("Entity", id)
+	ctx.Set("Entity", id.String())
 	return ctx.
 		Status(http.StatusOK).
 		JSON(util.SuccessDelete)
@@ -385,7 +391,7 @@ func (c *authController) Changepassword(ctx *fiber.Ctx) error {
 	currentpassword := ctx.Query("currentPassword")
 	newpassowrd := ctx.Query("newPassword")
 	id, err := security.GetUserByToken(ctx)
-	
+
 	if err != nil {
 		return ctx.Status(http.StatusUnauthorized).JSON(util.ErrInvalidAuthToken)
 	}
@@ -397,7 +403,7 @@ func (c *authController) Changepassword(ctx *fiber.Ctx) error {
 	}
 
 	err = security.VerifyPassword(user.Password, currentpassword)
-	
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNoMatchPassword)
 	}
@@ -417,8 +423,8 @@ func (c *authController) Changepassword(ctx *fiber.Ctx) error {
 }
 
 func AuthRequestWithId(ctx *fiber.Ctx) (*jwt.StandardClaims, error) {
-	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
 		return nil, util.ErrUnauthorized
 	}
 	token := ctx.Locals("user").(*jwt.Token)
@@ -426,7 +432,7 @@ func AuthRequestWithId(ctx *fiber.Ctx) (*jwt.StandardClaims, error) {
 	if err != nil {
 		return nil, err
 	}
-	if payload.Id != id || payload.Issuer != id {
+	if payload.Id != id.String() || payload.Issuer != id.String() {
 		return nil, util.ErrUnauthorized
 	}
 	return payload, nil
