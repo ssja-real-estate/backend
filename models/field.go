@@ -22,7 +22,7 @@ const (
 type Field struct {
 	Id       primitive.ObjectID `json:"id" bson:"_id"`
 	Title    string             `json:"title" bson:"title"`
-	Value    string             `json:"value" bson:"value"`
+	Value    Valuetype          `json:"value" bson:"value"`
 	Min      float64            `json:"min" bson:"min"`
 	Max      float64            `json:"max" bson:"max"`
 	Optional bool               `json:"optional" bson:"optional"`
@@ -48,7 +48,7 @@ func (filed *Field) Validate() error {
 	if filed.Optional == true {
 		return nil
 	}
-	if filed.Value == "" {
+	if filed.Value == nil {
 		return errors.New(fmt.Sprint("فیلد ", filed.Title, " نباید خالی باشد"))
 	}
 	if filed.Fields != nil {
@@ -68,11 +68,11 @@ func (field *Field) setValue() {
 	case Text:
 		field.Value = ""
 	case Number:
-		field.Value = "0"
+		field.Value = 0
 	// case Select:
 	// 	field.Value =
 	case Bool:
-		field.Value = "false"
+		field.Value = false
 	case Conditional:
 		{
 			field.Value = ""
@@ -81,7 +81,7 @@ func (field *Field) setValue() {
 		field.Value = ""
 	case Range:
 		{
-			field.Value = "0"
+			field.Value = 0
 			field.Max = 0
 			field.Min = 0
 		}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"realstate/db"
 	"realstate/models"
 
@@ -50,6 +51,9 @@ func (r *formRepository) GetForms() ([]models.Form, error) {
 	defer result.Close(context.TODO())
 	for result.Next(context.TODO()) {
 		var form models.Form
+		fmt.Println("------------------------")
+		fmt.Println(result.Current)
+		fmt.Println("----------------------")
 		if err = result.Decode(&form); err != nil {
 			return make([]models.Form, 0), err
 		}
