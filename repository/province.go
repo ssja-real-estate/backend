@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const provincecollection = "province"
@@ -92,8 +93,9 @@ func (r *provinceRepository) DeleteProvince(id primitive.ObjectID) error {
 func (r *provinceRepository) AddCity(city models.City, id primitive.ObjectID) error {
 
 	_city := bson.M{"$push": bson.M{"cities": city}}
+	opts := options.Update().SetUpsert(true)
 	provice := bson.M{"_id": id}
-	_, err := r.c.UpdateOne(context.TODO(), provice, _city)
+	_, err := r.c.UpdateOne(context.TODO(), provice, _city, opts)
 	return err
 
 }

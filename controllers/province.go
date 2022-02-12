@@ -59,6 +59,9 @@ func (c *provinceController) CreateProvince(ctx *fiber.Ctx) error {
 		province.CreatedAt = time.Now()
 		province.UpdatedAt = time.Now()
 		province.Id = primitive.NewObjectID()
+		if province.Cities == nil {
+			province.Cities = make([]models.City, 0)
+		}
 		err = c.province.SaveProvince(&province)
 		if err != nil {
 			return ctx.
@@ -107,6 +110,9 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 		}
 		dbprovince.UpdatedAt = time.Now()
 		dbprovince.Name = province.Name
+		if dbprovince.Cities == nil {
+			dbprovince.Cities = make([]models.City, 0)
+		}
 		err = r.province.UpdateProvince(dbprovince)
 		if err != nil {
 
@@ -213,6 +219,9 @@ func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
 	}
 	city.Id = primitive.NewObjectID()
+	if city.Neighborhoods == nil {
+		city.Neighborhoods = make([]models.Neighborhood, 0)
+	}
 	err = r.province.AddCity(city, id)
 
 	if err != nil {
