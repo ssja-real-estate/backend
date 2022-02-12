@@ -7,7 +7,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Valuetype interface{}
+type Valuetype interface {
+}
+type text struct {
+	value string
+}
+type number struct {
+	value int
+}
+type boolean struct {
+	value bool
+}
+type arraystring struct {
+	value []string
+}
+type arrayint struct {
+	value []int
+}
 
 const (
 	Text        = 0
@@ -20,15 +36,15 @@ const (
 )
 
 type Field struct {
-	Id       primitive.ObjectID `json:"id" bson:"_id"`
-	Title    string             `json:"title" bson:"title"`
-	Value    Valuetype          `json:"value" bson:"value"`
-	Min      float64            `json:"min" bson:"min"`
-	Max      float64            `json:"max" bson:"max"`
-	Optional bool               `json:"optional" bson:"optional"`
-	Options  []string           `json:"options" bson:"options"`
-	Fields   []Field            `json:"fields" bson:"fields"`
-	Type     int                `json:"type"  bson:"type"`
+	Id         primitive.ObjectID `json:"id" bson:"_id"`
+	Title      string             `json:"title" bson:"title"`
+	FiledValue interface{}        `json:"fieldValue" bson:"fieldValue"`
+	Min        float64            `json:"min" bson:"min"`
+	Max        float64            `json:"max" bson:"max"`
+	Optional   bool               `json:"optional" bson:"optional"`
+	Options    []string           `json:"options" bson:"options"`
+	Fields     []Field            `json:"fields" bson:"fields"`
+	Type       int                `json:"type"  bson:"type"`
 }
 
 // to do set value from type by enum
@@ -48,7 +64,7 @@ func (filed *Field) Validate() error {
 	if filed.Optional == true {
 		return nil
 	}
-	if filed.Value == nil {
+	if filed.FiledValue == nil {
 		return errors.New(fmt.Sprint("فیلد ", filed.Title, " نباید خالی باشد"))
 	}
 	if filed.Fields != nil {
@@ -66,22 +82,22 @@ func (filed *Field) Validate() error {
 func (field *Field) setValue() {
 	switch field.Type {
 	case Text:
-		field.Value = ""
+		field.FiledValue = text{}
 	case Number:
-		field.Value = 0
+		field.FiledValue = number{}
 	// case Select:
 	// 	field.Value =
 	case Bool:
-		field.Value = false
+		field.FiledValue = boolean{}
 	case Conditional:
 		{
-			field.Value = ""
+			field.FiledValue = arrayint{}
 		}
 	case Image:
-		field.Value = ""
+		field.FiledValue = arrayint{}
 	case Range:
 		{
-			field.Value = 0
+			field.FiledValue = arrayint{}
 			field.Max = 0
 			field.Min = 0
 		}
