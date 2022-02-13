@@ -12,9 +12,8 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-	dbPass := os.Getenv("DBPASS")
 	//  client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://analytics:"+dbPass+"@amlak.wjtlb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://analytics:%s@amlak.wjtlb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", os.Getenv("DBPASS"))))
 	if err != nil {
 		fmt.Println("---------error in connecting --------")
 		log.Fatal(err)
