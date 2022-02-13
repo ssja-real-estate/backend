@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -11,9 +12,9 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
-
+	dbPass := os.Getenv("DBPASS")
+	//  client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://analytics:"+dbPass+"@amlak.wjtlb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"))
 	if err != nil {
 		fmt.Println("---------error in connecting --------")
 		log.Fatal(err)
