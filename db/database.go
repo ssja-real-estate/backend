@@ -12,7 +12,8 @@ import (
 
 func ConnectDB() *mongo.Client {
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
+	// client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://analytics:Amanc1101@amlak.wjtlb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"))
 	if err != nil {
 		fmt.Println("---------error in connecting --------")
 		log.Fatal(err)

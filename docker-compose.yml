@@ -23,6 +23,6 @@ services:
         dockerfile: Dockerfile    
      ports: 
       - "8080:8000"
-     depends_on:
-      - mongo
+   #   depends_on:
+   #    - mongo
  
