@@ -14,7 +14,7 @@ const settingCollection = "settings"
 
 type AssignmentTypeRepository interface {
 	Save(assignmenttype *models.AssignmentType) error
-	Update(assignmenttype *models.AssignmentType) error
+	Update(assignmenttype *models.AssignmentType, assignmenttypeid primitive.ObjectID) error
 	GetById(id primitive.ObjectID) (assignmenttype *models.AssignmentType, err error)
 	GetByName(name string) (assignmenttype *models.AssignmentType, err error)
 	GetAll() ([]models.AssignmentType, error)
@@ -34,8 +34,11 @@ func (r *assignmentTypeRepository) Save(assignmenmenttype *models.AssignmentType
 	return err
 
 }
-func (r *assignmentTypeRepository) Update(assignmenttype *models.AssignmentType) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": assignmenttype.Id}, assignmenttype)
+func (r *assignmentTypeRepository) Update(assignmenttype *models.AssignmentType, assignmenttypeid primitive.ObjectID) error {
+	filter := bson.M{"_id": assignmenttypeid}
+	update := bson.M{"$set": &assignmenttype}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
+
 	return err
 }
 

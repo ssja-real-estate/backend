@@ -14,7 +14,7 @@ const unitcollection = "units"
 
 type UnitRepository interface {
 	SaveUnit(unit *models.Unit) error
-	UpdateUnit(unit *models.Unit) error
+	UpdateUnit(unit *models.Unit, id primitive.ObjectID) error
 	GetUnitById(id primitive.ObjectID) (unit *models.Unit, err error)
 	GetUnitByName(name string) (unit *models.Unit, err error)
 	GetUnitAll() (units []models.Unit, err error)
@@ -33,8 +33,10 @@ func (r *unitRepository) SaveUnit(unit *models.Unit) error {
 	_, err := r.c.InsertOne(context.TODO(), unit)
 	return err
 }
-func (r *unitRepository) UpdateUnit(unit *models.Unit) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": unit.Id}, unit)
+func (r *unitRepository) UpdateUnit(unit *models.Unit, id primitive.ObjectID) error {
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": &unit}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 }
 

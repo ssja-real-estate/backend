@@ -87,9 +87,13 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 // @Router /EstateType/ [put]
 // @Security ApiKeyAuth
 func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
+	estateTypeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
+	if err != nil {
+		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
+	}
 
 	var estatetype models.EstateType
-	err := ctx.BodyParser(&estatetype)
+	err = ctx.BodyParser(&estatetype)
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
@@ -100,7 +104,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 	_, err = r.esstatetype.GetEstateTypeByName(estatetype.Name)
 
 	if err == mongo.ErrNoDocuments {
-		dbestatetype, err := r.esstatetype.GetEstateTypeById(estatetype.Id)
+		dbestatetype, err := r.esstatetype.GetEstateTypeById(estateTypeid)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -108,7 +112,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 		}
 		dbestatetype.UpdatedAt = time.Now()
 		dbestatetype.Name = estatetype.Name
-		err = r.esstatetype.UpdateEstateType(dbestatetype)
+		err = r.esstatetype.UpdateEstateType(dbestatetype, estateTypeid)
 		if err != nil {
 
 			return ctx.Status(http.StatusInternalServerError).JSON(err)

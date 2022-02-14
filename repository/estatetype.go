@@ -14,7 +14,7 @@ const estateCollection = "estatetype"
 
 type EstateTypeRepository interface {
 	SaveEstateType(estatetype *models.EstateType) error
-	UpdateEstateType(estatetype *models.EstateType) error
+	UpdateEstateType(estatetype *models.EstateType, estateid primitive.ObjectID) error
 	GetEstateTypeById(id primitive.ObjectID) (estatetype *models.EstateType, err error)
 	GetEstateTypeByName(name string) (estatetype *models.EstateType, err error)
 	GetEstateTypeAll() ([]models.EstateType, error)
@@ -33,8 +33,10 @@ func (r *estateTypeRepository) SaveEstateType(estatetype *models.EstateType) err
 	_, err := r.c.InsertOne(context.TODO(), estatetype)
 	return err
 }
-func (r *estateTypeRepository) UpdateEstateType(estatetype *models.EstateType) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": estatetype.Id}, estatetype)
+func (r *estateTypeRepository) UpdateEstateType(estatetype *models.EstateType, estatetypeid primitive.ObjectID) error {
+	filter := bson.M{"_id": estatetypeid}
+	update := bson.M{"$set": &estatetype}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 }
 

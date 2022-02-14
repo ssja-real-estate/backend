@@ -17,14 +17,15 @@ const provincecollection = "province"
 
 type ProvinceRepository interface {
 	SaveProvince(province *models.Province) error
-	UpdateProvince(province *models.Province) error
+	UpdateProvince(province *models.Province, provinceid primitive.ObjectID) error
 	GetProvinceById(id primitive.ObjectID) (province *models.Province, err error)
 	GetProvinceByName(name string) (province *models.Province, err error)
 	GetProvinceAll() (provinces []models.Province, err error)
 	DeleteProvince(id primitive.ObjectID) error
 	AddCity(city models.City, id primitive.ObjectID) error
 	EditCity(city models.City, provinceid primitive.ObjectID, cityid primitive.ObjectID) error
-	GetCityByName(name string, id primitive.ObjectID) (int64, error)
+	CityExists(name string, id primitive.ObjectID) (int64, error)
+	GetCityById(provinceid primitive.ObjectID, cityid primitive.ObjectID) (models.City, error)
 	DeleteCityByID(proviceid primitive.ObjectID, cityid primitive.ObjectID) error
 	IsProvinceDelete(provinceid primitive.ObjectID) (int64, error)
 	AddNeighborhood(models.Neighborhood, primitive.ObjectID, primitive.ObjectID) error
@@ -45,8 +46,8 @@ func (r *provinceRepository) SaveProvince(province *models.Province) error {
 	return err
 }
 
-func (r *provinceRepository) UpdateProvince(province *models.Province) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": province.Id}, province)
+func (r *provinceRepository) UpdateProvince(province *models.Province, provinceid primitive.ObjectID) error {
+	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": provinceid}, province)
 	return err
 
 }
@@ -105,13 +106,7 @@ func (r *provinceRepository) AddCity(city models.City, id primitive.ObjectID) er
 }
 
 func (r *provinceRepository) EditCity(city models.City, provinceid primitive.ObjectID, cityid primitive.ObjectID) error {
-	count, err := r.GetCityByName(city.Name, provinceid)
-	if err != nil {
-		return nil
-	}
-	if count > 0 {
-		return util.ErrNameAlreadyExists
-	}
+
 	res := r.c.FindOneAndUpdate(
 		context.TODO(),
 		bson.D{
@@ -125,6 +120,14 @@ func (r *provinceRepository) EditCity(city models.City, provinceid primitive.Obj
 	)
 
 	return res.Err()
+}
+func (r *provinceRepository) GetCityById(provinceid primitive.ObjectID, cityid primitive.ObjectID) (models.City, error) {
+	var provice models.Province
+	err := r.c.FindOne(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid}).Decode(provice)
+	if err != nil {
+		return models.City{}, err
+	}
+	return provice.Cities[0], err
 }
 func (r *provinceRepository) AddNeighborhood(neighborhood models.Neighborhood, cityid primitive.ObjectID, provinceid primitive.ObjectID) error {
 
@@ -141,8 +144,12 @@ func (r *provinceRepository) AddNeighborhood(neighborhood models.Neighborhood, c
 	return err
 
 }
-func (r *provinceRepository) GetCityByName(name string, id primitive.ObjectID) (int64, error) {
+func (r *provinceRepository) CityExists(name string, id primitive.ObjectID) (int64, error) {
+
 	count, err := r.c.CountDocuments(context.TODO(), bson.M{"_id": id, "cities.name": name})
+	if err != nil {
+		return 0, err
+	}
 	return count, err
 
 }
@@ -171,14 +178,6 @@ func (r *provinceRepository) GetNeighborhoodByName(provinceid primitive.ObjectID
 }
 
 func (r *provinceRepository) EditNeighborhood(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID, neighborhood models.Neighborhood) error {
-	count, err := r.GetNeighborhoodByName(provinceid, cityid, neighborhood.Name)
-	if err != nil {
-		return err
-	}
-	if count > 0 {
-		return util.ErrIsNeighborhoodExists
-	}
-
 	res := r.c.FindOneAndUpdate(
 		context.TODO(),
 		bson.D{
@@ -219,4 +218,12 @@ func (r *provinceRepository) DeleteNeighborhoodById(provinceid primitive.ObjectI
 	_, err := r.c.UpdateOne(context.TODO(), province, action)
 
 	return err
+}
+
+func (r *provinceRepository) ErrIsNeighborhoodExists(provinceid primitive.ObjectID, cityid primitive.ObjectID, neigborhoodid primitive.ObjectID) (int64, error) {
+	count, err := r.c.CountDocuments(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid, "citites.neighborhoods._id": neigborhoodid})
+	if err != nil {
+		return 0, err
+	}
+	return count, err
 }

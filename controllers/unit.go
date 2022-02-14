@@ -81,8 +81,12 @@ func (c *unitController) CreateUnit(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /Unit/ [put]
 func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
+	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
+	}
 	var unit models.Unit
-	err := ctx.BodyParser(&unit)
+	err = ctx.BodyParser(&unit)
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
@@ -93,7 +97,7 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 	_, err = r.unit.GetUnitByName(unit.Name)
 
 	if err == mongo.ErrNoDocuments {
-		dbunit, err := r.unit.GetUnitById(unit.Id)
+		dbunit, err := r.unit.GetUnitById(id)
 		if err != nil {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -101,7 +105,7 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 		}
 		dbunit.UpdatedAt = time.Now()
 		dbunit.Name = unit.Name
-		err = r.unit.UpdateUnit(dbunit)
+		err = r.unit.UpdateUnit(dbunit, id)
 		if err != nil {
 
 			return ctx.Status(http.StatusInternalServerError).JSON(err)

@@ -57,7 +57,9 @@ func (r *usersRepository) Save(user *models.User) error {
 }
 
 func (r *usersRepository) Update(user *models.User) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": user.Id}, &user)
+	filter := bson.M{"_id": user.Id}
+	update := bson.M{"$set": &user}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 }
 

@@ -112,16 +112,15 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 	}
 	if province.Name != dbprovince.Name {
 		_, err = r.province.GetProvinceByName(province.Name)
+
 	}
 
 	if err == mongo.ErrNoDocuments || err == nil {
 
-		dbprovince.UpdatedAt = time.Now()
-		dbprovince.Name = province.Name
-		if dbprovince.Cities == nil {
+		if province.Cities == nil {
 			dbprovince.Cities = make([]models.City, 0)
 		}
-		err = r.province.UpdateProvince(dbprovince)
+		err = r.province.UpdateProvince(&province, provinceid)
 		if err != nil {
 
 			return ctx.Status(http.StatusInternalServerError).JSON(err)
@@ -218,7 +217,7 @@ func (r *provinceController) AddCity(ctx *fiber.Ctx) error {
 	if strings.TrimSpace(exists.Name) == "" {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(util.ErrNotFound))
 	}
-	count, err := r.province.GetCityByName(city.Name, id)
+	count, err := r.province.CityExists(city.Name, id)
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -303,11 +302,25 @@ func (r *provinceController) EditCity(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
+	dbcity, err := r.province.GetCityById(proviceid, cityid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	if dbcity.Name != city.Name {
+		count, err := r.province.CityExists(city.Name, proviceid)
+		if err != nil {
+			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		}
+		if count > 0 {
+			return ctx.Status(http.StatusBadRequest).JSON(util.ErrNameAlreadyExists)
+		}
+	}
+
 	err = r.province.EditCity(city, proviceid, cityid)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": city})
 }
 
 func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
@@ -333,7 +346,7 @@ func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": neighborhood})
 }
 
 func (r *provinceController) DeleteNeighborhood(ctx *fiber.Ctx) error {

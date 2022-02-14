@@ -17,7 +17,7 @@ func NewUnitRoute(unitcontroller controllers.UnitController) Routes {
 func (r *unitRoutes) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/unit", AuthRequired, r.unitController.CreateUnit)
-	api.Put("/unit", AuthRequired, r.unitController.UpdateUnit)
+	api.Put("/unit/:id", AuthRequired, r.unitController.UpdateUnit)
 	api.Get("/unit/:id", AuthRequired, r.unitController.GetUnit)
 	api.Get("/unit", AuthRequired, r.unitController.GetUnits)
 	api.Delete("/unit/:id", AuthRequired, r.unitController.DeleteUnit)

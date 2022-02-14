@@ -14,7 +14,7 @@ const estateCollections = "estate"
 
 type EstateRepository interface {
 	SaveEstate(estate *models.Estate) error
-	UpdateEstate(estate *models.Estate) error
+	UpdateEstate(estate *models.Estate, estateid primitive.ObjectID) error
 	DeleteEstate(estateid primitive.ObjectID) error
 	GetEstateById(estateid primitive.ObjectID) (models.Estate, error)
 }
@@ -32,8 +32,11 @@ func (r *estateRepository) SaveEstate(estate *models.Estate) error {
 	return err
 }
 
-func (r *estateRepository) UpdateEstate(estate *models.Estate) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": estate.Id}, estate)
+func (r *estateRepository) UpdateEstate(estate *models.Estate, estateid primitive.ObjectID) error {
+
+	filter := bson.M{"_id": estateid}
+	update := bson.M{"$set": &estate}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 
 }

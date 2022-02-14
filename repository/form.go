@@ -73,7 +73,9 @@ func (r *formRepository) DeleteForm(id primitive.ObjectID) error {
 }
 
 func (r *formRepository) UpdateForm(id primitive.ObjectID, form *models.Form) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": id}, form)
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": &form}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 }
 
