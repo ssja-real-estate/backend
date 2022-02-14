@@ -30,6 +30,7 @@ type ProvinceRepository interface {
 	IsProvinceDelete(provinceid primitive.ObjectID) (int64, error)
 	AddNeighborhood(models.Neighborhood, primitive.ObjectID, primitive.ObjectID) error
 	EditNeighborhood(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID, neighborhood models.Neighborhood) error
+
 	GetNeighborhoodByName(provinceid primitive.ObjectID, cityid primitive.ObjectID, name string) (int64, error)
 	DeleteNeighborhoodById(provinceid primitive.ObjectID, cityid primitive.ObjectID, neghborhoodid primitive.ObjectID) error
 }
@@ -47,7 +48,9 @@ func (r *provinceRepository) SaveProvince(province *models.Province) error {
 }
 
 func (r *provinceRepository) UpdateProvince(province *models.Province, provinceid primitive.ObjectID) error {
-	_, err := r.c.UpdateOne(context.TODO(), bson.M{"_id": provinceid}, province)
+	filter := bson.M{"_id": provinceid}
+	update := bson.M{"$set": bson.M{"name": province.Name, "mapinfo": &province.MapInfo}}
+	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 
 }
@@ -113,7 +116,7 @@ func (r *provinceRepository) EditCity(city models.City, provinceid primitive.Obj
 			{"_id", provinceid},
 			{"cities._id", cityid},
 		},
-		bson.M{"$set": bson.M{"cities.$[elem].name": city.Name}},
+		bson.M{"$set": bson.M{"cities.$[elem]": &city}},
 		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
 			Filters: []interface{}{bson.M{"elem._id": city.Id}},
 		}),
@@ -123,7 +126,7 @@ func (r *provinceRepository) EditCity(city models.City, provinceid primitive.Obj
 }
 func (r *provinceRepository) GetCityById(provinceid primitive.ObjectID, cityid primitive.ObjectID) (models.City, error) {
 	var provice models.Province
-	err := r.c.FindOne(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid}).Decode(provice)
+	err := r.c.FindOne(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid}).Decode(&provice)
 	if err != nil {
 		return models.City{}, err
 	}
