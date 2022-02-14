@@ -90,8 +90,12 @@ func (c *provinceController) CreateProvince(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /Province/ [put]
 func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
+	provinceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceId"))
+	if err != nil {
+		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
+	}
 	var province models.Province
-	err := ctx.BodyParser(&province)
+	err = ctx.BodyParser(&province)
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
@@ -99,15 +103,19 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 
-	_, err = r.province.GetProvinceByName(province.Name)
+	dbprovince, err := r.province.GetProvinceById(provinceid)
 
-	if err == mongo.ErrNoDocuments {
-		dbprovince, err := r.province.GetProvinceById(province.Id)
-		if err != nil {
-			return ctx.
-				Status(http.StatusBadRequest).
-				JSON(util.NewJError(util.ErrNotFound))
-		}
+	if err != nil {
+		return ctx.
+			Status(http.StatusBadRequest).
+			JSON(util.NewJError(util.ErrNotFound))
+	}
+	if province.Name != dbprovince.Name {
+		_, err = r.province.GetProvinceByName(province.Name)
+	}
+
+	if err == mongo.ErrNoDocuments || err == nil {
+
 		dbprovince.UpdatedAt = time.Now()
 		dbprovince.Name = province.Name
 		if dbprovince.Cities == nil {

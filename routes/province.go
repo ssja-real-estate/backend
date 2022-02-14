@@ -17,7 +17,7 @@ func NewProvicneRoute(provincecontroller controllers.ProvinceController) Routes 
 func (r *provinceRoutes) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/province", AuthRequired, r.provinceController.CreateProvince)
-	api.Put("/province", AuthRequired, r.provinceController.UpdateProvince)
+	api.Put("/province/:provinceId", AuthRequired, r.provinceController.UpdateProvince)
 	api.Get("/province/:id", AuthRequired, r.provinceController.GetProvince)
 	api.Get("/province", AuthRequired, r.provinceController.GetProvinces)
 	api.Delete("/province/:id", AuthRequired, r.provinceController.DeleteProvince)
