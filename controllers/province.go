@@ -339,7 +339,7 @@ func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
 	}
 	var neighborhood models.Neighborhood
 	err = ctx.BodyParser(&neighborhood)
-	dbneigborhood, err := r.province.GetNeighborhoodByName()
+	_, err = r.province.GetNeighborhoodByName(proviceid, cityid, neighborhood.Name)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}

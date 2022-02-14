@@ -30,7 +30,6 @@ type ProvinceRepository interface {
 	IsProvinceDelete(provinceid primitive.ObjectID) (int64, error)
 	AddNeighborhood(models.Neighborhood, primitive.ObjectID, primitive.ObjectID) error
 	EditNeighborhood(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID, neighborhood models.Neighborhood) error
-
 	GetNeighborhoodByName(provinceid primitive.ObjectID, cityid primitive.ObjectID, name string) (int64, error)
 	DeleteNeighborhoodById(provinceid primitive.ObjectID, cityid primitive.ObjectID, neghborhoodid primitive.ObjectID) error
 }
