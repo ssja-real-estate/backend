@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"realstate/models"
 	"realstate/repository"
@@ -40,13 +41,16 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	form, err := ctx.MultipartForm()
 
 	forms := form.File["image"]
-
+	wd, _ := os.Getwd()
 	for _, item := range forms {
 		fmt.Println(item.Filename)
 
+		err = ctx.SaveFile(item, wd+"/app/images/"+item.Filename)
+		if err != nil {
+			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		}
 	}
 
-	// wd, _ := os.Getwd()
 	// file1, err1 := ctx.FormFile("image")
 
 	// if err1 != nil {
