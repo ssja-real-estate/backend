@@ -370,11 +370,11 @@ func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
 }
 
 func (r *provinceController) DeleteNeighborhood(ctx *fiber.Ctx) error {
-	proviceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceid"))
+	proviceid, err := primitive.ObjectIDFromHex(ctx.Params("provinceId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityid"))
+	cityid, err := primitive.ObjectIDFromHex(ctx.Params("cityId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -388,5 +388,5 @@ func (r *provinceController) DeleteNeighborhood(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+	return ctx.Status(http.StatusOK).JSON(util.SuccessDelete)
 }

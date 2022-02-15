@@ -215,16 +215,16 @@ func (r *provinceRepository) IsProvinceDelete(provinceid primitive.ObjectID) (in
 }
 func (r *provinceRepository) IsCityDelete(provinceid primitive.ObjectID, cityid primitive.ObjectID) (int64, error) {
 	count, err := r.c.CountDocuments(context.TODO(),
-		bson.M{"_id": provinceid, "cities._id": cityid, "cities.neghborhoods.0": bson.M{"$exists": true}})
+		bson.M{"_id": provinceid, "cities._id": cityid, "cities.neighborhoods.0": bson.M{"$exists": true}})
 	if err != nil {
 		return 0, err
 	}
 	return count, err
 }
 func (r *provinceRepository) DeleteNeighborhoodById(provinceid primitive.ObjectID, cityid primitive.ObjectID, neghborhoodid primitive.ObjectID) error {
-	province := bson.M{"_id": provinceid, "cities._id": cityid}
+	province := bson.M{"_id": provinceid, "cities._id": cityid, "cities.neighborhoods._id": neghborhoodid}
+	action := bson.M{"$pull": bson.M{"cities.$.neighborhoods": bson.M{"_id": neghborhoodid}}}
 
-	action := bson.M{"$pull": bson.M{"cities.neghborhoods._id": bson.M{"_id": neghborhoodid}}}
 	_, err := r.c.UpdateOne(context.TODO(), province, action)
 
 	return err
