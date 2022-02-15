@@ -39,9 +39,15 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	form, err := ctx.MultipartForm()
-
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
 	forms := form.File["image"]
-	wd, _ := os.Getwd()
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
 	for _, item := range forms {
 		fmt.Println(item.Filename)
 
