@@ -117,15 +117,12 @@ func (r *provinceController) UpdateProvince(ctx *fiber.Ctx) error {
 
 	if err == mongo.ErrNoDocuments || err == nil {
 
-		if province.Cities == nil {
-			dbprovince.Cities = make([]models.City, 0)
-		}
 		err = r.province.UpdateProvince(&province, provinceid)
 		if err != nil {
 
 			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
-		return ctx.Status(http.StatusOK).JSON(dbprovince)
+		return ctx.Status(http.StatusOK).JSON(province)
 
 	}
 
@@ -283,7 +280,7 @@ func (r *provinceController) AddNeighborhood(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "ok"})
+	return ctx.Status(http.StatusOK).JSON(neighborhood)
 }
 
 func (r *provinceController) EditCity(ctx *fiber.Ctx) error {
@@ -304,6 +301,7 @@ func (r *provinceController) EditCity(ctx *fiber.Ctx) error {
 
 	dbcity, err := r.province.GetCityById(proviceid, cityid)
 	if err != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	if dbcity.Name != city.Name {
@@ -312,15 +310,17 @@ func (r *provinceController) EditCity(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 		if count > 0 {
-			return ctx.Status(http.StatusBadRequest).JSON(util.ErrNameAlreadyExists)
+			return ctx.Status(http.StatusOK).JSON(dbcity)
 		}
 	}
-
+	city.Id = dbcity.Id
 	err = r.province.EditCity(city, proviceid, cityid)
 	if err != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": city})
+
+	return ctx.Status(http.StatusOK).JSON(city)
 }
 
 func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
@@ -337,17 +337,36 @@ func (r *provinceController) EditNeighborhood(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	var neighborhood models.Neighborhood
-	err = ctx.BodyParser(&neighborhood)
-	_, err = r.province.GetNeighborhoodByName(proviceid, cityid, neighborhood.Name)
+
+	dbneighborhood, err := r.province.GetNeighborhoodById(proviceid, cityid, neighborhoodid)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
+	var neighborhood models.Neighborhood
+	err = ctx.BodyParser(&neighborhood)
+
+	if neighborhood.Name != dbneighborhood.Name {
+
+		count, err := r.province.GetNeighborhoodByName(proviceid, cityid, neighborhood.Name)
+		if err != nil {
+
+			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		}
+
+		if count > 0 {
+
+			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsNeighborhoodExists))
+		}
+	}
+	neighborhood.Id = dbneighborhood.Id
+
 	err = r.province.EditNeighborhood(proviceid, cityid, neighborhoodid, neighborhood)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": neighborhood})
+	return ctx.Status(http.StatusOK).JSON(neighborhood)
 }
 
 func (r *provinceController) DeleteNeighborhood(ctx *fiber.Ctx) error {

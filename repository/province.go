@@ -31,6 +31,7 @@ type ProvinceRepository interface {
 	AddNeighborhood(models.Neighborhood, primitive.ObjectID, primitive.ObjectID) error
 	EditNeighborhood(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID, neighborhood models.Neighborhood) error
 	GetNeighborhoodByName(provinceid primitive.ObjectID, cityid primitive.ObjectID, name string) (int64, error)
+	GetNeighborhoodById(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID) (models.Neighborhood, error)
 	DeleteNeighborhoodById(provinceid primitive.ObjectID, cityid primitive.ObjectID, neghborhoodid primitive.ObjectID) error
 }
 type provinceRepository struct {
@@ -48,7 +49,7 @@ func (r *provinceRepository) SaveProvince(province *models.Province) error {
 
 func (r *provinceRepository) UpdateProvince(province *models.Province, provinceid primitive.ObjectID) error {
 	filter := bson.M{"_id": provinceid}
-	update := bson.M{"$set": bson.M{"name": province.Name, "mapinfo": &province.MapInfo}}
+	update := bson.M{"$set": bson.M{"name": province.Name, "mapInfo": &province.MapInfo}}
 	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 
@@ -117,7 +118,7 @@ func (r *provinceRepository) EditCity(city models.City, provinceid primitive.Obj
 		},
 		bson.M{"$set": bson.M{"cities.$[elem]": &city}},
 		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
-			Filters: []interface{}{bson.M{"elem._id": city.Id}},
+			Filters: []interface{}{bson.M{"elem._id": cityid}},
 		}),
 	)
 
@@ -125,11 +126,18 @@ func (r *provinceRepository) EditCity(city models.City, provinceid primitive.Obj
 }
 func (r *provinceRepository) GetCityById(provinceid primitive.ObjectID, cityid primitive.ObjectID) (models.City, error) {
 	var provice models.Province
-	err := r.c.FindOne(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid}).Decode(&provice)
+
+	query := bson.M{"_id": provinceid, "cities._id": cityid}
+	err := r.c.FindOne(context.TODO(), query).Decode(&provice)
 	if err != nil {
 		return models.City{}, err
 	}
-	return provice.Cities[0], err
+	for _, item := range provice.Cities {
+		if item.Id == cityid {
+			return item, nil
+		}
+	}
+	return models.City{}, mongo.ErrNoDocuments
 }
 func (r *provinceRepository) AddNeighborhood(neighborhood models.Neighborhood, cityid primitive.ObjectID, provinceid primitive.ObjectID) error {
 
@@ -175,7 +183,7 @@ func (r *provinceRepository) DeleteCityByID(proviceid primitive.ObjectID, cityid
 }
 
 func (r *provinceRepository) GetNeighborhoodByName(provinceid primitive.ObjectID, cityid primitive.ObjectID, name string) (int64, error) {
-	count, err := r.c.CountDocuments(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid, "cities.neighborhoods.name": name})
+	count, err := r.c.CountDocuments(context.TODO(), bson.M{"_id": provinceid, "cities": bson.M{"_id": cityid}, "cities.neighborhoods": bson.M{"name": name}})
 	return count, err
 }
 
@@ -228,4 +236,24 @@ func (r *provinceRepository) ErrIsNeighborhoodExists(provinceid primitive.Object
 		return 0, err
 	}
 	return count, err
+}
+
+func (r *provinceRepository) GetNeighborhoodById(provinceid primitive.ObjectID, cityid primitive.ObjectID, neighborhoodid primitive.ObjectID) (models.Neighborhood, error) {
+	var province models.Province
+	err := r.c.FindOne(context.TODO(), bson.M{"_id": provinceid, "cities._id": cityid, "cities.neighborhoods._id": neighborhoodid}).Decode(&province)
+
+	if err != nil {
+		return models.Neighborhood{}, err
+	}
+
+	for _, item := range province.Cities {
+
+		for _, city := range item.Neighborhoods {
+			if city.Id == neighborhoodid {
+				return city, nil
+			}
+		}
+
+	}
+	return models.Neighborhood{}, mongo.ErrNoDocuments
 }
