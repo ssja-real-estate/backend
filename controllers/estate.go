@@ -29,6 +29,7 @@ func NewEstateController(estaterepo repository.EstateRepository) EstateControlle
 	return &estateController{estaterepo}
 }
 func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
+	fmt.Println("is downloading")
 	var estate models.Estate
 	err := ctx.BodyParser(&estate)
 	if err != nil {
@@ -43,7 +44,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	forms := form.File["image"]
-
+	fmt.Println(len(forms))
 	wd, err := os.Getwd()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
