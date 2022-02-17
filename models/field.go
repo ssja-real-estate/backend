@@ -38,7 +38,7 @@ const (
 type Field struct {
 	Id         primitive.ObjectID `json:"id" bson:"_id"`
 	Title      string             `json:"title" bson:"title"`
-	FiledValue interface{}        `json:"fieldValue" bson:"fieldValue"`
+	FiledValue interface{}        `json:"value" bson:"value"`
 	Min        float64            `json:"min" bson:"min"`
 	Max        float64            `json:"max" bson:"max"`
 	Optional   bool               `json:"optional" bson:"optional"`
@@ -88,13 +88,13 @@ func (field *Field) setValue() {
 	// case Select:
 	// 	field.Value =
 	case Bool:
-		field.FiledValue = boolean{}
+		field.FiledValue = false
 	case Conditional:
 		{
-			field.FiledValue = arrayint{}
+			field.FiledValue = false
 		}
 	case Image:
-		field.FiledValue = arrayint{}
+		field.FiledValue = make([]string, 0)
 	case Range:
 		{
 			field.FiledValue = arrayint{}
