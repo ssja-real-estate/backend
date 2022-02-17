@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -32,7 +33,12 @@ func NewEstateController(estaterepo repository.EstateRepository) EstateControlle
 func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 
 	var estate models.Estate
+	fmt.Print(ctx)
 	err := ctx.BodyParser(&estate)
+	strestate := ctx.FormValue("estate")
+
+	json.Unmarshal([]byte(strestate), &estate)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -70,7 +76,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		for _, Sections := range estate.DataForm.Sections {
 			for _, field := range Sections.Fileds {
 				if field.Type == 5 {
-					field.FiledValue = images
+					estate.DataForm.Sections[0].Fileds[0].FiledValue = images
 				}
 			}
 
