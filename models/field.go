@@ -38,7 +38,7 @@ const (
 type Field struct {
 	Id         primitive.ObjectID `json:"id" bson:"_id"`
 	Title      string             `json:"title" bson:"title"`
-	FiledValue interface{}        `json:"value" bson:"value"`
+	FieldValue interface{}        `json:"value" bson:"value"`
 	Min        float64            `json:"min" bson:"min"`
 	Max        float64            `json:"max" bson:"max"`
 	Optional   bool               `json:"optional" bson:"optional"`
@@ -49,7 +49,6 @@ type Field struct {
 
 // to do set value from type by enum
 func (field *Field) updateid() {
-
 	field.Id = primitive.NewObjectID()
 	if len(field.Fields) > 0 {
 		for i := 0; i < len(field.Fields); i++ {
@@ -59,18 +58,17 @@ func (field *Field) updateid() {
 	} else {
 		field.setValue()
 	}
-
 }
 
-func (filed *Field) Validate() error {
-	if filed.Optional == true {
+func (field *Field) Validate() error {
+	if field.Optional == true {
 		return nil
 	}
-	if filed.FiledValue == nil {
-		return errors.New(fmt.Sprint("فیلد ", filed.Title, " نباید خالی باشد"))
+	if field.FieldValue == nil {
+		return errors.New(fmt.Sprint("فیلد ", field.Title, " نباید خالی باشد"))
 	}
-	if filed.Fields != nil {
-		for _, item := range filed.Fields {
+	if field.Fields != nil {
+		for _, item := range field.Fields {
 			err := item.Validate()
 			if err != nil {
 				return err
@@ -78,28 +76,26 @@ func (filed *Field) Validate() error {
 		}
 	}
 	return nil
-
 }
-
 func (field *Field) setValue() {
 	switch field.Type {
 	// case Text:
-	// 	field.FiledValue = ""
+	// 	field.FieldValue = ""
 	// case Number:
-	// 	field.FiledValue = 0
-	//  case Select:
-	// 	field.Value =nil
+	// 	field.FieldValue = 0
+	//   case Select:
+	// 	field.FieldValue =boolean{}
 	case Bool:
-		field.FiledValue = false
+		field.FieldValue = false
 	case Conditional:
 		{
-			field.FiledValue = false
+			field.FieldValue = false
 		}
 	case Image:
-		field.FiledValue = make([]string, 0)
+		field.FieldValue = make([]string, 0)
 	case Range:
 		{
-			field.FiledValue = arrayint{}
+			field.FieldValue = arrayint{}
 			field.Max = 0
 			field.Min = 0
 		}

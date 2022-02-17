@@ -28,39 +28,30 @@ type assignmentTypeRepository struct {
 func NewAssignmentTypesRepository(DB *mongo.Client) AssignmentTypeRepository {
 	return &assignmentTypeRepository{db.GetCollection(DB, settingCollection)}
 }
-
 func (r *assignmentTypeRepository) Save(assignmenmenttype *models.AssignmentType) error {
 	_, err := r.c.InsertOne(context.TODO(), assignmenmenttype)
 	return err
-
 }
 func (r *assignmentTypeRepository) Update(assignmenttype *models.AssignmentType, assignmenttypeid primitive.ObjectID) error {
 	filter := bson.M{"_id": assignmenttypeid}
 	update := bson.M{"$set": &assignmenttype}
 	_, err := r.c.UpdateOne(context.TODO(), filter, update)
-
 	return err
 }
 
 func (r *assignmentTypeRepository) GetById(id primitive.ObjectID) (assignmenttype *models.AssignmentType, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&assignmenttype)
-
 	return assignmenttype, err
 }
-
 func (r *assignmentTypeRepository) GetByName(name string) (assignmenttype *models.AssignmentType, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"name": name}).Decode(assignmenttype)
-
 	return assignmenttype, err
 }
 func (r *assignmentTypeRepository) GetAll() ([]models.AssignmentType, error) {
 	var assignments []models.AssignmentType
-
 	restult, err := r.c.Find(context.TODO(), bson.M{})
-
 	if err != nil {
 		return make([]models.AssignmentType, 0), err
-
 	}
 	defer restult.Close(context.TODO())
 	for restult.Next(context.TODO()) {
