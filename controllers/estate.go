@@ -22,6 +22,7 @@ type EstateController interface {
 	// UpdateEstate(ctx *fiber.Ctx) error
 	DeleteEstate(ctx *fiber.Ctx) error
 	GetEstate(ctx *fiber.Ctx) error
+	GetNotVerifiedEstate(ctx *fiber.Ctx) error
 }
 type estateController struct {
 	estate repository.EstateRepository
@@ -95,7 +96,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 }
 
 func (r *estateController) GetEstate(ctx *fiber.Ctx) error {
-	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	id, err := primitive.ObjectIDFromHex(ctx.Params("estaeId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
@@ -103,7 +104,7 @@ func (r *estateController) GetEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": &estate})
+	return ctx.Status(http.StatusOK).JSON(estate)
 }
 
 func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
@@ -116,4 +117,12 @@ func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "The Estate id Deleted....."})
+}
+func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
+	estates, err := r.estate.GetEstateNotVerified()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(estates)
+
 }

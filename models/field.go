@@ -83,12 +83,12 @@ func (filed *Field) Validate() error {
 
 func (field *Field) setValue() {
 	switch field.Type {
-	case Text:
-		field.FiledValue = text{}
-	case Number:
-		field.FiledValue = number{}
-	// case Select:
-	// 	field.Value =
+	// case Text:
+	// 	field.FiledValue = ""
+	// case Number:
+	// 	field.FiledValue = 0
+	//  case Select:
+	// 	field.Value =nil
 	case Bool:
 		field.FiledValue = false
 	case Conditional:

@@ -17,6 +17,7 @@ type EstateRepository interface {
 	UpdateEstate(estate *models.Estate, estateid primitive.ObjectID) error
 	DeleteEstate(estateid primitive.ObjectID) error
 	GetEstateById(estateid primitive.ObjectID) (models.Estate, error)
+	GetEstateNotVerified() ([]models.Estate, error)
 }
 
 type estateRepository struct {
@@ -50,4 +51,23 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 	err := r.c.FindOne(context.TODO(), bson.M{"_id": estateid}).Decode(&estate)
 
 	return estate, err
+}
+func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
+	var estates []models.Estate
+	result, err := r.c.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+
+	defer result.Close(context.TODO())
+	for result.Next(context.TODO()) {
+		var estate models.Estate
+		if err = result.Decode(&estate); err != nil {
+			return nil, err
+		}
+		estates = append(estates, estate)
+
+	}
+	return estates, nil
+
 }
