@@ -24,6 +24,7 @@ type EstateController interface {
 	GetEstate(ctx *fiber.Ctx) error
 	GetNotVerifiedEstate(ctx *fiber.Ctx) error
 	VerifiedEstate(ctx *fiber.Ctx) error
+	GetEstateByUserID(ctx *fiber.Ctx) error
 }
 type estateController struct {
 	estate repository.EstateRepository
@@ -74,7 +75,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		for _, Sections := range estate.DataForm.Sections {
 			for _, field := range Sections.Fileds {
 				if field.Type == 5 {
-					estate.DataForm.Sections[0].Fileds[0].FiledValue = images
+					estate.DataForm.Sections[0].Fileds[0].FieldValue = images
 				}
 			}
 
@@ -138,4 +139,9 @@ func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(count)
+}
+
+func (r *estateController) GetEstateByUserID(ctx *fiber.Ctx) error {
+	// userid,err:=primitive.ObjectIDFromHex(ctx.Params("userId"))
+	return nil
 }
