@@ -34,7 +34,7 @@ import (
 
 func main() {
 
-	app := fiber.New(fiber.Config{BodyLimit: 100 * 1024 * 1024})
+	app := fiber.New(fiber.Config{BodyLimit: 5 * 1024 * 1024})
 	app.Use(logger.New())
 	app.Use(cors.New())
 

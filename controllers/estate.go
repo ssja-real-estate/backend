@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
-
 	"realstate/models"
 	"realstate/repository"
 	"realstate/security"
 	"realstate/util"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,7 +30,7 @@ func NewEstateController(estaterepo repository.EstateRepository) EstateControlle
 	return &estateController{estaterepo}
 }
 func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
-	fmt.Println("is downloading")
+
 	var estate models.Estate
 	err := ctx.BodyParser(&estate)
 	if err != nil {
@@ -43,33 +44,38 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	forms := form.File["image"]
-	fmt.Println(len(forms))
+	forms := form.File["images"]
 	wd, err := os.Getwd()
+	estate.Id = primitive.NewObjectID()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	for _, item := range forms {
-		fmt.Println(item.Filename)
-
-		err = ctx.SaveFile(item, wd+"/app/images/"+item.Filename)
+	images := []string{}
+	for index, item := range forms {
+		if index == 0 {
+			err = os.Mkdir(fmt.Sprint(wd, "/app/images/", estate.Id.Hex()), fs.ModePerm)
+		}
+		extention := strings.Split(item.Filename, ".")[1]
+		image := fmt.Sprintf("%s%d.%s", estate.Id.Hex(), index+1, extention)
+		images = append(images, image)
+		err = ctx.SaveFile(item, wd+"/app/images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
 
-	// file1, err1 := ctx.FormFile("image")
-
-	// if err1 != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	// }
-
-	// err = ctx.SaveFile(file1, wd+"/app/images/"+file1.Filename)
-	// if err != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	// }
-	estate.Id = primitive.NewObjectID()
 	estate.UserId = userId
+	if len(images) > 0 {
+
+		for _, Sections := range estate.DataForm.Sections {
+			for _, field := range Sections.Fileds {
+				if field.Type == 5 {
+					field.FiledValue = images
+				}
+			}
+
+		}
+	}
 	estate.Verified = false
 	estate.CreatedAt = time.Now()
 	estate.UpdateAt = time.Now()
@@ -95,6 +101,7 @@ func (r *estateController) GetEstate(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": &estate})
 }
+
 func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 	if err != nil {
