@@ -57,6 +57,7 @@ func (field *Field) updateid() {
 			field.setValue()
 		}
 	}
+	field.setValue()
 
 }
 
