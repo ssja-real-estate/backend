@@ -56,8 +56,9 @@ func (field *Field) updateid() {
 			field.Fields[i].updateid()
 			field.setValue()
 		}
+	} else {
+		field.setValue()
 	}
-	field.setValue()
 
 }
 

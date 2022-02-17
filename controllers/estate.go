@@ -36,9 +36,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	fmt.Print(ctx)
 	err := ctx.BodyParser(&estate)
 	strestate := ctx.FormValue("estate")
-
 	json.Unmarshal([]byte(strestate), &estate)
-
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -69,10 +67,8 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
-
 	estate.UserId = userId
 	if len(images) > 0 {
-
 		for _, Sections := range estate.DataForm.Sections {
 			for _, field := range Sections.Fileds {
 				if field.Type == 5 {
@@ -87,10 +83,12 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	estate.UpdateAt = time.Now()
 	err = estate.DataForm.Validate()
 	if err != nil {
+		os.RemoveAll(estate.Id.Hex())
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	err = r.estate.SaveEstate(&estate)
 	if err != nil {
+		os.RemoveAll(estate.Id.Hex())
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(estate)

@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const estateCollection = "estatetype"
+const estatetypeCollection = "estatetype"
 
 type EstateTypeRepository interface {
 	SaveEstateType(estatetype *models.EstateType) error
@@ -26,7 +26,7 @@ type estateTypeRepository struct {
 }
 
 func NewEstateTypesRepository(Db *mongo.Client) EstateTypeRepository {
-	return &estateTypeRepository{db.GetCollection(Db, estateCollection)}
+	return &estateTypeRepository{db.GetCollection(Db, estatetypeCollection)}
 }
 
 func (r *estateTypeRepository) SaveEstateType(estatetype *models.EstateType) error {
