@@ -6,7 +6,6 @@ import (
 	"realstate/repository"
 	"realstate/util"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -50,8 +49,7 @@ func (c *unitController) CreateUnit(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
 		}
-		unit.CreatedAt = time.Now()
-		unit.UpdatedAt = time.Now()
+
 		unit.Id = primitive.NewObjectID()
 		err = c.unit.SaveUnit(&unit)
 		if err != nil {
@@ -103,7 +101,7 @@ func (r *unitController) UpdateUnit(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrNotFound))
 		}
-		dbunit.UpdatedAt = time.Now()
+
 		dbunit.Name = unit.Name
 		err = r.unit.UpdateUnit(dbunit, id)
 		if err != nil {

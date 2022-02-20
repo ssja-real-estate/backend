@@ -110,7 +110,7 @@ func (r *estateController) GetEstate(ctx *fiber.Ctx) error {
 }
 
 func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
-	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+	id, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
@@ -122,6 +122,14 @@ func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 }
 func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
 	estates, err := r.estate.GetEstateNotVerified()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(estates)
+
+}
+func (r *estateController) GetVerifiedEstate(ctx *fiber.Ctx) error {
+	estates, err := r.estate.GetEstateVerified()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -142,6 +150,14 @@ func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
 }
 
 func (r *estateController) GetEstateByUserID(ctx *fiber.Ctx) error {
-	// userid,err:=primitive.ObjectIDFromHex(ctx.Params("userId"))
-	return nil
+	userid, err := primitive.ObjectIDFromHex(ctx.Params("userId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	estates, err := r.estate.GetEstateByUserID(userid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(estates)
 }

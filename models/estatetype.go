@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -14,8 +12,4 @@ type EstateType struct {
 	// example: خرید
 	// required: true
 	Name string `json:"name" bson:"name"`
-	// required: false
-	CreatedAt time.Time `json:"-" bson:"createdAt"`
-	// required: false
-	UpdatedAt time.Time `json:"-" bson:"updatedAt"`
 }

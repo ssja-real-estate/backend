@@ -8,7 +8,6 @@ import (
 	"realstate/repository"
 	"realstate/util"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -56,8 +55,6 @@ func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
 		}
-		assignmenttype.CreatedAt = time.Now()
-		assignmenttype.UpdatedAt = time.Now()
 		assignmenttype.Id = primitive.NewObjectID()
 		err = c.assignmenttyperepo.Save(&assignmenttype)
 		if err != nil {
@@ -115,7 +112,7 @@ func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
 				JSON(util.NewJError(util.ErrNotFound))
 		}
 		fmt.Println("7")
-		dbassignmenttype.UpdatedAt = time.Now()
+
 		dbassignmenttype.Name = assignmenttype.Name
 		err = r.assignmenttyperepo.Update(dbassignmenttype, assignmenttypeid)
 		fmt.Println("8")

@@ -6,7 +6,6 @@ import (
 	"realstate/repository"
 	"realstate/util"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -56,8 +55,7 @@ func (c *provinceController) CreateProvince(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
 		}
-		province.CreatedAt = time.Now()
-		province.UpdatedAt = time.Now()
+
 		province.Id = primitive.NewObjectID()
 		if province.Cities == nil {
 			province.Cities = make([]models.City, 0)

@@ -18,6 +18,7 @@ type EstateRepository interface {
 	DeleteEstate(estateid primitive.ObjectID) error
 	GetEstateById(estateid primitive.ObjectID) (models.Estate, error)
 	GetEstateNotVerified() ([]models.Estate, error)
+	GetEstateVerified() ([]models.Estate, error)
 	VerifyEstated(estaeid primitive.ObjectID) (int, error)
 	GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error)
 }
@@ -54,7 +55,7 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 
 	return estate, err
 }
-func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
+func (r *estateRepository) GetEstateVerified() ([]models.Estate, error) {
 	var estates []models.Estate
 	result, err := r.c.Find(context.TODO(), bson.M{"verified": false})
 	if err != nil {
@@ -78,6 +79,25 @@ func (r *estateRepository) VerifyEstated(estaeid primitive.ObjectID) (int, error
 	update := bson.M{"$set": bson.M{"verified": true}}
 	res, err := r.c.UpdateOne(context.TODO(), query, update)
 	return int(res.ModifiedCount), err
+
+}
+func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
+	var estates []models.Estate
+	result, err := r.c.Find(context.TODO(), bson.M{"verified": true})
+	if err != nil {
+		return nil, err
+	}
+
+	defer result.Close(context.TODO())
+	for result.Next(context.TODO()) {
+		var estate models.Estate
+		if err = result.Decode(&estate); err != nil {
+			return nil, err
+		}
+		estates = append(estates, estate)
+
+	}
+	return estates, nil
 
 }
 

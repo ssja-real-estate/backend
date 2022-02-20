@@ -7,7 +7,6 @@ import (
 	"realstate/repository"
 	"realstate/util"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -54,8 +53,7 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrEmptyName))
 		}
-		estatetype.CreatedAt = time.Now()
-		estatetype.UpdatedAt = time.Now()
+
 		estatetype.Id = primitive.NewObjectID()
 		err = c.esstatetype.SaveEstateType(&estatetype)
 		if err != nil {
@@ -110,7 +108,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrNotFound))
 		}
-		dbestatetype.UpdatedAt = time.Now()
+
 		dbestatetype.Name = estatetype.Name
 		err = r.esstatetype.UpdateEstateType(dbestatetype, estateTypeid)
 		if err != nil {
