@@ -16,10 +16,11 @@ func NewEstateRoute(estatecontroller controllers.EstateController) Routes {
 func (r *estateRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/estate", AuthRequired, r.esteteContorller.CreateEstate)
-	app.Get("/estate/:estaeId", AuthRequired, r.esteteContorller.GetEstate)
-	app.Get("/estate/unverified", AuthRequired, r.esteteContorller.GetNotVerifiedEstate)
-	app.Put("/estate/verify/:estateId", AuthRequired, r.esteteContorller.VerifiedEstate)
-	app.Delete("/estate/:estateId", AuthRequired, r.esteteContorller.DeleteEstate)
-	app.Get("estate/user/:userId", AuthRequired, r.esteteContorller.GetEstateByUserID)
-	app.Get("/estate/all", AuthRequired, r.esteteContorller.VerifiedEstate)
+	api.Get("/estate/:estaeId", AuthRequired, r.esteteContorller.GetEstate)
+	api.Put("/estate/verify/:estateId", AuthRequired, r.esteteContorller.VerifiedEstate)
+	api.Delete("/estate/:estateId", AuthRequired, r.esteteContorller.DeleteEstate)
+	api.Get("/estate/user/:userId", AuthRequired, r.esteteContorller.GetEstateByUserID)
+	api.Get("/estate/show/unverified", AuthRequired, r.esteteContorller.GetNotVerifiedEstate)
+	api.Get("/estate/show/all", AuthRequired, r.esteteContorller.Getverifiedestate)
+
 }

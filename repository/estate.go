@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"os"
 	"realstate/db"
 	"realstate/models"
 
@@ -45,7 +46,12 @@ func (r *estateRepository) UpdateEstate(estate *models.Estate, estateid primitiv
 
 }
 func (r *estateRepository) DeleteEstate(estateid primitive.ObjectID) error {
-	_, err := r.c.DeleteOne(context.TODO(), bson.M{"_id": estateid})
+	err := os.RemoveAll(estateid.Hex())
+	if err != nil {
+		return err
+	}
+	_, err = r.c.DeleteOne(context.TODO(), bson.M{"_id": estateid})
+
 	return err
 }
 
@@ -56,8 +62,9 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 	return estate, err
 }
 func (r *estateRepository) GetEstateVerified() ([]models.Estate, error) {
+
 	var estates []models.Estate
-	result, err := r.c.Find(context.TODO(), bson.M{"verified": false})
+	result, err := r.c.Find(context.TODO(), bson.M{"verified": true})
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +90,7 @@ func (r *estateRepository) VerifyEstated(estaeid primitive.ObjectID) (int, error
 }
 func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
 	var estates []models.Estate
-	result, err := r.c.Find(context.TODO(), bson.M{"verified": true})
+	result, err := r.c.Find(context.TODO(), bson.M{"verified": false})
 	if err != nil {
 		return nil, err
 	}

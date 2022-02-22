@@ -44,6 +44,7 @@ func main() {
 	}))
 
 	db.ConnectDB()
+
 	usersRepo := repository.NewUsersRepository(db.DB)
 	authController := controllers.NewAuthController(usersRepo)
 	authRoutes := routes.NewAuthRoutes(authController)

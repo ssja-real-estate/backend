@@ -19,12 +19,12 @@ import (
 
 type EstateController interface {
 	CreateEstate(ctx *fiber.Ctx) error
-	// UpdateEstate(ctx *fiber.Ctx) error
 	DeleteEstate(ctx *fiber.Ctx) error
 	GetEstate(ctx *fiber.Ctx) error
 	GetNotVerifiedEstate(ctx *fiber.Ctx) error
 	VerifiedEstate(ctx *fiber.Ctx) error
 	GetEstateByUserID(ctx *fiber.Ctx) error
+	Getverifiedestate(ctx *fiber.Ctx) error
 }
 type estateController struct {
 	estate repository.EstateRepository
@@ -128,7 +128,10 @@ func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(estates)
 
 }
-func (r *estateController) GetVerifiedEstate(ctx *fiber.Ctx) error {
+func (r *estateController) Getverifiedestate(ctx *fiber.Ctx) error {
+	fmt.Println("in here.........")
+	// page := ctx.Query("page", "1")
+	// fmt.Println(page)
 	estates, err := r.estate.GetEstateVerified()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))

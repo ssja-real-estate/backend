@@ -8,7 +8,7 @@ type JError struct {
 	Error string `json:"error"`
 }
 
-
+var PageLen = 20
 
 func NewJError(err error) JError {
 	jerr := JError{
@@ -19,8 +19,6 @@ func NewJError(err error) JError {
 	}
 	return jerr
 }
-
-
 
 func NormalizeEmail(email string) string {
 	return strings.TrimSpace(strings.ToLower(email))
