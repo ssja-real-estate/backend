@@ -129,9 +129,7 @@ func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
 
 }
 func (r *estateController) Getverifiedestate(ctx *fiber.Ctx) error {
-	fmt.Println("in here.........")
-	// page := ctx.Query("page", "1")
-	// fmt.Println(page)
+
 	estates, err := r.estate.GetEstateVerified()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
