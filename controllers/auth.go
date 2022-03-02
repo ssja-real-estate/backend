@@ -221,7 +221,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
-			JSON(util.NewJError(err))
+			JSON(util.NewJError(util.ErrNotSignUp))
 	}
 
 	user, err = c.usersRepo.GetByMobile(input.Mobile)
@@ -237,7 +237,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Mobile, err.Error())
 		return ctx.Status(http.StatusUnauthorized).
-			JSON(util.NewJError(util.ErrInvalidCredentials))
+			JSON(util.NewJError(util.ErrNotSignUp))
 	}
 
 	err = security.VerifyPassword(user.Password, input.Password)
@@ -245,14 +245,14 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
-			JSON(util.NewJError(util.ErrInvalidCredentials))
+			JSON(util.NewJError(util.ErrNotSignUp))
 	}
 	token, err := security.NewToken(user.Id.Hex())
 	if err != nil {
 		log.Printf("%s signin failed: %v\n", input.Name, err.Error())
 		return ctx.
 			Status(http.StatusUnauthorized).
-			JSON(util.NewJError(err))
+			JSON(util.NewJError(util.ErrNotSignUp))
 	}
 	return ctx.
 		Status(http.StatusOK).

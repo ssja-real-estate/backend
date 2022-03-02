@@ -3,6 +3,7 @@ package util
 import "errors"
 
 var (
+	ErrNotSignUp               = errors.New("نام کاربری یا رمز عبور شما نادرست می باشد")
 	ErrInvalidEmail            = errors.New("invalid email")
 	ErrMobileAlreadyExists     = errors.New("این شماره موبایل قبلا ثبت شده است")
 	ErrNameAlreadyExists       = errors.New("این نام قبلا درج شده است")

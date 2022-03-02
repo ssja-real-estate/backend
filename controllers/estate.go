@@ -64,7 +64,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		}
 		extention := strings.Split(item.Filename, ".")[1]
 		image := fmt.Sprintf("%s%d.%s", estate.Id.Hex(), index+1, extention)
-		images = append(images, image)
+		images = append(images, fmt.Sprintf("%s/%s", estate.Id.Hex(), image))
 		err = ctx.SaveFile(item, wd+"/app/images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -118,7 +118,7 @@ func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"data": "The Estate id Deleted....."})
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{})
 }
 func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
 	estates, err := r.estate.GetEstateNotVerified()
@@ -143,20 +143,20 @@ func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	count, err := r.estate.VerifyEstated(estaeid)
+	_, err = r.estate.VerifyEstated(estaeid)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(count)
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{})
 }
 
 func (r *estateController) GetEstateByUserID(ctx *fiber.Ctx) error {
-	userid, err := primitive.ObjectIDFromHex(ctx.Params("userId"))
+	userId, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
-	estates, err := r.estate.GetEstateByUserID(userid)
+	estates, err := r.estate.GetEstateByUserID(userId)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
