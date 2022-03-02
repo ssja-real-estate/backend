@@ -56,26 +56,26 @@ func (r *estateRepository) DeleteEstate(estateid primitive.ObjectID) error {
 }
 
 func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Estate, error) {
-	var estate models.Estate
+	estate := models.Estate{}
 	err := r.c.FindOne(context.TODO(), bson.M{"_id": estateid}).Decode(&estate)
 	if err != nil {
-		return models.Estate{}, err
+		return estate, err
 	}
 	return estate, err
 }
 func (r *estateRepository) GetEstateVerified() ([]models.Estate, error) {
 
-	var estates []models.Estate
+	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), bson.M{"verified": true})
 	if err != nil {
-		return []models.Estate{}, err
+		return estates, nil
 	}
 
 	defer result.Close(context.TODO())
 	for result.Next(context.TODO()) {
 		var estate models.Estate
 		if err = result.Decode(&estate); err != nil {
-			return []models.Estate{}, err
+			return estates, nil
 		}
 		estates = append(estates, estate)
 
@@ -91,17 +91,17 @@ func (r *estateRepository) VerifyEstated(estaeid primitive.ObjectID) (int, error
 
 }
 func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
-	var estates []models.Estate
+	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), bson.M{"verified": false})
 	if err != nil {
-		return []models.Estate{}, err
+		return estates, nil
 	}
 
 	defer result.Close(context.TODO())
 	for result.Next(context.TODO()) {
 		var estate models.Estate
 		if err = result.Decode(&estate); err != nil {
-			return []models.Estate{}, err
+			return estates, err
 		}
 		estates = append(estates, estate)
 
@@ -112,16 +112,16 @@ func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
 
 func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error) {
 	query := bson.M{"userId": userId}
-	var estates []models.Estate
+	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), query)
 	if err != nil {
-		return []models.Estate{}, err
+		return estates, nil
 	}
 	defer result.Close(context.TODO())
 	for result.Next(context.TODO()) {
 		var estate models.Estate
 		if err = result.Decode(&estate); err != nil {
-			return []models.Estate{}, err
+			return estates, nil
 		}
 		estates = append(estates, estate)
 	}
