@@ -62,6 +62,7 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 		return estate, err
 	}
 	return estate, err
+
 }
 func (r *estateRepository) GetEstateVerified() ([]models.Estate, error) {
 
