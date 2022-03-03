@@ -33,6 +33,7 @@ var (
 	ErrNotDeleteProvince       = errors.New("این استان قابل حذف نمی باشد")
 	ErrNotDeleteCity           = errors.New("این شهر قابل حذف نمی باشد")
 	ErrIsNeighborhoodExists    = errors.New("نام این محله قبلا ثبت شده است.")
+	ErrIsPermmisonDenied       = errors.New("شما به این قسمت دسترسی ندارید")
 
 	SuccessDelete  = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate  = "آیتم مورد نظر با موفقیت اپدیت شد."

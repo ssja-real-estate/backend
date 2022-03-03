@@ -13,6 +13,7 @@ type estateRoute struct {
 func NewEstateRoute(estatecontroller controllers.EstateController) Routes {
 	return &estateRoute{estatecontroller}
 }
+
 func (r *estateRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/estate", AuthRequired, r.esteteContorller.CreateEstate)
@@ -22,5 +23,4 @@ func (r *estateRoute) Install(app *fiber.App) {
 	api.Get("/estate/list/user", AuthRequired, r.esteteContorller.GetEstateByUserID)
 	api.Get("/estate/list/unverified", AuthRequired, r.esteteContorller.GetNotVerifiedEstate)
 	api.Get("/estate/list/verified", AuthRequired, r.esteteContorller.Getverifiedestate)
-
 }

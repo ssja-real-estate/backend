@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"realstate/db"
 	"realstate/models"
 	"realstate/repository"
 	"realstate/security"
@@ -121,6 +122,22 @@ func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{})
 }
 func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
+
+	estaeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
+	}
+	userRepo := repository.NewUsersRepository(db.DB)
+	user, err := userRepo.GetById(estaeid)
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
+	}
+	if user.Role != 1 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
+	}
+
 	estates, err := r.estate.GetEstateNotVerified()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -140,8 +157,17 @@ func (r *estateController) Getverifiedestate(ctx *fiber.Ctx) error {
 
 func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
 	estaeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
+	userid, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	userRepo := repository.NewUsersRepository(db.DB)
+	user, err := userRepo.GetById(userid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	if user.Role != 1 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
 	}
 	_, err = r.estate.VerifyEstated(estaeid)
 	if err != nil {
