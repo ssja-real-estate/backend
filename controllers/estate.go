@@ -197,6 +197,7 @@ func (r *estateController) RejectedEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
 	}
 	reject.RejectDate = time.Now()
+	reject.Rejected = true
 	err = r.estate.RejectedEstate(estaeid, reject)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
