@@ -52,6 +52,7 @@ func (c *authController) VeryfiyMobile(ctx *fiber.Ctx) error {
 
 	mobile := ctx.Query("mobile")
 	veryfiyCode := ctx.Query("code")
+
 	exists, err := c.usersRepo.GetByMobile(mobile)
 	if err != nil || exists.Mobile != mobile {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
@@ -219,6 +220,7 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&input)
 
 	if err != nil {
+		fmt.Println("1: ", err)
 		return ctx.
 			Status(http.StatusUnprocessableEntity).
 			JSON(util.NewJError(util.ErrNotSignUp))
@@ -226,7 +228,8 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 
 	user, err = c.usersRepo.GetByMobile(input.Mobile)
 	if user == nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotFound)
+
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
 	}
 	if !user.Verify {
 		return ctx.
@@ -386,33 +389,36 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /changepassword [post]
 func (c *authController) Changepassword(ctx *fiber.Ctx) error {
+
 	var UserPassword models.UserPassword
 	err := ctx.BodyParser(&UserPassword)
 
 	if err != nil {
+
 		return ctx.Status(http.StatusUnauthorized).JSON(util.ErrInvalidAuthToken)
 	}
 	id, err := security.GetUserByToken(ctx)
 
 	if err != nil {
-		return ctx.Status(http.StatusUnauthorized).JSON(util.ErrInvalidAuthToken)
+
+		return ctx.Status(http.StatusUnauthorized).JSON(util.NewJError(err))
 	}
 
 	user, err := c.usersRepo.GetById(id)
 
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrInvalidAuthToken)
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
 	err = security.VerifyPassword(user.Password, UserPassword.CurrentPassword)
 
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNoMatchPassword)
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNoMatchPassword))
 	}
 
 	user.Password, err = security.EncryptPassword(UserPassword.CurrentPassword)
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(err)
+		return ctx.Status(http.StatusInternalServerError).JSON(util.NewJError(err))
 	}
 
 	err = c.usersRepo.Update(user)
