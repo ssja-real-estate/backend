@@ -228,62 +228,74 @@ func (r *estateController) GetEstateByUserID(ctx *fiber.Ctx) error {
 }
 
 func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
+	var updateestate models.Estate
 
-	var estate models.Estate
-	err := ctx.BodyParser(&estate)
-	strestate := ctx.FormValue("estate")
-	json.Unmarshal([]byte(strestate), &estate)
+	estateid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-
+	strestate := ctx.FormValue("estate")
+	json.Unmarshal([]byte(strestate), &updateestate)
+	oldestate, err := r.estate.GetEstateById(estateid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	updateestate.Id = estateid
 	form, err := ctx.MultipartForm()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	forms := form.File["images"]
 	wd, err := os.Getwd()
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	images := []string{}
-	for index, item := range forms {
-		if index == 0 {
-			err = os.Mkdir(fmt.Sprint(wd, "/app/images/", estate.Id.Hex()), fs.ModePerm)
+
+	for _, _sections := range oldestate.DataForm.Sections {
+		for _, _fileds := range _sections.Fileds {
+			if _fileds.Type == 5 {
+				listimages := _fileds.FieldValue
+				fmt.Println(listimages)
+			}
+
 		}
+	}
+	for index, item := range forms {
+
 		extention := strings.Split(item.Filename, ".")[1]
-		image := fmt.Sprintf("%s%d.%s", estate.Id.Hex(), index+1, extention)
-		images = append(images, fmt.Sprintf("%s/%s", estate.Id.Hex(), image))
-		err = ctx.SaveFile(item, wd+"/app/images/"+estate.Id.Hex()+"/"+image)
+		image := fmt.Sprintf("%s%d.%s", updateestate.Id.Hex(), index+1, extention)
+		images = append(images, fmt.Sprintf("%s/%s", updateestate.Id.Hex(), image))
+		err = ctx.SaveFile(item, wd+"/app/images/"+updateestate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
 
 	if len(images) > 0 {
-		for _, Sections := range estate.DataForm.Sections {
+		for _, Sections := range updateestate.DataForm.Sections {
 			for _, field := range Sections.Fileds {
 				if field.Type == 5 {
-					estate.DataForm.Sections[0].Fileds[0].FieldValue = images
+					updateestate.DataForm.Sections[0].Fileds[0].FieldValue = images
 				}
 			}
 
 		}
 	}
-	estate.Verified = false
-	estate.CreatedAt = time.Now()
-	estate.UpdateAt = time.Now()
-	err = estate.DataForm.Validate()
-	if err != nil {
-		os.RemoveAll(estate.Id.Hex())
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	err = r.estate.SaveEstate(&estate)
-	if err != nil {
-		os.RemoveAll(estate.Id.Hex())
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	return ctx.Status(http.StatusOK).JSON(estate)
 
-	return nil
+	updateestate.UpdateAt = time.Now()
+	err = updateestate.DataForm.Validate()
+	if err != nil {
+		os.RemoveAll(updateestate.Id.Hex())
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	err = r.estate.SaveEstate(&updateestate)
+	if err != nil {
+		os.RemoveAll(updateestate.Id.Hex())
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(updateestate)
+
 }

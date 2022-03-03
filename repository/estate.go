@@ -132,7 +132,7 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 
 func (r *estateRepository) RejectedEstate(estateId primitive.ObjectID, rejected models.Reject) error {
 	query := bson.M{"_id": estateId}
-	update := bson.M{"$set": bson.M{"rejected": rejected}}
+	update := bson.M{"$set": bson.M{"rejectionStatus": rejected}}
 	_, err := r.c.UpdateOne(context.TODO(), query, update)
 	return err
 }
