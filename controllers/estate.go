@@ -123,13 +123,13 @@ func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 }
 func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
 
-	estaeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
-
+	userId, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
 	}
+
 	userRepo := repository.NewUsersRepository(db.DB)
-	user, err := userRepo.GetById(estaeid)
+	user, err := userRepo.GetById(userId)
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
