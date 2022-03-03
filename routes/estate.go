@@ -18,10 +18,9 @@ func (r *estateRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/estate", AuthRequired, r.esteteContorller.CreateEstate)
 	api.Get("/estate/:estaeId", AuthRequired, r.esteteContorller.GetEstate)
-	api.Put("/estate/verify/:estateId", AuthRequired, r.esteteContorller.VerifiedEstate)
+	api.Put("/estate/status/:estateId", AuthRequired, r.esteteContorller.UpdateStaus)
 	api.Delete("/estate/:estateId", AuthRequired, r.esteteContorller.DeleteEstate)
 	api.Get("/estate/list/user", AuthRequired, r.esteteContorller.GetEstateByUserID)
-	api.Get("/estate/list/unverified", AuthRequired, r.esteteContorller.GetNotVerifiedEstate)
-	api.Get("/estate/list/verified", AuthRequired, r.esteteContorller.Getverifiedestate)
-	api.Put("/estate/reject/:estateId", AuthRequired, r.esteteContorller.RejectedEstate)
+	api.Get("/estate/list/:status", AuthRequired, r.esteteContorller.GetStateByStatus)
+
 }

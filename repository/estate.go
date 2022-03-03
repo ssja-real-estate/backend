@@ -18,11 +18,9 @@ type EstateRepository interface {
 	UpdateEstate(estate *models.Estate, estateid primitive.ObjectID) error
 	DeleteEstate(estateid primitive.ObjectID) error
 	GetEstateById(estateid primitive.ObjectID) (models.Estate, error)
-	GetEstateNotVerified() ([]models.Estate, error)
-	GetEstateVerified() ([]models.Estate, error)
-	VerifyEstated(estaeid primitive.ObjectID) (int, error)
+	GetEstateByStatus(status int) ([]models.Estate, error)
+	UpdateStatus(estaeid primitive.ObjectID, estateStatus models.EstateStatus) (int, error)
 	GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error)
-	RejectedEstate(estaeid primitive.ObjectID, rejected models.Reject) error
 }
 
 type estateRepository struct {
@@ -65,10 +63,10 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 	return estate, err
 
 }
-func (r *estateRepository) GetEstateVerified() ([]models.Estate, error) {
+func (r *estateRepository) GetStateByStatus(status int) ([]models.Estate, error) {
 
 	estates := []models.Estate{}
-	result, err := r.c.Find(context.TODO(), bson.M{"verified": true})
+	result, err := r.c.Find(context.TODO(), bson.M{"estateStatus.status": status})
 	if err != nil {
 		return estates, nil
 	}
@@ -85,30 +83,11 @@ func (r *estateRepository) GetEstateVerified() ([]models.Estate, error) {
 	return estates, nil
 
 }
-func (r *estateRepository) VerifyEstated(estaeid primitive.ObjectID) (int, error) {
+func (r *estateRepository) UpdateStatus(estaeid primitive.ObjectID, estateStatus models.EstateStatus) (int, error) {
 	query := bson.M{"_id": estaeid}
-	update := bson.M{"$set": bson.M{"verified": true}}
+	update := bson.M{"$set": bson.M{"estateStatus": estateStatus}}
 	res, err := r.c.UpdateOne(context.TODO(), query, update)
 	return int(res.ModifiedCount), err
-
-}
-func (r *estateRepository) GetEstateNotVerified() ([]models.Estate, error) {
-	estates := []models.Estate{}
-	result, err := r.c.Find(context.TODO(), bson.M{"verified": false})
-	if err != nil {
-		return estates, nil
-	}
-
-	defer result.Close(context.TODO())
-	for result.Next(context.TODO()) {
-		var estate models.Estate
-		if err = result.Decode(&estate); err != nil {
-			return estates, err
-		}
-		estates = append(estates, estate)
-
-	}
-	return estates, nil
 
 }
 
@@ -128,11 +107,4 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 		estates = append(estates, estate)
 	}
 	return estates, nil
-}
-
-func (r *estateRepository) RejectedEstate(estateId primitive.ObjectID, rejected models.Reject) error {
-	query := bson.M{"_id": estateId}
-	update := bson.M{"$set": bson.M{"rejectionStatus": rejected}}
-	_, err := r.c.UpdateOne(context.TODO(), query, update)
-	return err
 }

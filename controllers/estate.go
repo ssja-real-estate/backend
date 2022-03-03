@@ -11,6 +11,7 @@ import (
 	"realstate/repository"
 	"realstate/security"
 	"realstate/util"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,11 +24,10 @@ type EstateController interface {
 	DeleteEstate(ctx *fiber.Ctx) error
 	GetEstate(ctx *fiber.Ctx) error
 	UpdateEstate(ctx *fiber.Ctx) error
-	GetNotVerifiedEstate(ctx *fiber.Ctx) error
-	VerifiedEstate(ctx *fiber.Ctx) error
+
+	UpdateStaus(ctx *fiber.Ctx) error
 	GetEstateByUserID(ctx *fiber.Ctx) error
-	Getverifiedestate(ctx *fiber.Ctx) error
-	RejectedEstate(ctx *fiber.Ctx) error
+	GetStateByStatus(ctx *fiber.Ctx) error
 }
 type estateController struct {
 	estate repository.EstateRepository
@@ -84,7 +84,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 
 		}
 	}
-	estate.Verified = false
+	estate.Estatetatus.Status = 2
 	estate.CreatedAt = time.Now()
 	estate.UpdateAt = time.Now()
 	err = estate.DataForm.Validate()
@@ -131,33 +131,10 @@ func (r *estateController) DeleteEstate(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{})
 }
-func (r *estateController) GetNotVerifiedEstate(ctx *fiber.Ctx) error {
 
-	userId, err := security.GetUserByToken(ctx)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
-	}
-
-	userRepo := repository.NewUsersRepository(db.DB)
-	user, err := userRepo.GetById(userId)
-
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotSignUp))
-	}
-	if user.Role != 1 {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
-	}
-
-	estates, err := r.estate.GetEstateNotVerified()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	return ctx.Status(http.StatusOK).JSON(estates)
-
-}
-func (r *estateController) Getverifiedestate(ctx *fiber.Ctx) error {
-
-	estates, err := r.estate.GetEstateVerified()
+func (r *estateController) GetStateByStatus(ctx *fiber.Ctx) error {
+	status, err := strconv.Atoi(ctx.Params("status"))
+	estates, err := r.estate.GetEstateByStatus(status)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -165,8 +142,11 @@ func (r *estateController) Getverifiedestate(ctx *fiber.Ctx) error {
 
 }
 
-func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
+func (r *estateController) UpdateStaus(ctx *fiber.Ctx) error {
 	estaeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
+	var EstateStatus models.EstateStatus
+
+	ctx.BodyParser(&EstateStatus)
 	userid, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -179,35 +159,7 @@ func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
 	if user.Role != 1 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
 	}
-	_, err = r.estate.VerifyEstated(estaeid)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{})
-}
-
-func (r *estateController) RejectedEstate(ctx *fiber.Ctx) error {
-	estaeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
-	userid, err := security.GetUserByToken(ctx)
-	var reject models.Reject
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	err = ctx.BodyParser(&reject)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	userRepo := repository.NewUsersRepository(db.DB)
-	user, err := userRepo.GetById(userid)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-	if user.Role != 1 {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
-	}
-	reject.RejectDate = time.Now()
-	reject.Rejected = true
-	err = r.estate.RejectedEstate(estaeid, reject)
+	_, err = r.estate.UpdateStatus(estaeid, EstateStatus)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -229,22 +181,34 @@ func (r *estateController) GetEstateByUserID(ctx *fiber.Ctx) error {
 
 func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	var updateestate models.Estate
+	var listimages []string
+	var deleteimaages []string
 
 	estateid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
+	deletelist := ctx.FormValue("deleteimage")
+	json.Unmarshal([]byte(deletelist), &deleteimaages)
+
 	strestate := ctx.FormValue("estate")
 	json.Unmarshal([]byte(strestate), &updateestate)
+
 	oldestate, err := r.estate.GetEstateById(estateid)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+
 	}
+
 	updateestate.Id = estateid
 	form, err := ctx.MultipartForm()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	forms := form.File["images"]
 	wd, err := os.Getwd()
 
@@ -257,12 +221,16 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	for _, _sections := range oldestate.DataForm.Sections {
 		for _, _fileds := range _sections.Fileds {
 			if _fileds.Type == 5 {
-				listimages := _fileds.FieldValue
-				fmt.Println(listimages)
+				for _, stringname := range _fileds.FieldValue.([]interface{}) {
+					listimages = append(listimages, stringname.(string))
+				}
+
 			}
 
 		}
+
 	}
+
 	for index, item := range forms {
 
 		extention := strings.Split(item.Filename, ".")[1]
