@@ -416,7 +416,7 @@ func (c *authController) Changepassword(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNoMatchPassword))
 	}
 
-	user.Password, err = security.EncryptPassword(UserPassword.CurrentPassword)
+	user.Password, err = security.EncryptPassword(UserPassword.NewPassword)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(util.NewJError(err))
 	}
