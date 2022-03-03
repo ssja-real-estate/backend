@@ -386,8 +386,12 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /changepassword [post]
 func (c *authController) Changepassword(ctx *fiber.Ctx) error {
-	currentpassword := ctx.Query("currentPassword")
-	newpassowrd := ctx.Query("newPassword")
+	var UserPassword models.UserPassword
+	err := ctx.BodyParser(&UserPassword)
+
+	if err != nil {
+		return ctx.Status(http.StatusUnauthorized).JSON(util.ErrInvalidAuthToken)
+	}
 	id, err := security.GetUserByToken(ctx)
 
 	if err != nil {
@@ -400,13 +404,13 @@ func (c *authController) Changepassword(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrInvalidAuthToken)
 	}
 
-	err = security.VerifyPassword(user.Password, currentpassword)
+	err = security.VerifyPassword(user.Password, UserPassword.CurrentPassword)
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNoMatchPassword)
 	}
 
-	user.Password, err = security.EncryptPassword(newpassowrd)
+	user.Password, err = security.EncryptPassword(UserPassword.CurrentPassword)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(err)
 	}
@@ -416,7 +420,7 @@ func (c *authController) Changepassword(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErroNotUserUpdate)
 	}
 
-	return ctx.Status(http.StatusOK).JSON(util.SuccessUpdate)
+	return ctx.Status(http.StatusOK).JSON(util.SuccessChangePassword)
 
 }
 

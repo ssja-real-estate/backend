@@ -23,7 +23,7 @@ func (r *authRoutes) Install(app *fiber.App) {
 	api.Put("/user/:id", AuthRequired, r.authController.PutUser)
 	api.Delete("/user/:id", AuthRequired, r.authController.DeleteUser)
 	api.Get("/verify/", r.authController.VeryfiyMobile)
-	api.Post("/changepassword", AuthRequired, r.authController.Changepassword)
+	api.Post("/change-password", AuthRequired, r.authController.Changepassword)
 	api.Post("/forgetpassword/:mobile", r.authController.ForgetPassword)
 
 }

@@ -22,6 +22,7 @@ type EstateRepository interface {
 	GetEstateVerified() ([]models.Estate, error)
 	VerifyEstated(estaeid primitive.ObjectID) (int, error)
 	GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error)
+	RejectedEstate(estaeid primitive.ObjectID, rejected models.Reject) error
 }
 
 type estateRepository struct {
@@ -127,4 +128,11 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 		estates = append(estates, estate)
 	}
 	return estates, nil
+}
+
+func (r *estateRepository) RejectedEstate(estateid primitive.ObjectID, rejected models.Reject) error {
+	query := bson.M{"_id": estateid}
+	update := bson.M{"$set": bson.M{"rejected": rejected}}
+	_, err := r.c.UpdateOne(context.TODO(), query, update)
+	return err
 }

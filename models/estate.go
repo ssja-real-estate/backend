@@ -10,6 +10,7 @@ type Estate struct {
 	Id           primitive.ObjectID `json:"id" bson:"_id"`
 	UserId       primitive.ObjectID `json:"userId" bson:"userId"`
 	Verified     bool               `json:"verified" bson:"verified"`
+	Rejected     Reject             `json:"rejected" bson:"rejected" `
 	Position     Position           `json:"position" bson:"position"`
 	City         EstateLocation     `json:"city" bson:"city"`
 	Province     EstateLocation     `json:"province" bson:"province"`

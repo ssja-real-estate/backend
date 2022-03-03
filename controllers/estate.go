@@ -26,6 +26,7 @@ type EstateController interface {
 	VerifiedEstate(ctx *fiber.Ctx) error
 	GetEstateByUserID(ctx *fiber.Ctx) error
 	Getverifiedestate(ctx *fiber.Ctx) error
+	RejectedEstate(ctx *fiber.Ctx) error
 }
 type estateController struct {
 	estate repository.EstateRepository
@@ -170,6 +171,33 @@ func (r *estateController) VerifiedEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
 	}
 	_, err = r.estate.VerifyEstated(estaeid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{})
+}
+
+func (r *estateController) RejectedEstate(ctx *fiber.Ctx) error {
+	estaeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
+	userid, err := security.GetUserByToken(ctx)
+	var reject models.Reject
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	err = ctx.BodyParser(&reject)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	userRepo := repository.NewUsersRepository(db.DB)
+	user, err := userRepo.GetById(userid)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	if user.Role != 1 {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrIsPermmisonDenied))
+	}
+	reject.RejectDate = time.Now()
+	err = r.estate.RejectedEstate(estaeid, reject)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
