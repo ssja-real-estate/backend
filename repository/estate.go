@@ -63,7 +63,7 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 	return estate, err
 
 }
-func (r *estateRepository) GetStateByStatus(status int) ([]models.Estate, error) {
+func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error) {
 
 	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), bson.M{"estateStatus.status": status})
