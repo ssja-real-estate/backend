@@ -11,6 +11,7 @@ import (
 	"realstate/repository"
 	"realstate/security"
 	"realstate/util"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -183,7 +184,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	var updateestate models.Estate
 	var listimages []string
 	var deleteimaages []string
-
+	images := []string{}
 	estateid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
 
 	if err != nil {
@@ -204,19 +205,6 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	}
 
 	updateestate.Id = estateid
-	form, err := ctx.MultipartForm()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-
-	forms := form.File["images"]
-	wd, err := os.Getwd()
-
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
-
-	images := []string{}
 
 	for _, _sections := range oldestate.DataForm.Sections {
 		for _, _fileds := range _sections.Fileds {
@@ -231,10 +219,35 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 
 	}
 
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	forms := form.File["images"]
+	wd, err := os.Getwd()
+
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	// delete file in hard disk
+	for _, deletefile := range deleteimaages {
+		os.Remove(fmt.Sprintf("%s/app/images/%s/%s", wd, estateid.Hex(), deletefile))
+	}
+
+	// delete file name in DB
+	for _, imagefilename := range listimages {
+		indexfile := sort.SearchStrings(deleteimaages, imagefilename)
+		if indexfile < 0 {
+			images = append(images, imagefilename)
+		}
+	}
+
 	for index, item := range forms {
 
 		extention := strings.Split(item.Filename, ".")[1]
-		image := fmt.Sprintf("%s%d.%s", updateestate.Id.Hex(), index+1, extention)
+		image := fmt.Sprintf("%s%d.%s", updateestate.Id.Hex(), (index+len(images))+1, extention)
 		images = append(images, fmt.Sprintf("%s/%s", updateestate.Id.Hex(), image))
 		err = ctx.SaveFile(item, wd+"/app/images/"+updateestate.Id.Hex()+"/"+image)
 		if err != nil {

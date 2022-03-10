@@ -17,6 +17,7 @@ func NewEstateRoute(estatecontroller controllers.EstateController) Routes {
 func (r *estateRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/estate", AuthRequired, r.esteteContorller.CreateEstate)
+	api.Put("/estate/:estateId", AuthRequired, r.esteteContorller.UpdateEstate)
 	api.Get("/estate/:estaeId", AuthRequired, r.esteteContorller.GetEstate)
 	api.Put("/estate/status/:estateId", AuthRequired, r.esteteContorller.UpdateStaus)
 	api.Delete("/estate/:estateId", AuthRequired, r.esteteContorller.DeleteEstate)
