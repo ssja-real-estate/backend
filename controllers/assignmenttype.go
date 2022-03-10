@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"realstate/db"
 	"realstate/models"
@@ -84,40 +83,39 @@ func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /assignmenttype/ [put]
 func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
-	fmt.Println("0")
+
 	assignmenttypeid, err := primitive.ObjectIDFromHex(ctx.Params("assignmenttypeId"))
-	fmt.Println("1")
+
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
-	fmt.Println("2")
+
 	var assignmenttype models.AssignmentType
 	err = ctx.BodyParser(&assignmenttype)
-	fmt.Println("3")
+
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
 	if len(assignmenttype.Name) < 2 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
-	fmt.Println("4")
+
 	_, err = r.assignmenttyperepo.GetByName(assignmenttype.Name)
 	if err == mongo.ErrNoDocuments {
-		fmt.Println("5")
+
 		dbassignmenttype, err := r.assignmenttyperepo.GetById(assignmenttypeid)
 		if err != nil {
-			fmt.Println("6")
+
 			return ctx.
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrNotFound))
 		}
-		fmt.Println("7")
 
 		dbassignmenttype.Name = assignmenttype.Name
 		err = r.assignmenttyperepo.Update(dbassignmenttype, assignmenttypeid)
-		fmt.Println("8")
+
 		if err != nil {
-			fmt.Println(err)
+
 			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
 		return ctx.Status(http.StatusOK).JSON(dbassignmenttype)
