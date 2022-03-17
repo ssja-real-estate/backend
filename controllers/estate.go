@@ -68,7 +68,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		}
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
-		images = append(images, fmt.Sprintf("%s/%s", estate.Id.Hex(), image))
+		images = append(images, image)
 		err = ctx.SaveFile(item, wd+"/app/images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -241,7 +241,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
 
-		images = append(images, fmt.Sprintf("%s/%s", updateestate.Id.Hex(), image))
+		images = append(images, image)
 
 		err = ctx.SaveFile(item, wd+"/app/images/"+updateestate.Id.Hex()+"/"+image)
 		if err != nil {
