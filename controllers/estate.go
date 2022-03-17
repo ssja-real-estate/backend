@@ -67,7 +67,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 			err = os.Mkdir(fmt.Sprint(wd, "/app/images/", estate.Id.Hex()), fs.ModePerm)
 		}
 		extention := strings.Split(item.Filename, ".")[1]
-		image := fmt.Sprintf("%s%d.%s", estate.Id.Hex(), index+1, extention)
+		image := getname(images, extention)
 		images = append(images, fmt.Sprintf("%s/%s", estate.Id.Hex(), image))
 		err = ctx.SaveFile(item, wd+"/app/images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
@@ -189,7 +189,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	deletelist := ctx.FormValue("deleteimage")
+	deletelist := ctx.FormValue("deletedImages")
 	json.Unmarshal([]byte(deletelist), &deleteimaages)
 
 	strestate := ctx.FormValue("estate")
@@ -201,7 +201,6 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 
 	}
 	updateestate.Id = estateid
-
 	for _, _sections := range oldestate.DataForm.Sections {
 		for _, _fileds := range _sections.Fileds {
 			if _fileds.Type == 5 {
@@ -213,6 +212,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 
 		}
 	}
+
 	form, err := ctx.MultipartForm()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -230,17 +230,19 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	// delete file name in DB
 	for _, imagefilename := range listimages {
 		indexfile := sort.SearchStrings(deleteimaages, imagefilename)
-		fmt.Println(indexfile)
-		if indexfile == 0 {
+
+		if indexfile >= len(listimages) {
 			images = append(images, imagefilename)
 		}
 	}
-	fmt.Println("-----------------List Images ------------")
-	fmt.Println(images)
-	for index, item := range forms {
+
+	for _, item := range forms {
+
 		extention := strings.Split(item.Filename, ".")[1]
-		image := fmt.Sprintf("%s%d.%s", updateestate.Id.Hex(), (index+len(images))+1, extention)
+		image := getname(images, extention)
+
 		images = append(images, fmt.Sprintf("%s/%s", updateestate.Id.Hex(), image))
+
 		err = ctx.SaveFile(item, wd+"/app/images/"+updateestate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -257,6 +259,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 		}
 	}
 	updateestate.UpdateAt = time.Now()
+
 	err = updateestate.DataForm.Validate()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -266,4 +269,17 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(updateestate)
+}
+func getname(images []string, extension string) string {
+
+	var index int = len(images) + 1
+	for {
+		find := sort.SearchStrings(images, fmt.Sprintf("%d.%s", index, extension))
+		if find == len(images) {
+			return fmt.Sprintf("%d.%s", index, extension)
+		} else {
+			index++
+		}
+
+	}
 }
