@@ -273,6 +273,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 func getname(images []string, extension string) string {
 
 	var index int = len(images) + 1
+
 	for {
 		find := sort.SearchStrings(images, fmt.Sprintf("%d.%s", index, extension))
 		if find == len(images) {
