@@ -259,6 +259,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 		}
 	}
 	updateestate.UpdateAt = time.Now()
+	updateestate.Estatetatus.Status = 2
 
 	err = updateestate.DataForm.Validate()
 	if err != nil {
