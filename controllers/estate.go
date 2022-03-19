@@ -28,6 +28,7 @@ type EstateController interface {
 	UpdateStaus(ctx *fiber.Ctx) error
 	GetEstateByUserID(ctx *fiber.Ctx) error
 	GetStateByStatus(ctx *fiber.Ctx) error
+	SearchEstate(ctx *fiber.Ctx) error
 }
 
 type estateController struct {
@@ -36,6 +37,10 @@ type estateController struct {
 
 func NewEstateController(estaterepo repository.EstateRepository) EstateController {
 	return &estateController{estaterepo}
+}
+func (r *estateController) SearchEstate(ctx *fiber.Ctx) error {
+	fmt.Println(ctx.Params("privoince"))
+	return nil
 }
 func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 
@@ -212,7 +217,6 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 
 		}
 	}
-
 	form, err := ctx.MultipartForm()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -230,34 +234,26 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	// delete file name in DB
 	for _, imagefilename := range listimages {
 		indexfile := sort.SearchStrings(deleteimaages, imagefilename)
-
 		if indexfile >= len(deleteimaages) {
 			images = append(images, imagefilename)
 		}
 	}
-
 	for _, item := range forms {
-
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
-
 		images = append(images, image)
-
 		err = ctx.SaveFile(item, wd+"/app/images/"+updateestate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
-
 	for _, Sections := range updateestate.DataForm.Sections {
 		for _, field := range Sections.Fileds {
 			if field.Type == 5 {
 				updateestate.DataForm.Sections[0].Fileds[0].FieldValue = images
 			}
 		}
-
 	}
-
 	updateestate.UpdateAt = time.Now()
 	updateestate.Estatetatus.Status = 2
 
@@ -272,9 +268,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(&updateestate)
 }
 func getname(images []string, extension string) string {
-
 	var index int = len(images) + 1
-
 	for {
 		find := sort.SearchStrings(images, fmt.Sprintf("%d.%s", index, extension))
 		if find == len(images) {
@@ -282,6 +276,5 @@ func getname(images []string, extension string) string {
 		} else {
 			index++
 		}
-
 	}
 }

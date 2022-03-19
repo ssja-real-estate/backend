@@ -45,6 +45,7 @@ type Field struct {
 	Options    []string           `json:"options" bson:"options"`
 	Fields     []Field            `json:"fields" bson:"fields"`
 	Type       int                `json:"type"  bson:"type"`
+	Filterable bool               `json:"filterable" bson:"filterable"`
 }
 
 // to do set value from type by enum
