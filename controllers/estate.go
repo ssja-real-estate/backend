@@ -231,7 +231,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	for _, imagefilename := range listimages {
 		indexfile := sort.SearchStrings(deleteimaages, imagefilename)
 
-		if indexfile >= len(listimages) {
+		if indexfile >= len(deleteimaages) {
 			images = append(images, imagefilename)
 		}
 	}
@@ -269,7 +269,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(updateestate)
+	return ctx.Status(http.StatusOK).JSON(&updateestate)
 }
 func getname(images []string, extension string) string {
 
