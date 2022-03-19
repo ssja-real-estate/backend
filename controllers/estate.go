@@ -248,16 +248,16 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
-	if len(images) > 0 {
-		for _, Sections := range updateestate.DataForm.Sections {
-			for _, field := range Sections.Fileds {
-				if field.Type == 5 {
-					updateestate.DataForm.Sections[0].Fileds[0].FieldValue = images
-				}
-			}
 
+	for _, Sections := range updateestate.DataForm.Sections {
+		for _, field := range Sections.Fileds {
+			if field.Type == 5 {
+				updateestate.DataForm.Sections[0].Fileds[0].FieldValue = images
+			}
 		}
+
 	}
+
 	updateestate.UpdateAt = time.Now()
 	updateestate.Estatetatus.Status = 2
 
