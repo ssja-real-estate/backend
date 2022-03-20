@@ -7,23 +7,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Valuetype interface {
-}
-type text struct {
-	value string
-}
-type number struct {
-	value int
-}
-type boolean struct {
-	value bool
-}
-type arraystring struct {
-	value []string
-}
-type arrayint struct {
-	value []int
-}
+// type Valuetype interface {
+// }
+// type text struct {
+// 	value string
+// }
+// type number struct {
+// 	value int
+// }
+// type boolean struct {
+// 	value bool
+// }
+// type arraystring struct {
+// 	value []string
+// }
+// type arrayint struct {
+// 	value []int
+// }
 
 const (
 	Text        = 0
@@ -38,7 +38,7 @@ const (
 type Field struct {
 	Id         primitive.ObjectID `json:"id" bson:"_id"`
 	Title      string             `json:"title" bson:"title"`
-	FieldValue interface{}        `json:"value" bson:"value"`
+	FieldValue any                `json:"value" bson:"value"`
 	Min        float64            `json:"min" bson:"min"`
 	Max        float64            `json:"max" bson:"max"`
 	Optional   bool               `json:"optional" bson:"optional"`
@@ -60,7 +60,6 @@ func (field *Field) updateid() {
 		field.setValue()
 	}
 }
-
 func (field *Field) Validate() error {
 	if field.Optional == true {
 		return nil
@@ -96,7 +95,7 @@ func (field *Field) setValue() {
 		field.FieldValue = make([]string, 0)
 	case Range:
 		{
-			field.FieldValue = arrayint{}
+			field.FieldValue = make([]int, 0)
 			field.Max = 0
 			field.Min = 0
 		}
