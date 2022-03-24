@@ -64,13 +64,11 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 
 }
 func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error) {
-
 	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), bson.M{"estateStatus.status": status})
 	if err != nil {
 		return estates, nil
 	}
-
 	defer result.Close(context.TODO())
 	for result.Next(context.TODO()) {
 		var estate models.Estate
@@ -81,14 +79,12 @@ func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error
 
 	}
 	return estates, nil
-
 }
 func (r *estateRepository) UpdateStatus(estaeid primitive.ObjectID, estateStatus models.EstateStatus) (int, error) {
 	query := bson.M{"_id": estaeid}
 	update := bson.M{"$set": bson.M{"estateStatus": estateStatus}}
 	res, err := r.c.UpdateOne(context.TODO(), query, update)
 	return int(res.ModifiedCount), err
-
 }
 
 func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error) {

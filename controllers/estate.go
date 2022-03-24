@@ -267,6 +267,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(&updateestate)
 }
+
 func getname(images []string, extension string) string {
 	var index int = len(images) + 1
 	for {

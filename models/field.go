@@ -7,24 +7,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// type Valuetype interface {
-// }
-// type text struct {
-// 	value string
-// }
-// type number struct {
-// 	value int
-// }
-// type boolean struct {
-// 	value bool
-// }
-// type arraystring struct {
-// 	value []string
-// }
-// type arrayint struct {
-// 	value []int
-// }
-
 const (
 	Text        = 0
 	Number      = 1

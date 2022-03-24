@@ -18,6 +18,7 @@ type FormController interface {
 	GetForm(ctx *fiber.Ctx) error
 	DeleteForm(ctx *fiber.Ctx) error
 	UpdateForm(ctx *fiber.Ctx) error
+	GetFormFilter(ctx *fiber.Ctx) error
 }
 
 type formController struct {
@@ -194,4 +195,26 @@ func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrInvalidCredentials))
 	}
 	return ctx.Status(http.StatusOK).JSON(util.SuccessUpdate)
+}
+
+func (r *formController) GetFormFilter(ctx *fiber.Ctx) error {
+	assignmentTypeId, err := primitive.ObjectIDFromHex(ctx.Params("assignmentTypeId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	estateTypeId, err := primitive.ObjectIDFromHex(ctx.Params("estateTypeId"))
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	form, err := r.form.GetFormForFilter(assignmentTypeId, estateTypeId)
+	if err != nil {
+
+		return ctx.Status(http.StatusOK).JSON(nil)
+	}
+	form, err = r.form.GetFilterForm(form)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	return ctx.Status(http.StatusOK).JSON(form)
+
 }
