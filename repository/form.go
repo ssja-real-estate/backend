@@ -98,14 +98,14 @@ func (r *formRepository) IsEstateTypeId(estatetypeid primitive.ObjectID) (int64,
 func (r *formRepository) getMaxandMin(formid primitive.ObjectID, fieldid primitive.ObjectID) (int, int, error) {
 
 	filterByFormId := bson.D{{Key: "$match", Value: bson.D{{Key: "dataForm._id", Value: formid}}}}
-	flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$dataForm.sections"}}}}
+	flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$dataForm.sections"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}}
 	projectOut := bson.D{{Key: "$project", Value: bson.D{{Key: "items", Value: bson.D{{Key: "$filter", Value: bson.D{
 		{Key: "input", Value: "$dataForm.sections.fields"},
 		{Key: "as", Value: "item"},
 		{Key: "cond", Value: bson.D{{Key: "$eq", Value: bson.A{"$$item._id", fieldid}}}},
 	}}}}}}}
 
-	flatArray2 := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$items"}, {Key: "preserveNullAndEmptyArrays", Value: false}}}}
+	flatArray2 := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$items"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}}
 
 	groupby := bson.D{{Key: "$group", Value: bson.D{
 		{Key: "_id", Value: formid},
@@ -136,14 +136,16 @@ func (r *formRepository) getMaxandMin(formid primitive.ObjectID, fieldid primiti
 
 }
 func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
-
+	var newform models.Form
+	newform = form
+	newform.Sections = []models.Section{}
 	for j, item := range form.Sections {
 
 		for index, fields := range item.Fileds {
 
 			field := &form.Sections[j].Fileds[index]
-			if fields.Type == 1 {
 
+			if fields.Type == 1 {
 				max, min, err := r.getMaxandMin(form.Id, fields.Id)
 				field.Min = float64(min)
 				field.Max = float64(max)
@@ -155,11 +157,16 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 
 			}
 		}
+		if len(item.Fileds) > 0 {
+			newform.Sections = append(newform.Sections, item)
+		}
 
 	}
-	return form, nil
+
+	return newform, nil
 }
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {
+
 	findForm := bson.D{{Key: "$match", Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}}}}
 	flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
 	projectForm := bson.D{{Key: "$project", Value: bson.D{
@@ -188,6 +195,7 @@ func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, e
 	}}}
 
 	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm, flatArray, projectForm, groupForm})
+
 	if err != nil {
 		return models.Form{}, err
 	}
