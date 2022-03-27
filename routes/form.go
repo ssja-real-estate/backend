@@ -21,5 +21,5 @@ func (r *formRoute) Install(app *fiber.App) {
 	api.Get("/form", AuthRequired, r.formController.GetForm)
 	api.Put("/form/:id", AuthRequired, r.formController.UpdateForm)
 	api.Delete("/form/:id", AuthRequired, r.formController.DeleteForm)
-	api.Get("/filterform/:assignmentTypeId/:estateTypeId", AuthRequired, r.formController.GetFormFilter)
+	api.Get("/filter", AuthRequired, r.formController.GetFormFilter)
 }
