@@ -113,8 +113,8 @@ func (r *provinceRepository) EditCity(city models.City, provinceid primitive.Obj
 	res := r.c.FindOneAndUpdate(
 		context.TODO(),
 		bson.D{
-			{"_id", provinceid},
-			{"cities._id", cityid},
+			{Key: "_id", Value: provinceid},
+			{Key: "cities._id", Value: cityid},
 		},
 		bson.M{"$set": bson.M{"cities.$[elem]": &city}},
 		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
@@ -191,9 +191,9 @@ func (r *provinceRepository) EditNeighborhood(provinceid primitive.ObjectID, cit
 	res := r.c.FindOneAndUpdate(
 		context.TODO(),
 		bson.D{
-			{"_id", provinceid},
-			{"cities._id", cityid},
-			{"cities.neighborhoods._id", neighborhoodid},
+			{Key: "_id", Value: provinceid},
+			{Key: "cities._id", Value: cityid},
+			{Key: "cities.neighborhoods._id", Value: neighborhoodid},
 		},
 		bson.M{"$set": bson.M{"cities.$.neighborhoods.$[elem]": neighborhood}},
 		options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{

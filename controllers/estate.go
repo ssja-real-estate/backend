@@ -39,8 +39,17 @@ func NewEstateController(estaterepo repository.EstateRepository) EstateControlle
 	return &estateController{estaterepo}
 }
 func (r *estateController) SearchEstate(ctx *fiber.Ctx) error {
-	fmt.Println(ctx.Params("privoince"))
-	return nil
+	var filterForm models.Filter
+	err := ctx.BodyParser(&filterForm)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+	estate, err := r.estate.FindEstate(filterForm)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(estate)
 }
 func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 

@@ -21,6 +21,7 @@ type EstateRepository interface {
 	GetEstateByStatus(status int) ([]models.Estate, error)
 	UpdateStatus(estaeid primitive.ObjectID, estateStatus models.EstateStatus) (int, error)
 	GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error)
+	FindEstate(filterForm models.Filter) ([]models.Estate, error)
 }
 
 type estateRepository struct {
@@ -88,13 +89,17 @@ func (r *estateRepository) UpdateStatus(estaeid primitive.ObjectID, estateStatus
 }
 
 func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error) {
+
 	query := bson.M{"userId": userId}
 	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), query)
+
 	if err != nil {
 		return estates, nil
 	}
+
 	defer result.Close(context.TODO())
+
 	for result.Next(context.TODO()) {
 		var estate models.Estate
 		if err = result.Decode(&estate); err != nil {
@@ -103,4 +108,70 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 		estates = append(estates, estate)
 	}
 	return estates, nil
+}
+func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate, error) {
+	var headFilter bson.D
+	var formquery bson.D
+	var estates []models.Estate
+	if filterForm.Header.AssignmentTypeID.IsZero() == false {
+		headFilter = append(headFilter, bson.E{Key: "dataForm.assignmentTypeId", Value: filterForm.Header.AssignmentTypeID})
+	}
+	if filterForm.Header.EstateTypeID.IsZero() == false {
+		headFilter = append(headFilter, bson.E{Key: "dataForm.estateTypeId", Value: filterForm.Form.EstateTypeID})
+	}
+	if filterForm.Header.ProvinceID.IsZero() == false {
+		headFilter = append(headFilter, bson.E{Key: "province._id", Value: filterForm.Header.ProvinceID})
+	}
+	if filterForm.Header.CityID.IsZero() == false {
+		headFilter = append(headFilter, bson.E{Key: "city._id", Value: filterForm.Header.CityID})
+	}
+	if filterForm.Header.NeighborhoodID.IsZero() == false {
+		headFilter = append(headFilter, bson.E{Key: "neighborhood._id", Value: filterForm.Header.NeighborhoodID})
+	}
+
+	for _, item := range filterForm.Form.Sections {
+		for _, field := range item.Fileds {
+			formquery = append(formquery, createQueryForm(field))
+		}
+	}
+
+	resultquery := bson.D{{Key: "$and", Value: bson.A{headFilter, formquery}}}
+
+	result, err := r.c.Find(context.TODO(), resultquery)
+
+	if err != nil {
+		return []models.Estate{}, err
+	}
+
+	defer result.Close(context.TODO())
+	for result.Next(context.TODO()) {
+		var estate models.Estate
+		if err = result.Decode(&estate); err != nil {
+			return []models.Estate{}, err
+		}
+		estates = append(estates, estate)
+
+	}
+	return estates, nil
+
+}
+
+func createQueryForm(field models.Field) bson.E {
+	var formquery bson.E
+
+	switch field.Type {
+	case 0:
+		formquery = bson.E{Key: "dataForm.sections.fields.value", Value: bson.D{{Key: "$regex", Value: field.FieldValue}}}
+
+	case 2, 3:
+		formquery = bson.E{Key: "dataForm.sections.fields.value", Value: field.FieldValue}
+	case 4:
+		formquery = createQueryForm(field.Fields[0])
+
+	case 6, 1:
+		formquery = bson.E{Key: "dataForm.sections.fields.value", Value: bson.D{{Key: "$gte", Value: field.Min}, {Key: "$lte", Value: field.Max}}}
+
+	}
+	return formquery
+
 }
