@@ -21,8 +21,8 @@ type Field struct {
 	Id         primitive.ObjectID `json:"id" bson:"_id"`
 	Title      string             `json:"title" bson:"title"`
 	FieldValue any                `json:"value" bson:"value"`
-	Min        float64            `json:"min" bson:"min"`
-	Max        float64            `json:"max" bson:"max"`
+	Min        *float64           `json:"min" bson:"min"`
+	Max        *float64           `json:"max" bson:"max"`
 	Optional   bool               `json:"optional" bson:"optional"`
 	Options    []string           `json:"options" bson:"options"`
 	Fields     []Field            `json:"fields" bson:"fields"`
@@ -78,8 +78,8 @@ func (field *Field) setValue() {
 	case Range:
 		{
 			field.FieldValue = make([]int, 0)
-			field.Max = 0
-			field.Min = 0
+			field.Max = nil
+			field.Min = nil
 		}
 	}
 }

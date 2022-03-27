@@ -137,6 +137,7 @@ func (r *formRepository) getMaxandMin(formid primitive.ObjectID, fieldid primiti
 }
 func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 	var newform models.Form
+
 	newform = form
 	newform.Sections = []models.Section{}
 	for j, item := range form.Sections {
@@ -146,14 +147,8 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 			field := &form.Sections[j].Fileds[index]
 
 			if fields.Type == 1 {
-				max, min, err := r.getMaxandMin(form.Id, fields.Id)
-				field.Min = float64(min)
-				field.Max = float64(max)
+				// max, min, err := r.getMaxandMin(form.Id, fields.Id)
 				field.Type = 6
-
-				if err != nil {
-					return models.Form{}, err
-				}
 
 			}
 		}
