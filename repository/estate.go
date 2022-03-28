@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"realstate/db"
 	"realstate/models"
@@ -114,6 +113,7 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 	var headFilter bson.D
 	var formquery bson.D
 	var estates []models.Estate
+	estateStaus := bson.D{{Key: "estateStatus.status", Value: 1}}
 
 	if filterForm.Header.AssignmentTypeID.IsZero() == false {
 		headFilter = append(headFilter, bson.E{Key: "dataForm.assignmentTypeId", Value: filterForm.Header.AssignmentTypeID})
@@ -139,18 +139,17 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 	var resultquery bson.D
 
 	if headFilter != nil && formquery != nil {
-		resultquery = bson.D{{Key: "$and", Value: bson.A{headFilter, formquery}}}
+		resultquery = bson.D{{Key: "$and", Value: bson.A{headFilter, formquery, estateStaus}}}
 	}
 	if headFilter != nil && formquery == nil {
-		resultquery = bson.D{{Key: "$and", Value: bson.A{headFilter}}}
+		resultquery = bson.D{{Key: "$and", Value: bson.A{headFilter, estateStaus}}}
 	}
 	if headFilter == nil && formquery != nil {
-		resultquery = bson.D{{Key: "$and", Value: bson.A{formquery}}}
+		resultquery = bson.D{{Key: "$and", Value: bson.A{formquery, estateStaus}}}
 	}
 	if headFilter == nil && formquery == nil {
-		resultquery = bson.D{{}}
+		resultquery = estateStaus
 	}
-	fmt.Println(resultquery)
 
 	result, err := r.c.Find(context.TODO(), resultquery)
 
