@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"realstate/db"
 	"realstate/models"
@@ -204,26 +203,25 @@ func (r *formController) GetFormFilter(ctx *fiber.Ctx) error {
 	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 
 	// }
-	fmt.Println(ctx.Query("assignmentTypeId"))
+
 	assignmentTypeId, err := primitive.ObjectIDFromHex(ctx.Query("assignmentTypeId"))
-	fmt.Println(assignmentTypeId)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	estateTypeId, err := primitive.ObjectIDFromHex(ctx.Query("estateTypeId"))
 
-	// estateTypeId, err := primitive.ObjectIDFromHex(ctx.Params("estateTypeId"))
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	form, err := r.form.GetFormForFilter(assignmentTypeId, estateTypeId)
 	if err != nil {
 
-		return ctx.Status(http.StatusOK).JSON(nil)
+		return ctx.Status(http.StatusNotFound).JSON(nil)
 	}
 	form, err = r.form.GetFilterForm(form)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(form)
 

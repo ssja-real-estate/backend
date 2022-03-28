@@ -157,7 +157,9 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 		}
 
 	}
-
+	if newform.Id.IsZero() {
+		return models.Form{}, nil
+	}
 	return newform, nil
 }
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {
@@ -201,8 +203,12 @@ func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, e
 		if err = coursor.Decode(&form); err != nil {
 			return models.Form{}, err
 		}
+
+		if form.Id.IsZero() {
+			return models.Form{}, mongo.ErrNoDocuments
+		}
 		return form, err
 
 	}
-	return models.Form{}, err
+	return models.Form{}, mongo.ErrNoDocuments
 }
