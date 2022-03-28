@@ -160,6 +160,9 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 	if newform.Id.IsZero() {
 		return models.Form{}, nil
 	}
+	if len(newform.Sections) == 0 {
+		return models.Form{}, mongo.ErrNilDocument
+	}
 	return newform, nil
 }
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {

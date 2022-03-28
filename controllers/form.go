@@ -217,11 +217,11 @@ func (r *formController) GetFormFilter(ctx *fiber.Ctx) error {
 	form, err := r.form.GetFormForFilter(assignmentTypeId, estateTypeId)
 	if err != nil {
 
-		return ctx.Status(http.StatusNotFound).JSON(nil)
+		return ctx.Status(http.StatusOK).JSON(nil)
 	}
 	form, err = r.form.GetFilterForm(form)
 	if err != nil {
-		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
+		return ctx.Status(http.StatusOK).JSON(nil)
 	}
 	return ctx.Status(http.StatusOK).JSON(form)
 
