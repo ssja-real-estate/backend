@@ -131,10 +131,10 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 		headFilter = append(headFilter, bson.E{Key: "neighborhood._id", Value: filterForm.Header.NeighborhoodID})
 	}
 
-	for _, item := range filterForm.Form.Sections {
-		for _, field := range item.Fileds {
-			formquery = append(formquery, createQueryForm(field))
-		}
+	for _, item := range filterForm.Form.Fields {
+
+		formquery = append(formquery, createQueryForm(item))
+
 	}
 	var resultquery bson.D
 

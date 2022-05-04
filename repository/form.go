@@ -136,34 +136,16 @@ func (r *formRepository) getMaxandMin(formid primitive.ObjectID, fieldid primiti
 
 }
 func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
-	var newform models.Form
 
-	newform = form
-	newform.Sections = []models.Section{}
-	for j, item := range form.Sections {
-
-		for index, fields := range item.Fileds {
-
-			field := &form.Sections[j].Fileds[index]
-
-			if fields.Type == 1 {
-				// max, min, err := r.getMaxandMin(form.Id, fields.Id)
-				field.Type = 6
-
-			}
-		}
-		if len(item.Fileds) > 0 {
-			newform.Sections = append(newform.Sections, item)
-		}
-
-	}
-	if newform.Id.IsZero() {
+	if len(form.Fields) == 0 {
 		return models.Form{}, nil
 	}
-	if len(newform.Sections) == 0 {
-		return models.Form{}, mongo.ErrNilDocument
+	for index, item := range form.Fields {
+		if item.Type == 6 {
+			form.Fields[index].Type = 1
+		}
 	}
-	return newform, nil
+	return form, nil
 }
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {
 

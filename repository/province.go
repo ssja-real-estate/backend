@@ -245,9 +245,7 @@ func (r *provinceRepository) GetNeighborhoodById(provinceid primitive.ObjectID, 
 	if err != nil {
 		return models.Neighborhood{}, err
 	}
-
 	for _, item := range province.Cities {
-
 		for _, city := range item.Neighborhoods {
 			if city.Id == neighborhoodid {
 				return city, nil
