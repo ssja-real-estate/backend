@@ -150,7 +150,7 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {
 
 	findForm := bson.D{{Key: "$match", Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}}}}
-	flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
+	// flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
 	projectForm := bson.D{{Key: "$project", Value: bson.D{
 		{Key: "_id", Value: 1},
 		{Key: "title", Value: 1},
@@ -176,7 +176,7 @@ func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, e
 		{Key: "sections", Value: bson.D{{Key: "$push", Value: "$sections"}}},
 	}}}
 
-	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm, flatArray, projectForm, groupForm})
+	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm, projectForm, groupForm})
 
 	if err != nil {
 		return models.Form{}, err
