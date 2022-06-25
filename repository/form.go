@@ -149,34 +149,38 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 }
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {
 
-	findForm := bson.D{{Key: "$match", Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}}}}
+	findForm := bson.D{{Key: "$match",
+		Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}, {
+			Key: "fileds.filterable", Value: true,
+		}}}}
 	// flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
-	projectForm := bson.D{{Key: "$project", Value: bson.D{
-		{Key: "_id", Value: 1},
-		{Key: "title", Value: 1},
-		{Key: "assignmentTypeId", Value: 1},
-		{Key: "estateTypeId", Value: 1},
-		{Key: "sections", Value: bson.D{
-			{Key: "_id", Value: 1},
-			{Key: "title", Value: 1},
-			{Key: "fields", Value: bson.D{
-				{Key: "$filter", Value: bson.D{
-					{Key: "input", Value: "$sections.fields"},
-					{Key: "as", Value: "item"},
-					{Key: "cond", Value: bson.D{{Key: "$eq", Value: bson.A{"$$item.filterable", true}}}},
-				}},
-			}},
-		}},
-	}}}
-	groupForm := bson.D{{Key: "$group", Value: bson.D{
-		{Key: "_id", Value: "$_id"},
-		{Key: "title", Value: bson.D{{Key: "$first", Value: "$title"}}},
-		{Key: "assignmentTypeId", Value: bson.D{{Key: "$first", Value: "$assignmentTypeId"}}},
-		{Key: "estateTypeId", Value: bson.D{{Key: "$first", Value: "$estateTypeId"}}},
-		{Key: "sections", Value: bson.D{{Key: "$push", Value: "$sections"}}},
-	}}}
+	// projectForm := bson.D{{Key: "$project", Value: bson.D{
+	// 	{Key: "_id", Value: 1},
+	// 	{Key: "title", Value: 1},
+	// 	{Key: "assignmentTypeId", Value: 1},
+	// 	{Key: "estateTypeId", Value: 1},
+	// 	{Key: "fields", Value: bson.D{
+	// 		{Key: "_id", Value: 1},
+	// 		{Key: "title", Value: 1},
+	// 		{Key:"type",Value: 1},
+	// 		{Key: "fields", Value: bson.D{
+	// 			{Key: "$filter", Value: bson.D{
+	// 				{Key: "input", Value: "$sections.fields"},
+	// 				{Key: "as", Value: "item"},
+	// 				{Key: "cond", Value: bson.D{{Key: "$eq", Value: bson.A{"$$item.filterable", true}}}},
+	// 			}},
+	// 		}},
+	// 	}},
+	// }}}
+	// groupForm := bson.D{{Key: "$group", Value: bson.D{
+	// 	{Key: "_id", Value: "$_id"},
+	// 	{Key: "title", Value: bson.D{{Key: "$first", Value: "$title"}}},
+	// 	{Key: "assignmentTypeId", Value: bson.D{{Key: "$first", Value: "$assignmentTypeId"}}},
+	// 	{Key: "estateTypeId", Value: bson.D{{Key: "$first", Value: "$estateTypeId"}}},
+	// 	{Key: "sections", Value: bson.D{{Key: "$push", Value: "$sections"}}},
+	// }}}
 
-	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm, projectForm, groupForm})
+	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm})
 
 	if err != nil {
 		return models.Form{}, err
