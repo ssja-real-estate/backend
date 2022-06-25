@@ -136,65 +136,51 @@ func (r *formRepository) getMaxandMin(formid primitive.ObjectID, fieldid primiti
 
 }
 func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
-	var newform models.Form
 
-	newform = form
-	newform.Sections = []models.Section{}
-	for j, item := range form.Sections {
-
-		for index, fields := range item.Fileds {
-
-			field := &form.Sections[j].Fileds[index]
-
-			if fields.Type == 1 {
-				// max, min, err := r.getMaxandMin(form.Id, fields.Id)
-				field.Type = 6
-
-			}
-		}
-		if len(item.Fileds) > 0 {
-			newform.Sections = append(newform.Sections, item)
-		}
-
-	}
-	if newform.Id.IsZero() {
+	if len(form.Fields) == 0 {
 		return models.Form{}, nil
 	}
-	if len(newform.Sections) == 0 {
-		return models.Form{}, mongo.ErrNilDocument
+	for index, item := range form.Fields {
+		if item.Type == 6 {
+			form.Fields[index].Type = 1
+		}
 	}
-	return newform, nil
+	return form, nil
 }
 func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (models.Form, error) {
 
-	findForm := bson.D{{Key: "$match", Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}}}}
-	flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
-	projectForm := bson.D{{Key: "$project", Value: bson.D{
-		{Key: "_id", Value: 1},
-		{Key: "title", Value: 1},
-		{Key: "assignmentTypeId", Value: 1},
-		{Key: "estateTypeId", Value: 1},
-		{Key: "sections", Value: bson.D{
-			{Key: "_id", Value: 1},
-			{Key: "title", Value: 1},
-			{Key: "fields", Value: bson.D{
-				{Key: "$filter", Value: bson.D{
-					{Key: "input", Value: "$sections.fields"},
-					{Key: "as", Value: "item"},
-					{Key: "cond", Value: bson.D{{Key: "$eq", Value: bson.A{"$$item.filterable", true}}}},
-				}},
-			}},
-		}},
-	}}}
-	groupForm := bson.D{{Key: "$group", Value: bson.D{
-		{Key: "_id", Value: "$_id"},
-		{Key: "title", Value: bson.D{{Key: "$first", Value: "$title"}}},
-		{Key: "assignmentTypeId", Value: bson.D{{Key: "$first", Value: "$assignmentTypeId"}}},
-		{Key: "estateTypeId", Value: bson.D{{Key: "$first", Value: "$estateTypeId"}}},
-		{Key: "sections", Value: bson.D{{Key: "$push", Value: "$sections"}}},
-	}}}
+	findForm := bson.D{{Key: "$match",
+		Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}, {
+			Key: "fileds.filterable", Value: true,
+		}}}}
+	// flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
+	// projectForm := bson.D{{Key: "$project", Value: bson.D{
+	// 	{Key: "_id", Value: 1},
+	// 	{Key: "title", Value: 1},
+	// 	{Key: "assignmentTypeId", Value: 1},
+	// 	{Key: "estateTypeId", Value: 1},
+	// 	{Key: "fields", Value: bson.D{
+	// 		{Key: "_id", Value: 1},
+	// 		{Key: "title", Value: 1},
+	// 		{Key:"type",Value: 1},
+	// 		{Key: "fields", Value: bson.D{
+	// 			{Key: "$filter", Value: bson.D{
+	// 				{Key: "input", Value: "$sections.fields"},
+	// 				{Key: "as", Value: "item"},
+	// 				{Key: "cond", Value: bson.D{{Key: "$eq", Value: bson.A{"$$item.filterable", true}}}},
+	// 			}},
+	// 		}},
+	// 	}},
+	// }}}
+	// groupForm := bson.D{{Key: "$group", Value: bson.D{
+	// 	{Key: "_id", Value: "$_id"},
+	// 	{Key: "title", Value: bson.D{{Key: "$first", Value: "$title"}}},
+	// 	{Key: "assignmentTypeId", Value: bson.D{{Key: "$first", Value: "$assignmentTypeId"}}},
+	// 	{Key: "estateTypeId", Value: bson.D{{Key: "$first", Value: "$estateTypeId"}}},
+	// 	{Key: "sections", Value: bson.D{{Key: "$push", Value: "$sections"}}},
+	// }}}
 
-	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm, flatArray, projectForm, groupForm})
+	coursor, err := r.c.Aggregate(context.TODO(), mongo.Pipeline{findForm})
 
 	if err != nil {
 		return models.Form{}, err

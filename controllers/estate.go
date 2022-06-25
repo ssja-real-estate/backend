@@ -90,11 +90,11 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	}
 	estate.UserId = userId
 	if len(images) > 0 {
-		for _, Sections := range estate.DataForm.Sections {
-			for _, field := range Sections.Fileds {
-				if field.Type == 5 {
-					estate.DataForm.Sections[0].Fileds[0].FieldValue = images
-				}
+
+		for index, field := range estate.DataForm.Fields {
+			if field.Type == 5 {
+				estate.DataForm.Fields[index].FieldValue = images
+
 			}
 
 		}
@@ -215,16 +215,15 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 
 	}
 	updateestate.Id = estateid
-	for _, _sections := range oldestate.DataForm.Sections {
-		for _, _fileds := range _sections.Fileds {
-			if _fileds.Type == 5 {
-				_primitive := _fileds.FieldValue.(primitive.A)
-				bytedata, _ := json.Marshal(_primitive)
-				json.Unmarshal(bytedata, &listimages)
+	for _, fields := range oldestate.DataForm.Fields {
 
-			}
+		if fields.Type == 5 {
+			_primitive := fields.FieldValue.(primitive.A)
+			bytedata, _ := json.Marshal(_primitive)
+			json.Unmarshal(bytedata, &listimages)
 
 		}
+
 	}
 	form, err := ctx.MultipartForm()
 	if err != nil {
@@ -256,12 +255,12 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
-	for _, Sections := range updateestate.DataForm.Sections {
-		for _, field := range Sections.Fileds {
-			if field.Type == 5 {
-				updateestate.DataForm.Sections[0].Fileds[0].FieldValue = images
-			}
+	for _index, _fields := range updateestate.DataForm.Fields {
+
+		if _fields.Type == 5 {
+			updateestate.DataForm.Fields[_index].FieldValue = images
 		}
+
 	}
 	updateestate.UpdateAt = time.Now()
 	updateestate.Estatetatus.Status = 2

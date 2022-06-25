@@ -131,10 +131,10 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 		headFilter = append(headFilter, bson.E{Key: "neighborhood._id", Value: filterForm.Header.NeighborhoodID})
 	}
 
-	for _, item := range filterForm.Form.Sections {
-		for _, field := range item.Fileds {
-			formquery = append(formquery, createQueryForm(field))
-		}
+	for _, item := range filterForm.Form.Fields {
+
+		formquery = append(formquery, createQueryForm(item))
+
 	}
 	var resultquery bson.D
 
@@ -175,15 +175,15 @@ func createQueryForm(field models.Field) bson.E {
 
 	switch field.Type {
 	case 0:
-		formquery = bson.E{Key: "dataForm.sections.fields.value", Value: bson.D{{Key: "$regex", Value: field.FieldValue}}}
+		formquery = bson.E{Key: "dataForm.fields.value", Value: bson.D{{Key: "$regex", Value: field.FieldValue}}}
 
 	case 2, 3:
-		formquery = bson.E{Key: "dataForm.sections.fields.value", Value: field.FieldValue}
+		formquery = bson.E{Key: "dataForm.fields.value", Value: field.FieldValue}
 	case 4:
 		formquery = createQueryForm(field.Fields[0])
 
 	case 6, 1:
-		formquery = bson.E{Key: "dataForm.sections.fields.value", Value: bson.D{{Key: "$gte", Value: field.Min}, {Key: "$lte", Value: field.Max}}}
+		formquery = bson.E{Key: "dataForm.fields.value", Value: bson.D{{Key: "$gte", Value: field.Min}, {Key: "$lte", Value: field.Max}}}
 
 	}
 	return formquery

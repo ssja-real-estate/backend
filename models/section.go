@@ -11,13 +11,12 @@ type Section struct {
 }
 
 func (section *Section) updateid() {
-
 	section.Id = primitive.NewObjectID()
-
 	for i := 0; i < len(section.Fileds); i++ {
 		section.Fileds[i].updateid()
 	}
 }
+
 func (section *Section) Validate() error {
 
 	for _, item := range section.Fileds {
