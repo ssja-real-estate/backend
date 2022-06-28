@@ -20,7 +20,6 @@ type AssignmentTypeController interface {
 	GetAssignments(ctx *fiber.Ctx) error
 	Delete(ctx *fiber.Ctx) error
 }
-
 type assignmenttypeController struct {
 	assignmenttyperepo repository.AssignmentTypeRepository
 }
@@ -38,17 +37,12 @@ func NewAssignmentTypeController(assignmenttyperepo repository.AssignmentTypeRep
 // @Router /assignmenttype/ [post]
 func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 	var assignmenttype models.AssignmentType
-
 	err := ctx.BodyParser(&assignmenttype)
 	if err != nil {
-
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
-
 	exists, err := c.assignmenttyperepo.GetByName(assignmenttype.Name)
-
 	if err == mongo.ErrNoDocuments {
-
 		if strings.TrimSpace(assignmenttype.Name) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -65,7 +59,6 @@ func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 				Status(http.StatusCreated).
 				JSON(assignmenttype)
 		}
-
 	}
 	if exists != nil {
 		err = util.ErrNameAlreadyExists
@@ -83,46 +76,34 @@ func (c *assignmenttypeController) Create(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /assignmenttype/ [put]
 func (r *assignmenttypeController) Update(ctx *fiber.Ctx) error {
-
 	assignmenttypeid, err := primitive.ObjectIDFromHex(ctx.Params("assignmenttypeId"))
-
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
-
 	var assignmenttype models.AssignmentType
 	err = ctx.BodyParser(&assignmenttype)
-
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
 	if len(assignmenttype.Name) < 2 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
-
 	_, err = r.assignmenttyperepo.GetByName(assignmenttype.Name)
 	if err == mongo.ErrNoDocuments {
-
 		dbassignmenttype, err := r.assignmenttyperepo.GetById(assignmenttypeid)
 		if err != nil {
-
 			return ctx.
 				Status(http.StatusBadRequest).
 				JSON(util.NewJError(util.ErrNotFound))
 		}
-
 		dbassignmenttype.Name = assignmenttype.Name
 		err = r.assignmenttyperepo.Update(dbassignmenttype, assignmenttypeid)
-
 		if err != nil {
-
 			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
 		return ctx.Status(http.StatusOK).JSON(dbassignmenttype)
 	}
-
 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
-
 }
 
 // GetAssignmentType ... Get AssignmentType by id
@@ -153,12 +134,10 @@ func (r *assignmenttypeController) GetAssignment(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /assignmenttypes [get]
 func (r *assignmenttypeController) GetAssignments(ctx *fiber.Ctx) error {
-
 	assignmenttypes, err := r.assignmenttyperepo.GetAll()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-
 	return ctx.Status(http.StatusOK).JSON(assignmenttypes)
 }
 
@@ -177,7 +156,6 @@ func (r *assignmenttypeController) Delete(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-
 	formrepo := repository.NewFormRepositor(db.DB)
 	count, err = formrepo.IsExitAssignmentTypeId(id)
 	if err != nil {

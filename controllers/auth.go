@@ -52,20 +52,15 @@ func (c *authController) VeryfiyMobile(ctx *fiber.Ctx) error {
 
 	mobile := ctx.Query("mobile")
 	veryfiyCode := ctx.Query("code")
-
 	exists, err := c.usersRepo.GetByMobile(mobile)
 	if err != nil || exists.Mobile != mobile {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrNotMobile)
 	}
-
 	if exists.VerifyCode != veryfiyCode {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrVeryfiyCodeNotValid)
 	}
-
 	exists.Verify = true
-
 	err = c.usersRepo.Update(exists)
-
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrSignup)
 	}
