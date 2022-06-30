@@ -34,6 +34,9 @@ var (
 	ErrNotDeleteCity           = errors.New("این شهر قابل حذف نمی باشد")
 	ErrIsNeighborhoodExists    = errors.New("نام این محله قبلا ثبت شده است ")
 	ErrIsPermmisonDenied       = errors.New("شما به این قسمت دسترسی ندارید")
+	ErrCredete                 = errors.New("مقدارشارژ نباید خالی باشد")
+	ErrDuration                = errors.New("تعداد روزهای اشتراک نباید خالی باشد")
+	ErrPaymentExists           = errors.New("این نوع اعتبار قبلا ثبت شده است")
 
 	SuccessDelete         = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate         = "آیتم مورد نظر با موفقیت اپدیت شد."
