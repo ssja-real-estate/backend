@@ -141,8 +141,8 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 		return models.Form{}, nil
 	}
 	for index, item := range form.Fields {
-		if item.Type == 6 {
-			form.Fields[index].Type = 1
+		if item.Type == 1 {
+			form.Fields[index].Type = 6
 		}
 	}
 	return form, nil
