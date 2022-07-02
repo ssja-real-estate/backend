@@ -8,15 +8,13 @@ import (
 )
 
 const (
-	Text                 = 0
-	Number               = 1
-	Select               = 2
-	Bool                 = 3
-	Conditional          = 4
-	Image                = 5
-	Range                = 6
-	SelectiveConditional = 7
-	MultiSelect          = 8
+	Text        = 0
+	Number      = 1
+	Select      = 2
+	Bool        = 3
+	Conditional = 4
+	Image       = 5
+	Range       = 6
 )
 
 type Field struct {
@@ -30,6 +28,8 @@ type Field struct {
 	Fields     []Field            `json:"fields" bson:"fields"`
 	Type       int                `json:"type"  bson:"type"`
 	Filterable bool               `json:"filterable" bson:"filterable"`
+	FieldMap   map[string]Field   `json:"fieldMap" bson:"filedMap"`
+	Keys       []string           `json:"keys" bson:"keys"`
 }
 
 // to do set value from type by enum
