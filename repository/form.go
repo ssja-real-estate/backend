@@ -151,7 +151,7 @@ func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, e
 
 	findForm := bson.D{{Key: "$match",
 		Value: bson.D{{Key: "assignmentTypeId", Value: assignmenttypeid}, {Key: "estateTypeId", Value: estatetypeid}, {
-			Key: "fileds.filterable", Value: true,
+			Key: "fields.filterable", Value: true,
 		}}}}
 	// flatArray := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$sections"}}}}
 	// projectForm := bson.D{{Key: "$project", Value: bson.D{
