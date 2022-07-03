@@ -53,6 +53,7 @@ func (r *formController) GetForms(ctx *fiber.Ctx) error {
 // @Router /form [post]
 func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	ctx.AcceptsCharsets("utf-8", "iso-8859-1")
+	ctx.Type("json", "utf-8")
 	var form models.Form
 	err := ctx.BodyParser(&form)
 
@@ -181,6 +182,7 @@ func (r *formController) DeleteForm(ctx *fiber.Ctx) error {
 // @Router /form [put]
 func (r *formController) UpdateForm(ctx *fiber.Ctx) error {
 	ctx.AcceptsCharsets("utf-8", "iso-8859-1")
+	ctx.Type("json", "utf-8")
 	var form models.Form
 	id, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 	if err != nil {
