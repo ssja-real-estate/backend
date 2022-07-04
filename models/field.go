@@ -33,7 +33,7 @@ type Field struct {
 	Fields     []Field            `json:"fields" bson:"fields"`
 	Type       int                `json:"type"  bson:"type"`
 	Filterable bool               `json:"filterable" bson:"filterable"`
-	FieldMap   []FieldMap         `json:"fieldMap" bson:"filedMap"`
+	FieldMaps  []FieldMap         `json:"fieldMaps" bson:"filedMaps"`
 	Keys       []string           `json:"keys" bson:"keys"`
 }
 
