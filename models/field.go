@@ -17,6 +17,11 @@ const (
 	Range       = 6
 )
 
+type FieldMap struct {
+	Key    string  `json:"key" bson:"key"`
+	Fields []Field `json:"fields" bson:"fields"`
+}
+
 type Field struct {
 	Id         primitive.ObjectID `json:"id" bson:"_id"`
 	Title      string             `json:"title" bson:"title"`
@@ -28,7 +33,7 @@ type Field struct {
 	Fields     []Field            `json:"fields" bson:"fields"`
 	Type       int                `json:"type"  bson:"type"`
 	Filterable bool               `json:"filterable" bson:"filterable"`
-	FieldMap   map[string]Field   `json:"fieldMap" bson:"filedMap"`
+	FieldMap   []FieldMap         `json:"fieldMap" bson:"filedMap"`
 	Keys       []string           `json:"keys" bson:"keys"`
 }
 
