@@ -39,6 +39,7 @@ func (r *formRepository) SaveForm(form *models.Form) error {
 
 func (r *formRepository) GetForm(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (form models.Form, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"assignmentTypeId": assignmenttypeid, "estateTypeId": estatetypeid}).Decode(&form)
+	form, err = r.GetFilterForm(form)
 	return form, err
 }
 func (r *formRepository) GetForms() ([]models.Form, error) {
@@ -66,6 +67,7 @@ func (r *formRepository) GetForms() ([]models.Form, error) {
 
 func (r *formRepository) GetFormById(id primitive.ObjectID) (form models.Form, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&form)
+
 	return form, err
 }
 
