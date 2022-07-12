@@ -144,6 +144,19 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 		if item.Type == 1 {
 			form.Fields[index].Type = 6
 		}
+		if item.Type == 8 {
+
+			var listmap []map[string]bool
+
+			for _, keyString := range item.Keys {
+				thiskey := map[string]bool{
+					keyString: false,
+				}
+				listmap = append(listmap, thiskey)
+			}
+			item.FieldValue = listmap
+
+		}
 	}
 	return form, nil
 }
