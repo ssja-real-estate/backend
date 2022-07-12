@@ -147,16 +147,15 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 			form.Fields[index].Type = 6
 		}
 		if item.Type == 8 {
-
 			var listmap []map[string]bool
-
 			for _, keyString := range item.Keys {
 				thiskey := map[string]bool{
 					keyString: false,
 				}
 				listmap = append(listmap, thiskey)
 			}
-			item.FieldValue = listmap
+
+			form.Fields[index].FieldValue = listmap
 
 		}
 	}
@@ -211,7 +210,7 @@ func (r *formRepository) GetFormForFilter(assignmenttypeid primitive.ObjectID, e
 		if form.Id.IsZero() {
 			return models.Form{}, mongo.ErrNoDocuments
 		}
-		return form, err
+		return r.GetFilterForm(form)
 
 	}
 	return models.Form{}, mongo.ErrNoDocuments
