@@ -55,12 +55,15 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 
 	var estate models.Estate
 
-	err := ctx.BodyParser(&estate)
+	// err := ctx.BodyParser(&estate)
 	strestate := ctx.FormValue("estate")
+
 	json.Unmarshal([]byte(strestate), &estate)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
+	fmt.Println(estate.DataForm.Fields)
+
+	// if err != nil {
+	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	// }
 	userId, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))

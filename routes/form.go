@@ -13,6 +13,7 @@ type formRoute struct {
 func NewFormRoute(formcontroller controllers.FormController) Routes {
 	return &formRoute{formcontroller}
 }
+
 func (r *formRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/form", AuthRequired, r.formController.CreateForm)

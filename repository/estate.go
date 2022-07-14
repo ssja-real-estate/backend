@@ -61,7 +61,8 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 	if err != nil {
 		return estate, err
 	}
-	return estate, err
+
+	return decodetoMap(estate)
 
 }
 func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error) {
@@ -76,6 +77,7 @@ func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error
 		if err = result.Decode(&estate); err != nil {
 			return estates, nil
 		}
+		estate, _ = decodetoMap(estate)
 		estates = append(estates, estate)
 
 	}
@@ -102,9 +104,11 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 
 	for result.Next(context.TODO()) {
 		var estate models.Estate
+
 		if err = result.Decode(&estate); err != nil {
 			return estates, nil
 		}
+		estate, _ = decodetoMap(estate)
 		estates = append(estates, estate)
 	}
 	return estates, nil
@@ -163,6 +167,7 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 		if err = result.Decode(&estate); err != nil {
 			return []models.Estate{}, err
 		}
+		estate, _ = decodetoMap(estate)
 		estates = append(estates, estate)
 
 	}
@@ -170,6 +175,19 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 
 }
 
+func decodetoMap(estate models.Estate) (models.Estate, error) {
+	for index, item := range estate.DataForm.Fields {
+		if item.Type == 8 {
+			newmap := make(map[string]bool)
+			for _, maps := range item.FieldValue.(primitive.D) {
+				newmap[maps.Key] = maps.Value.(bool)
+			}
+			estate.DataForm.Fields[index].FieldValue = newmap
+
+		}
+	}
+	return estate, nil
+}
 func createQueryForm(field models.Field) bson.E {
 	var formquery bson.E
 
