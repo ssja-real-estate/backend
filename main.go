@@ -80,9 +80,9 @@ func main() {
 	estateroute := routes.NewEstateRoute(estateregistercontroller)
 	estateroute.Install(app)
 
-	paymentrepo := repository.NewEstateRepository(db.DB)
-	paymentController := controllers.NewEstateController(paymentrepo)
-	paymentroute := routes.NewEstateRoute(paymentController)
+	paymentrepo := repository.NewPaymentRepository(db.DB)
+	paymentController := controllers.NewPaymentController(paymentrepo)
+	paymentroute := routes.NewpaymentRoute(paymentController)
 	paymentroute.Install(app)
 
 	log.Fatal(app.Listen(":8000"))
