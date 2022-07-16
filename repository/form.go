@@ -39,6 +39,9 @@ func (r *formRepository) SaveForm(form *models.Form) error {
 
 func (r *formRepository) GetForm(assignmenttypeid primitive.ObjectID, estatetypeid primitive.ObjectID) (form models.Form, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"assignmentTypeId": assignmenttypeid, "estateTypeId": estatetypeid}).Decode(&form)
+	if err != nil {
+		return models.Form{}, err
+	}
 	form, err = r.GetFilterForm(form)
 	return form, err
 }
