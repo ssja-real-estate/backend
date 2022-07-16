@@ -48,9 +48,9 @@ func (c *paymentContorller) CreatePayment(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadGateway).JSON(util.NewJError(err))
 	}
 	isexist, err := c.payment.GetPaymentByCreditDuration(payment.Credit, payment.Duration)
-	if err != nil {
-		return ctx.Status(http.StatusBadGateway).JSON(util.NewJError(err))
-	}
+	// if err = nil {
+	// 	return ctx.Status(http.StatusBadGateway).JSON(util.NewJError(err))
+	// }
 	if isexist {
 		return ctx.Status(http.StatusBadGateway).JSON(util.ErrPaymentExists)
 	}
