@@ -17,7 +17,7 @@ type Payment struct {
 
 func (payment *Payment) Validate() error {
 	if len(payment.Title) < 3 {
-		return errors.New(fmt.Sprint("فیلد", payment.Title, "نباید خالی باشد"))
+		return errors.New(fmt.Sprint("فیلد", " عنوان ", "نباید خالی باشد"))
 	}
 	if payment.Credit < 0 {
 		return util.ErrCredete

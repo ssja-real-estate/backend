@@ -77,11 +77,11 @@ func (c *paymentContorller) UpdatePayment(ctx *fiber.Ctx) error {
 	}
 	var payment models.Payment
 	err = ctx.BodyParser(&payment)
-	err = payment.Validate()
+
 	if err != nil {
 		return ctx.Status(http.StatusBadGateway).JSON(util.NewJError(err))
 	}
-
+	err = payment.Validate()
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
@@ -125,11 +125,13 @@ func (c *paymentContorller) DeletePayment(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /payment/id [get]
 func (c *paymentContorller) GetPaymentById(ctx *fiber.Ctx) error {
+
 	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
+
 	var payment models.Payment
 	payment, err = c.payment.GetPaymentByID(paymentID)
 	if err != nil {
