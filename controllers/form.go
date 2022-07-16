@@ -78,6 +78,7 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 	_, estateerr := estateController.esstatetype.GetEstateTypeById(form.EstateTypeID)
 
 	if assignmentexisterr != nil && estateerr != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.ErrEstateIDAssignID)
 	}
 	if assignmentexisterr != nil {
@@ -94,11 +95,12 @@ func (r *formController) CreateForm(ctx *fiber.Ctx) error {
 
 	form.Updateid()
 	form.Id = primitive.NewObjectID()
-
 	err = r.form.SaveForm(&form)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	return ctx.Status(http.StatusCreated).JSON(form)
 }
 
