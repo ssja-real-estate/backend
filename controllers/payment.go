@@ -71,7 +71,7 @@ func (c *paymentContorller) CreatePayment(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /Payment/ [put]
 func (c *paymentContorller) UpdatePayment(ctx *fiber.Ctx) error {
-	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("paymentId"))
+	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
@@ -103,7 +103,7 @@ func (c *paymentContorller) UpdatePayment(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /payment/id [delete]
 func (c *paymentContorller) DeletePayment(ctx *fiber.Ctx) error {
-	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("paymentId"))
+	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
@@ -125,7 +125,7 @@ func (c *paymentContorller) DeletePayment(ctx *fiber.Ctx) error {
 // @Failure 400 {object} object
 // @Router /payment/id [get]
 func (c *paymentContorller) GetPaymentById(ctx *fiber.Ctx) error {
-	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("paymentId"))
+	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("id"))
 
 	if err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
