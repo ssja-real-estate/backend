@@ -21,7 +21,7 @@ type EstateRepository interface {
 	GetEstateByStatus(status int) ([]models.Estate, error)
 	UpdateStatus(estaeid primitive.ObjectID, estateStatus models.EstateStatus) (int, error)
 	GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error)
-	FindEstate(filterForm models.Filter) ([]models.Estate, error)
+	FindEstate(filterForm models.Filter, iscredit bool) ([]models.Estate, error)
 }
 
 type estateRepository struct {
@@ -113,7 +113,7 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 	}
 	return estates, nil
 }
-func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate, error) {
+func (r *estateRepository) FindEstate(filterForm models.Filter, iscredit bool) ([]models.Estate, error) {
 	var headFilter bson.D
 	var formquery bson.D
 	var estates []models.Estate
@@ -168,6 +168,10 @@ func (r *estateRepository) FindEstate(filterForm models.Filter) ([]models.Estate
 			return []models.Estate{}, err
 		}
 		estate, _ = decodetoMap(estate)
+		if iscredit == false {
+			estate.Phone = ""
+		}
+
 		estates = append(estates, estate)
 
 	}
