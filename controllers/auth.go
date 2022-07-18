@@ -291,6 +291,14 @@ func (c *authController) GetUser(ctx *fiber.Ctx) error {
 			Status(http.StatusInternalServerError).
 			JSON(util.NewJError(err))
 	}
+	creditrepo := repository.NewCreditRepository(db.DB)
+	credit, errcredit := creditrepo.GetCredit(user.Id)
+
+	if errcredit == nil {
+		user.Credit = &credit
+	} else {
+		user.Credit = nil
+	}
 	return ctx.
 		Status(http.StatusOK).
 		JSON(user)
