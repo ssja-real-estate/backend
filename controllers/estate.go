@@ -44,7 +44,15 @@ func (r *estateController) SearchEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-	estate, err := r.estate.FindEstate(filterForm)
+	userid, err := security.GetUserByToken(ctx)
+	creditrepo := repository.NewCreditRepository(db.DB)
+	_, errcredit := creditrepo.GetCredit(userid)
+	iscredit := false
+	if errcredit != nil {
+		iscredit = true
+	}
+
+	estate, err := r.estate.FindEstate(filterForm, iscredit)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
@@ -91,6 +99,9 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		}
 	}
 	estate.UserId = userId
+	userRepo := repository.NewUsersRepository(db.DB)
+	user, _ := userRepo.GetById(userId)
+	estate.Phone = user.Mobile
 	if len(images) > 0 {
 
 		for index, field := range estate.DataForm.Fields {
