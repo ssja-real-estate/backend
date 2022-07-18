@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"realstate/models"
 	"realstate/repository"
+	"realstate/sadadportal"
 	"realstate/util"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,6 +20,7 @@ type PaymentController interface {
 	DeletePayment(Ctx *fiber.Ctx) error
 	GetPaymentById(Ctx *fiber.Ctx) error
 	GetPayments(Ctx *fiber.Ctx) error
+	GetLinkPayment(Ctx *fiber.Ctx) error
 }
 
 type paymentContorller struct {
@@ -155,4 +160,31 @@ func (c *paymentContorller) GetPayments(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(payments)
 
+}
+
+func (r *paymentContorller) GetLinkPayment(ctx *fiber.Ctx) error {
+	paymentID, err := primitive.ObjectIDFromHex(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
+	}
+
+	var payment models.Payment
+	payment, err = r.payment.GetPaymentByID(paymentID)
+	if err != nil {
+		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
+	}
+	var sadad models.SadadPayment
+	sadad.Amount = payment.Credit
+	sadad.LocalDateTime = time.Now()
+	sadad.OrderId = 1
+	sadad.MerchantId = os.Getenv("MERCHANTID")
+	sadad.TerminalId = os.Getenv("TERMINALID")
+	key := os.Getenv("SADADKEY")
+	sadad.ReturnUrl = "url"
+	singed, err := sadadportal.TripleDesECBEncrypt([]byte(fmt.Sprintf(sadad.TerminalId, ";", sadad.MerchantId, ";", sadad.Amount)), []byte(key))
+	fmt.Println(err)
+	sadad.SignData = singed
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"url": "https://sadad.org"})
 }

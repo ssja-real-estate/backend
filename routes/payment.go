@@ -21,5 +21,6 @@ func (r *paymentRoutes) Install(app *fiber.App) {
 	api.Get("/payment/:id", AuthRequired, r.paymentController.GetPaymentById)
 	api.Get("/payment", AuthRequired, r.paymentController.GetPayments)
 	api.Delete("/payment/:id", AuthRequired, r.paymentController.DeletePayment)
+	api.Post("/paymentlink/:id", AuthRequired, r.paymentController.GetLinkPayment)
 
 }

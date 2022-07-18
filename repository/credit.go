@@ -51,7 +51,7 @@ func (r *creditRepository) GetCredit(userid primitive.ObjectID) (models.Credit, 
 	t := time.Now()
 	dif := t.Sub(credit.RegisterDate)
 	duration := credit.RemainingDuration - int(dif.Hours())/24
-	if duration > 0 {
+	if duration >= 0 {
 		credit.Duration = duration
 	} else {
 		credit.Duration = 0
