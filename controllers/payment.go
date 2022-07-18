@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"realstate/models"
 	"realstate/repository"
-	"realstate/sadadportal"
 	"realstate/util"
 	"time"
 
@@ -180,11 +178,11 @@ func (r *paymentContorller) GetLinkPayment(ctx *fiber.Ctx) error {
 	sadad.OrderId = 1
 	sadad.MerchantId = os.Getenv("MERCHANTID")
 	sadad.TerminalId = os.Getenv("TERMINALID")
-	key := os.Getenv("SADADKEY")
+	// key := os.Getenv("SADADKEY")
 	sadad.ReturnUrl = "url"
-	singed, err := sadadportal.TripleDesECBEncrypt([]byte(fmt.Sprintf(sadad.TerminalId, ";", sadad.MerchantId, ";", sadad.Amount)), []byte(key))
-	fmt.Println(err)
-	sadad.SignData = singed
+	// singed, err := sadadportal.TripleDesECBEncrypt([]byte(fmt.Sprintf(sadad.TerminalId, ";", sadad.MerchantId, ";", sadad.Amount)), []byte(key))
+	// fmt.Println(err)
+	sadad.SignData = "signed"
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{"url": "https://sadad.org"})
 }
