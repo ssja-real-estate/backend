@@ -42,7 +42,7 @@ func (r *formRepository) GetForm(assignmenttypeid primitive.ObjectID, estatetype
 	if err != nil {
 		return models.Form{}, err
 	}
-	form, err = r.GetFilterForm(form)
+
 	return form, err
 }
 func (r *formRepository) GetForms() ([]models.Form, error) {

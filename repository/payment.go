@@ -20,7 +20,6 @@ type PaymentRepository interface {
 	GetPaymentByID(paymentid primitive.ObjectID) (models.Payment, error)
 	GetPaymentByCreditDuration(credit int, duration int) (bool, error)
 }
-
 type paymentRepository struct {
 	c *mongo.Collection
 }
@@ -28,12 +27,10 @@ type paymentRepository struct {
 func NewPaymentRepository(DB *mongo.Client) PaymentRepository {
 	return &paymentRepository{db.GetCollection(db.DB, paymentCollection)}
 }
-
 func (r *paymentRepository) Save(payment *models.Payment) error {
 	_, err := r.c.InsertOne(context.TODO(), payment)
 	return err
 }
-
 func (r *paymentRepository) Update(payment *models.Payment, paymentid primitive.ObjectID) error {
 	filter := bson.M{"_id": paymentid}
 	update := bson.M{"$set": &payment}
@@ -61,11 +58,9 @@ func (r *paymentRepository) GetPayments() ([]models.Payment, error) {
 	}
 	return []models.Payment{}, nil
 }
-
 func (r *paymentRepository) DeletePayment(paymnetid primitive.ObjectID) error {
 	_, err := r.c.DeleteOne(context.TODO(), bson.M{"_id": paymnetid})
 	return err
-
 }
 func (r *paymentRepository) GetPaymentByID(paymentid primitive.ObjectID) (models.Payment, error) {
 	var payment models.Payment

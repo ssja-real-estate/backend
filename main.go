@@ -85,6 +85,11 @@ func main() {
 	paymentroute := routes.NewpaymentRoute(paymentController)
 	paymentroute.Install(app)
 
+	creditrepo := repository.NewCreditRepository(db.DB)
+	creditController := controllers.NewCreditController(creditrepo)
+	creditroute := routes.NewCreditRoute(creditController)
+	creditroute.Install(app)
+
 	log.Fatal(app.Listen(":8000"))
 
 }

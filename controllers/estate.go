@@ -59,7 +59,6 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	strestate := ctx.FormValue("estate")
 
 	json.Unmarshal([]byte(strestate), &estate)
-	fmt.Println(estate.DataForm.Fields)
 
 	// if err != nil {
 	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))

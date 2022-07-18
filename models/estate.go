@@ -9,6 +9,7 @@ import (
 type Estate struct {
 	Id           primitive.ObjectID `json:"id" bson:"_id"`
 	UserId       primitive.ObjectID `json:"userId" bson:"userId"`
+	Phone        string             `json:"phone" bson:"phone"`
 	Estatetatus  EstateStatus       `json:"estateStatus" bson:"estateStatus"`
 	Position     Position           `json:"position" bson:"position"`
 	City         EstateLocation     `json:"city" bson:"city"`

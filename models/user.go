@@ -15,6 +15,7 @@ type User struct {
 	Role       int       `json:"role"  bson:"role"`
 	VerifyCode string    `json:"-" bson:"verifyCode"`
 	Verify     bool      `json:"-" bson:"verify"`
+	Credit     *Credit   `json:"credit" bson:"credit"`
 	CreatedAt  time.Time `json:"-" bson:"createdAt"`
 	UpdatedAt  time.Time `json:"-" bson:"updatedAt"`
 }

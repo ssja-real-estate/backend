@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"realstate/db"
 	"realstate/models"
 	"realstate/repository"
 	"realstate/security"
@@ -252,6 +253,16 @@ func (c *authController) SignIn(ctx *fiber.Ctx) error {
 			Status(http.StatusUnauthorized).
 			JSON(util.NewJError(util.ErrNotSignUp))
 	}
+
+	creditrepo := repository.NewCreditRepository(db.DB)
+	credit, errcredit := creditrepo.GetCredit(user.Id)
+
+	if errcredit == nil {
+		user.Credit = &credit
+	} else {
+		user.Credit = nil
+	}
+
 	return ctx.
 		Status(http.StatusOK).
 		JSON(fiber.Map{
