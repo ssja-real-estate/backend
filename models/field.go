@@ -38,6 +38,7 @@ type Field struct {
 	Filterable bool               `json:"filterable" bson:"filterable"`
 	FieldMaps  []FieldMap         `json:"fieldMaps" bson:"filedMaps"`
 	Keys       []string           `json:"keys" bson:"keys"`
+	UnitName   string             `json:"unitName" bson:"unitName"`
 }
 
 // to do set value from type by enum
