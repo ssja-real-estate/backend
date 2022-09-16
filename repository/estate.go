@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"realstate/db"
 	"realstate/models"
@@ -91,7 +92,7 @@ func (r *estateRepository) UpdateStatus(estaeid primitive.ObjectID, estateStatus
 }
 
 func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error) {
-
+	fmt.Println("1")
 	query := bson.M{"userId": userId}
 	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), query)
@@ -180,6 +181,7 @@ func (r *estateRepository) FindEstate(filterForm models.Filter, iscredit bool) (
 }
 
 func decodetoMap(estate models.Estate) (models.Estate, error) {
+
 	for index, item := range estate.DataForm.Fields {
 		if item.Type == 8 {
 			newmap := make(map[string]bool)
@@ -190,6 +192,7 @@ func decodetoMap(estate models.Estate) (models.Estate, error) {
 
 		}
 	}
+	print(2)
 	return estate, nil
 }
 func createQueryForm(field models.Field) bson.E {

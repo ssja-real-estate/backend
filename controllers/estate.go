@@ -66,11 +66,11 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	// err := ctx.BodyParser(&estate)
 	strestate := ctx.FormValue("estate")
 
-	json.Unmarshal([]byte(strestate), &estate)
+	err := json.Unmarshal([]byte(strestate), &estate)
 
-	// if err != nil {
-	// 	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	// }
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+	}
 	userId, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
