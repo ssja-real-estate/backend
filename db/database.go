@@ -15,7 +15,6 @@ func ConnectDB() *mongo.Client {
 	//  client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://analytics:%s@amlak.wjtlb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", os.Getenv("DBPASS"))))
 	if err != nil {
-		fmt.Println("---------error in connecting --------")
 		log.Fatal(err)
 	}
 
@@ -24,17 +23,17 @@ func ConnectDB() *mongo.Client {
 	}
 
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		fmt.Println("------------error to connect DB ---------------------")
+
 		panic(err)
 	}
 	fmt.Println("Successfully connected and pinged.")
 	return client
 }
 
-//Client instance
+// Client instance
 var DB *mongo.Client = ConnectDB()
 
-//getting database collections
+// getting database collections
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	collection := client.Database("Amlak").Collection(collectionName)
 

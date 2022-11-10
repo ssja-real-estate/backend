@@ -29,6 +29,7 @@ type EstateController interface {
 	GetEstateByUserID(ctx *fiber.Ctx) error
 	GetStateByStatus(ctx *fiber.Ctx) error
 	SearchEstate(ctx *fiber.Ctx) error
+	GetEstates(ctx *fiber.Ctx) error
 }
 
 type estateController struct {
@@ -300,4 +301,11 @@ func getname(images []string, extension string) string {
 			index++
 		}
 	}
+}
+func (r *estateController) GetEstates(ctx *fiber.Ctx) error {
+	err, estates := r.estate.GetEstates()
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(err)
+	}
+	return ctx.Status(http.StatusOK).JSON(&estates)
 }

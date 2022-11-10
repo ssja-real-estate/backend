@@ -24,5 +24,6 @@ func (r *estateRoute) Install(app *fiber.App) {
 	api.Get("/estate/list/user", AuthRequired, r.esteteContorller.GetEstateByUserID)
 	api.Get("/estate/list/:status", AuthRequired, r.esteteContorller.GetStateByStatus)
 	api.Post("/estate/search/", AuthRequired, r.esteteContorller.SearchEstate)
+	api.Get("/estates", r.esteteContorller.GetEstates)
 
 }

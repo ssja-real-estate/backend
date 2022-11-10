@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"realstate/db"
 	"realstate/models"
@@ -10,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const estateCollections = "estate"
@@ -23,6 +23,7 @@ type EstateRepository interface {
 	UpdateStatus(estaeid primitive.ObjectID, estateStatus models.EstateStatus) (int, error)
 	GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error)
 	FindEstate(filterForm models.Filter, iscredit bool) ([]models.Estate, error)
+	GetEstates() ([]models.Estate, error)
 }
 
 type estateRepository struct {
@@ -92,7 +93,7 @@ func (r *estateRepository) UpdateStatus(estaeid primitive.ObjectID, estateStatus
 }
 
 func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]models.Estate, error) {
-	fmt.Println("1")
+
 	query := bson.M{"userId": userId}
 	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), query)
@@ -192,7 +193,7 @@ func decodetoMap(estate models.Estate) (models.Estate, error) {
 
 		}
 	}
-	print(2)
+
 	return estate, nil
 }
 func createQueryForm(field models.Field) bson.E {
@@ -212,5 +213,23 @@ func createQueryForm(field models.Field) bson.E {
 
 	}
 	return formquery
+
+}
+func (r *estateRepository) GetEstates() ([]models.Estate, error) {
+	opts := options.Find().SetSort(bson.D{{Key: "_id", Value: -1}}).SetLimit(10)
+	estates := []models.Estate{}
+	result, err := r.c.Find(context.TODO(), bson.M{}, opts)
+	if err != nil {
+		return []models.Estate{}, err
+	}
+	defer result.Close(context.TODO())
+	for result.Next(context.TODO()) {
+		var estate models.Estate
+		if err = result.Decode(&estate); err != nil {
+			return []models.Estate{}, err
+		}
+		estates = append(estates, estate)
+	}
+	return estates, nil
 
 }
