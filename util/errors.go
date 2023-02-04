@@ -41,5 +41,5 @@ var (
 	SuccessDelete         = "گزینه مورد نظر با موفقیت حذف شد"
 	SuccessUpdate         = "آیتم مورد نظر با موفقیت اپدیت شد."
 	SuccessSendSms        = "کد فعال سازی با موفقیت ارسال شد"
-	SuccessChangePassword = "رمز عبور شما با موفیقت بروزرسانی شد "
+	SuccessChangePassword = "رمز عبور شما با موفیقت بروزرسانی شد"
 )
