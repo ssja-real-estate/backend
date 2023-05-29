@@ -66,7 +66,7 @@ func (r *provinceRepository) GetProvinceByName(name string) (province *models.Pr
 	return province, err
 }
 func (r *provinceRepository) GetProvinceAll() ([]models.Province, error) {
-	result, err := r.c.Find(context.TODO(), bson.M{}, options.Find().SetSort(bson.D{{"name", 1}}))
+	result, err := r.c.Find(context.TODO(), bson.M{}, options.Find().SetSort(bson.D{{Key: "cities.name", Value: 1}}))
 	var provinces []models.Province
 	if err != nil {
 		return make([]models.Province, 0), err
