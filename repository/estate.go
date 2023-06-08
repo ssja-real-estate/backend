@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"realstate/db"
 	"realstate/models"
@@ -79,7 +80,7 @@ func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error
 		if err = result.Decode(&estate); err != nil {
 			return estates, nil
 		}
-		estate, _ = decodetoMap(estate)
+		// estate, _ = decodetoMap(estate)
 		estates = append(estates, estate)
 
 	}
@@ -97,10 +98,12 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 	query := bson.M{"userId": userId}
 	estates := []models.Estate{}
 	result, err := r.c.Find(context.TODO(), query)
+	fmt.Println(query)
 
 	if err != nil {
 		return estates, nil
 	}
+	fmt.Println("1111111111111111111111111111111")
 
 	defer result.Close(context.TODO())
 
@@ -108,9 +111,12 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 		var estate models.Estate
 
 		if err = result.Decode(&estate); err != nil {
-			return estates, nil
+			fmt.Println("222222222222222222222222222")
+			fmt.Println(err)
+			return []models.Estate{}, err
 		}
-		estate, _ = decodetoMap(estate)
+		// fmt.Println("333333333333333333333333333333")
+		// estate, _ = decodetoMap(estate)
 		estates = append(estates, estate)
 	}
 	return estates, nil
@@ -190,7 +196,6 @@ func decodetoMap(estate models.Estate) (models.Estate, error) {
 				newmap[maps.Key] = maps.Value.(bool)
 			}
 			estate.DataForm.Fields[index].FieldValue = newmap
-
 		}
 	}
 
