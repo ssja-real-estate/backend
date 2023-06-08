@@ -11,6 +11,7 @@ type User struct {
 	Name     string             `json:"name" bson:"name"`
 	Password string             `json:"password" bson:"password"`
 	Mobile   string             `json:"mobile" bson:"mobile"`
+	// name family nationalcode birthday todo
 	// owner 1 Admin 2 User 3
 	Role       int       `json:"role"  bson:"role"`
 	VerifyCode string    `json:"-" bson:"verifyCode"`

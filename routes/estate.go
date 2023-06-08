@@ -18,12 +18,12 @@ func (r *estateRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
 	api.Post("/estate", AuthRequired, r.esteteContorller.CreateEstate)
 	api.Put("/estate/:estateId", AuthRequired, r.esteteContorller.UpdateEstate)
-	api.Get("/estate/:estaeId", AuthRequired, r.esteteContorller.GetEstate)
+	api.Get("/estate/:estaeId", r.esteteContorller.GetEstate)
 	api.Put("/estate/status/:estateId", AuthRequired, r.esteteContorller.UpdateStaus)
 	api.Delete("/estate/:estateId", AuthRequired, r.esteteContorller.DeleteEstate)
-	api.Get("/estate/list/user", AuthRequired, r.esteteContorller.GetEstateByUserID)
+	api.Get("/estate/list/user", r.esteteContorller.GetEstateByUserID)
 	api.Get("/estate/list/:status", AuthRequired, r.esteteContorller.GetStateByStatus)
-	api.Post("/estate/search/", AuthRequired, r.esteteContorller.SearchEstate)
+	api.Post("/estate/search/", r.esteteContorller.SearchEstate)
 	api.Get("/estates", r.esteteContorller.GetEstates)
 
 }
