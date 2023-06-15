@@ -72,6 +72,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	userId, err := security.GetUserByToken(ctx)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -197,13 +198,17 @@ func (r *estateController) UpdateStaus(ctx *fiber.Ctx) error {
 }
 
 func (r *estateController) GetEstateByUserID(ctx *fiber.Ctx) error {
+
 	userId, err := security.GetUserByToken(ctx)
+
 	if err != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
 	estates, err := r.estate.GetEstateByUserID(userId)
 	if err != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(estates)

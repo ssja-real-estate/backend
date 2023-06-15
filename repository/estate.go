@@ -65,7 +65,7 @@ func (r *estateRepository) GetEstateById(estateid primitive.ObjectID) (models.Es
 		return estate, err
 	}
 
-	return decodetoMap(estate)
+	return estate, nil
 
 }
 func (r *estateRepository) GetEstateByStatus(status int) ([]models.Estate, error) {
@@ -103,7 +103,6 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 	if err != nil {
 		return estates, nil
 	}
-	fmt.Println("1111111111111111111111111111111")
 
 	defer result.Close(context.TODO())
 
@@ -111,11 +110,10 @@ func (r *estateRepository) GetEstateByUserID(userId primitive.ObjectID) ([]model
 		var estate models.Estate
 
 		if err = result.Decode(&estate); err != nil {
-			fmt.Println("222222222222222222222222222")
-			fmt.Println(err)
+
 			return []models.Estate{}, err
 		}
-		// fmt.Println("333333333333333333333333333333")
+
 		// estate, _ = decodetoMap(estate)
 		estates = append(estates, estate)
 	}
