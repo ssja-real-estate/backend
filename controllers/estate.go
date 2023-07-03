@@ -40,14 +40,19 @@ func NewEstateController(estaterepo repository.EstateRepository) EstateControlle
 	return &estateController{estaterepo}
 }
 func (r *estateController) SearchEstate(ctx *fiber.Ctx) error {
+
 	var filterForm models.Filter
+
 	err := ctx.BodyParser(&filterForm)
+
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	userid, err := security.GetUserByToken(ctx)
 	creditrepo := repository.NewCreditRepository(db.DB)
 	_, errcredit := creditrepo.GetCredit(userid)
+
 	iscredit := false
 	if errcredit != nil {
 		iscredit = true

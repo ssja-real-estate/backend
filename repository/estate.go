@@ -173,7 +173,7 @@ func (r *estateRepository) FindEstate(filterForm models.Filter, iscredit bool) (
 		if err = result.Decode(&estate); err != nil {
 			return []models.Estate{}, err
 		}
-		estate, _ = decodetoMap(estate)
+		// estate, _ = decodetoMap(estate)
 		if iscredit == false {
 			estate.Phone = ""
 		}
