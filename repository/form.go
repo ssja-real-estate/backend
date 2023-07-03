@@ -149,16 +149,16 @@ func (r *formRepository) GetFilterForm(form models.Form) (models.Form, error) {
 		if item.Type == 1 {
 			form.Fields[index].Type = 6
 		}
-		if item.Type == 8 {
-			listmap := make(map[string]bool)
-			for _, keyString := range item.Keys {
-				listmap[keyString] = false
+		// if item.Type == 8 {
+		// 	listmap := make(map[string]bool)
+		// 	for _, keyString := range item.Keys {
+		// 		listmap[keyString] = false
 
-			}
+		// 	}
 
-			form.Fields[index].FieldValue = listmap
+		// 	form.Fields[index].FieldValue = listmap
 
-		}
+		// }
 	}
 	return form, nil
 }
