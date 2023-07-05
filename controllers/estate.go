@@ -49,14 +49,15 @@ func (r *estateController) SearchEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
-	userid, err := security.GetUserByToken(ctx)
-	creditrepo := repository.NewCreditRepository(db.DB)
-	_, errcredit := creditrepo.GetCredit(userid)
+	// userid, err := security.GetUserByToken(ctx)
+	// creditrepo := repository.NewCreditRepository(db.DB)
+
+	// _, errcredit := creditrepo.GetCredit(userid)
 
 	iscredit := false
-	if errcredit != nil {
-		iscredit = true
-	}
+	// if errcredit != nil {
+	iscredit = true
+	// }
 
 	estate, err := r.estate.FindEstate(filterForm, iscredit)
 	if err != nil {
