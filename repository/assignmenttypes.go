@@ -12,6 +12,7 @@ import (
 
 const settingCollection = "settings"
 
+
 type AssignmentTypeRepository interface {
 	Save(assignmenttype *models.AssignmentType) error
 	Update(assignmenttype *models.AssignmentType, assignmenttypeid primitive.ObjectID) error
