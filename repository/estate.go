@@ -33,6 +33,7 @@ type estateRepository struct {
 
 func NewEstateRepository(DB *mongo.Client) EstateRepository {
 	return &estateRepository{db.GetCollection(DB, estateCollections)}
+	
 }
 
 func (r *estateRepository) SaveEstate(estate *models.Estate) error {
