@@ -17,7 +17,7 @@ func TripleDesECBEncrypt(src, key []byte) (string, error) {
 	fmt.Println(key)
 	block, err := des.NewTripleDESCipher(key)
 	if err != nil {
-		fmt.Println("find error")
+		fmt.Println("find error from sadad")
 		return "", err
 	}
 	bs := block.BlockSize()
