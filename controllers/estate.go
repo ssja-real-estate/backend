@@ -104,7 +104,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 			
 			err = os.Mkdir(fmt.Sprint(wd, "app/images/", estate.Id.Hex()), fs.ModePerm)
 		   if err!=nil {
-			fmt.Println(err)
+		
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		   }
 			
@@ -115,7 +115,7 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	
 		err = ctx.SaveFile(item, wd+"app/images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
-			fmt.Println(err)
+		
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
