@@ -89,24 +89,37 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	forms := form.File["images"]
+	
 	wd, err := os.Getwd()
+
 	estate.Id = primitive.NewObjectID()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	images := []string{}
+	
 	for index, item := range forms {
+	
 		if index == 0 {
-			err = os.Mkdir(fmt.Sprint(wd, "/app/images/", estate.Id.Hex()), fs.ModePerm)
+			
+			err = os.Mkdir(fmt.Sprint(wd, "app/images/", estate.Id.Hex()), fs.ModePerm)
+		   if err!=nil {
+			fmt.Println(err)
+			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+		   }
+			
 		}
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
 		images = append(images, image)
-		err = ctx.SaveFile(item, wd+"/app/images/"+estate.Id.Hex()+"/"+image)
+	
+		err = ctx.SaveFile(item, wd+"app/images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
+			fmt.Println(err)
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
+	
 	estate.UserId = userId
 	userRepo := repository.NewUsersRepository(db.DB)
 	user, _ := userRepo.GetById(userId)
