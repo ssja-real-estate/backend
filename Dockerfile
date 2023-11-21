@@ -8,8 +8,8 @@ EXPOSE 8000
 
 RUN go build main.go
 FROM alpine:latest 
-WORKDIR /
+WORKDIR /app
 
-COPY --from=build ./app/main ./main
+COPY --from=build ./app/main ./app/main
 
-ENTRYPOINT ["./main"]
+ENTRYPOINT ["./app/main"]

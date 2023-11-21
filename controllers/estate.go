@@ -89,37 +89,32 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	forms := form.File["images"]
-	
-	wd, err := os.Getwd()
 
 	estate.Id = primitive.NewObjectID()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
 	images := []string{}
-	
+
 	for index, item := range forms {
-	
+
 		if index == 0 {
-			
-			err = os.Mkdir(fmt.Sprint(wd, "app/images/", estate.Id.Hex()), fs.ModePerm)
-		   if err!=nil {
-		
-			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-		   }
-			
+
+			err = os.Mkdir(fmt.Sprint("./images/", estate.Id.Hex()), fs.ModePerm)
+			if err != nil {
+
+				return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
+			}
+
 		}
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
 		images = append(images, image)
-	
-		err = ctx.SaveFile(item, wd+"app/images/"+estate.Id.Hex()+"/"+image)
+
+		err = ctx.SaveFile(item, "./images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
-		
+
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
 	}
-	
+
 	estate.UserId = userId
 	userRepo := repository.NewUsersRepository(db.DB)
 	user, _ := userRepo.GetById(userId)
@@ -269,14 +264,11 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	forms := form.File["images"]
-	wd, err := os.Getwd()
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
+
 	// delete file in hard disk
 	for _, deletefile := range deleteimaages {
-		fmt.Println(deletefile)
-		os.Remove(fmt.Sprintf("%s/app/images/%s/%s", wd, estateid.Hex(), deletefile))
+
+		os.Remove(fmt.Sprintf("./images/%s/%s", estateid.Hex(), deletefile))
 	}
 	// delete file name in DB
 	for _, imagefilename := range listimages {
@@ -289,7 +281,7 @@ func (r *estateController) UpdateEstate(ctx *fiber.Ctx) error {
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
 		images = append(images, image)
-		err = ctx.SaveFile(item, wd+"/app/images/"+updateestate.Id.Hex()+"/"+image)
+		err = ctx.SaveFile(item, "./images/"+updateestate.Id.Hex()+"/"+image)
 		if err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 		}
