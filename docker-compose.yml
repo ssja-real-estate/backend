@@ -15,7 +15,7 @@ services:
      image: sajaweb/realestate_app
      container_name: realestateapp
      volumes: 
-      - ./app/images:/app/images
+      - /app/images:/app/images
      environment:
        - APIKEY=${SMS_KEY}  
        - DBPASS=${DATABASE_PASS}

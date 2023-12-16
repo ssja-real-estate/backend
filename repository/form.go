@@ -70,7 +70,6 @@ func (r *formRepository) GetForms() ([]models.Form, error) {
 
 func (r *formRepository) GetFormById(id primitive.ObjectID) (form models.Form, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&form)
-
 	return form, err
 }
 

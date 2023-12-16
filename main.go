@@ -90,6 +90,11 @@ func main() {
 	creditroute := routes.NewCreditRoute(creditController)
 	creditroute.Install(app)
 
+	documentrepo := repository.NewDocumentRepository(db.DB)
+	documentController := controllers.NewDocumentController(documentrepo)
+	documentRoute := routes.NewDocumentRoute(documentController)
+	documentRoute.Install(app)
+
 	log.Fatal(app.Listen(":8000"))
 
 }
