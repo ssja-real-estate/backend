@@ -26,8 +26,6 @@ type documentController struct {
 // CreateDocument implements DocumentController.
 func (r *documentController) CreateDocument(ctx *fiber.Ctx) error {
 	var document models.Document
-
-	// err := ctx.BodyParser(&estate)
 	strdocument := ctx.FormValue("document")
 
 	err := json.Unmarshal([]byte(strdocument), &document)
@@ -69,7 +67,7 @@ func (r *documentController) DeleteDocument(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
 
-	err = os.RemoveAll(fmt.Sprintf("./images/%s", document.Path))
+	err = os.RemoveAll(fmt.Sprintf("./documents/%s", document.Path))
 	if err != nil {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
