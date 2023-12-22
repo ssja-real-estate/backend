@@ -27,25 +27,35 @@ type documentController struct {
 func (r *documentController) CreateDocument(ctx *fiber.Ctx) error {
 	var document models.Document
 	strdocument := ctx.FormValue("document")
+	fmt.Println(strdocument)
 
+	fmt.Println("----------------------------")
 	err := json.Unmarshal([]byte(strdocument), &document)
 
 	if err != nil {
+		fmt.Println("1-")
+		fmt.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
 	file, err := ctx.FormFile("document")
 	if err != nil {
+		fmt.Println("2-")
+		fmt.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	err = ctx.SaveFile(file, "./documents")
 	if err != nil {
+		fmt.Println("3-")
+		fmt.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	document.Id = primitive.NewObjectID()
 	document.Path = file.Filename
 	err = r.document.SaveDoc(&document)
 	if err != nil {
+		fmt.Println("4-")
+		fmt.Println(err)
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(document)
