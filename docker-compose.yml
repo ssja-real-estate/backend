@@ -17,6 +17,7 @@ services:
      volumes: 
       - /app/images:/app/images
       - /app/document:/app/document
+ 
      environment:
        - APIKEY=${SMS_KEY}  
        - DBPASS=${DATABASE_PASS}
