@@ -25,7 +25,6 @@ type documentController struct {
 
 // CreateDocument implements DocumentController.
 func (r *documentController) CreateDocument(ctx *fiber.Ctx) error {
-
 	var document models.Document
 	strdocument := ctx.FormValue("document")
 
@@ -47,15 +46,14 @@ func (r *documentController) CreateDocument(ctx *fiber.Ctx) error {
 
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
+
 	document.Id = primitive.NewObjectID()
 	document.Path = file.Filename
 	err = r.document.SaveDoc(&document)
 	if err != nil {
-
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 	return ctx.Status(http.StatusOK).JSON(document)
-
 }
 
 // DeleteDocument implements DocumentController.
@@ -73,7 +71,7 @@ func (r *documentController) DeleteDocument(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
 
-	err = os.RemoveAll(fmt.Sprintf("./documents/%s", document.Path))
+	err = os.RemoveAll(fmt.Sprintf("./document/%s", document.Path))
 	if err != nil {
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
@@ -82,7 +80,7 @@ func (r *documentController) DeleteDocument(ctx *fiber.Ctx) error {
 
 // GetDocuments implements DocumentController.
 func (r *documentController) GetDocuments(ctx *fiber.Ctx) error {
-	err, documents := r.document.GetDocumentAll()
+	documents, err := r.document.GetDocumentAll()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(err)
 	}

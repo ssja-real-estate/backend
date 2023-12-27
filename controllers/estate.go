@@ -96,18 +96,15 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	for index, item := range forms {
 
 		if index == 0 {
-
 			err = os.Mkdir(fmt.Sprint("./images/", estate.Id.Hex()), fs.ModePerm)
 			if err != nil {
 
 				return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 			}
-
 		}
 		extention := strings.Split(item.Filename, ".")[1]
 		image := getname(images, extention)
 		images = append(images, image)
-
 		err = ctx.SaveFile(item, "./images/"+estate.Id.Hex()+"/"+image)
 		if err != nil {
 
@@ -120,7 +117,6 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 	user, _ := userRepo.GetById(userId)
 	estate.Phone = user.Mobile
 	if len(images) > 0 {
-
 		for index, field := range estate.DataForm.Fields {
 			if field.Type == 5 {
 				estate.DataForm.Fields[index].FieldValue = images

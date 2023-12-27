@@ -153,7 +153,6 @@ func (r *estatetypeController) GetEstateType(ctx *fiber.Ctx) error {
 // @Router /estatetypes [get]
 // @Security ApiKeyAuth
 func (r *estatetypeController) GetEsatteTypes(ctx *fiber.Ctx) error {
-
 	estatetypes, err := r.esstatetype.GetEstateTypeAll()
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
@@ -177,7 +176,6 @@ func (r *estatetypeController) DeleteEstateType(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
-
 	formrepo := repository.NewFormRepositor(db.DB)
 	count, err = formrepo.IsEstateTypeId(id)
 	if err != nil {
