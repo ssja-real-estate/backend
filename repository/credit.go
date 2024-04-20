@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
+
 	"realstate/db"
 	"realstate/models"
 	"time"
@@ -39,15 +39,14 @@ func (r *creditRepository) Delete(id primitive.ObjectID) error {
 	return err
 }
 func (r *creditRepository) GetCredit(userid primitive.ObjectID) (models.Credit, error) {
-
 	var credit models.Credit
-	fmt.Println(userid)
+
 	err := r.c.FindOne(context.TODO(), bson.M{"userId": userid}).Decode(&credit)
 	if err != nil {
-		fmt.Println(err)
+
 		return models.Credit{}, err
 	}
-	fmt.Println(credit)
+
 	t := time.Now()
 	dif := t.Sub(credit.RegisterDate)
 	duration := credit.RemainingDuration - int(dif.Hours())/24

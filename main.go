@@ -95,6 +95,11 @@ func main() {
 	documentRoute := routes.NewDocumentRoute(documentController)
 	documentRoute.Install(app)
 
+	sliderrepo := repository.NewSliderRepository(db.DB)
+	sliderController := controllers.NewSliderController(sliderrepo)
+	sliderRoute := routes.NewSliderRoute(&sliderController)
+	sliderRoute.Install(app)
+
 	log.Fatal(app.Listen(":8000"))
 
 }

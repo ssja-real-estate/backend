@@ -34,19 +34,16 @@ func (r *documentController) CreateDocument(ctx *fiber.Ctx) error {
 
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-
 	file, err := ctx.FormFile("document")
 	if err != nil {
 
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-
 	err = ctx.SaveFile(file, "./document/"+file.Filename)
 	if err != nil {
 
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
-
 	document.Id = primitive.NewObjectID()
 	document.Path = file.Filename
 	err = r.document.SaveDoc(&document)
