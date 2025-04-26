@@ -12,22 +12,25 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-	//  client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongodb:27017"))
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://analytics:%s@amlak.wjtlb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", os.Getenv("DBPASS"))))
+	dbPass := os.Getenv("DBPASS")
+	if dbPass == "" {
+		log.Fatal("DBPASS environment variable is not set")
+	}
+
+	uri := fmt.Sprintf("mongodb+srv://analytics:%s@amlak.wjtlb.mongodb.net/amlak?retryWrites=true&w=majority", dbPass)
+
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err != nil {
-		panic(err)
-	}
-
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-
-		panic(err)
+		log.Fatal(err)
 	}
+
 	fmt.Println("Successfully connected and pinged.")
 	return client
+
 }
 
 // Client instance
