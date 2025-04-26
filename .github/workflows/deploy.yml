@@ -28,9 +28,12 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           envs: DOCKER_USERNAME,DOCKER_PASSWORD
           script: |
-            cd backend
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker pull webssja/realestate_app
-            docker-compose  up  -d 
-            docker logout
+             cd backend
+             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+             docker pull webssja/realestate_app
+             docker-compose down
+             docker-compose up -d
+             docker image prune -af
+             docker container prune -f
+             docker logout
             

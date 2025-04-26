@@ -21,6 +21,7 @@ services:
         dockerfile: Dockerfile    
      ports: 
       - "5001:8000"
+     restart: always 
    #   depends_on:
    #    - mongo
  
