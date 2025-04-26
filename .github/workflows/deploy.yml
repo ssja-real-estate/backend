@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker build -t sajaweb/realestate_app -f Dockerfile .
+      - run: docker build -t webssja/realestate_app -f Dockerfile .
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      - run: docker push sajaweb/realestate_app
+      - run: docker push webssja/realestate_app
       - run: docker logout
       - uses: appleboy/ssh-action@master
         env:
@@ -31,7 +31,7 @@ jobs:
           script: |
             cd backend
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker pull sajaweb/realestate_app
+            docker pull webssja/realestate_app
             docker-compose  up  -d 
             docker logout
             

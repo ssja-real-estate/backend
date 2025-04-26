@@ -16,7 +16,7 @@ func NewJError(err error) JError {
 		Error: "generic error"}
 	if err != nil {
 		jerr.Error = err.Error()
-	}
+	} 
 	return jerr
 }
 
