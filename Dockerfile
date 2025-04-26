@@ -41,7 +41,7 @@ WORKDIR /app
 RUN adduser -D -g '' appuser
 
 # کپی فایل اجرایی از مرحله build
-COPY --from=build /app/main /app/main
+COPY --from=build ./app/main ./app/main
 
 # تغییر مالکیت به کاربر جدید
 RUN chown -R appuser /app
