@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,18 +39,6 @@ func (r *sliderController) GetSliders(ctx *fiber.Ctx) error {
 
 func (r *sliderController) CreateSlider(ctx *fiber.Ctx) error {
 	var slider models.Slider
-	strslider := ctx.FormValue("slider")
-
-	if strslider == "" {
-		log.Println("Error: 'slider' form value is empty")
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(fmt.Errorf("slider form value is missing")))
-	}
-
-	err := json.Unmarshal([]byte(strslider), &slider)
-	if err != nil {
-		log.Printf("Error unmarshalling slider JSON: %v\n", err)
-		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
-	}
 
 	file, err := ctx.FormFile("slider")
 	if err != nil {

@@ -6,9 +6,9 @@ services:
      image: sajaweb/realestate_app
      container_name: realestateapp
      volumes: 
-      - /app/images:/app/images
-      - /app/document:/app/document
-      - /app/slider:/app/slider
+      - ./app/images:/app/images
+      - ./app/document:/app/document
+      - ./app/slider:/app/slider
  
      environment:
        - APIKEY=${SMS_KEY}  
