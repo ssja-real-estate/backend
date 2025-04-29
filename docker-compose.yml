@@ -14,7 +14,7 @@ services:
        - APIKEY=${SMS_KEY}  
        - DBPASS=${DATABASE_PASS}
        - TERMINALID=${TERMINAL_ID}
-       - MERCHANTID=${MERCHANT_ID}
+       - MERCHANTID=${MERCHANT_ID}  
        - SADADKEY=${SADAD_KEY}
      build:  
         context: .

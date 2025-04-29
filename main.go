@@ -36,7 +36,12 @@ func main() {
 
 	app := fiber.New(fiber.Config{BodyLimit: 5 * 1024 * 1024})
 	app.Use(logger.New())
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000, https://ssja.ir",      // اجازه به دامنه‌های مشخص
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,OPTIONS",            // روش‌های مجاز
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization", // هدرهای مجاز
+		AllowCredentials: true,
+	}))
 
 	app.Get("/swagger/*", swagger.New(swagger.Config{ // custom
 		URL:         "/swagger/doc.json",
