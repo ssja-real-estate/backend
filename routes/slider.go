@@ -16,8 +16,8 @@ func NewSliderRoute(sliderController controllers.SliderController) Routes {
 
 func (r *silderRoute) Install(app *fiber.App) {
 	api := app.Group("/api")
-	api.Post("/slide", AuthRequired, r.sliderController.CreateSlider)
-	api.Delete("/slide/:sliderId", AuthRequired, r.sliderController.DeleteSilder)
-	api.Get("/slide", r.sliderController.GetSliders)
+	api.Post("/carsoul", AuthRequired, r.sliderController.CreateSlider)
+	api.Delete("/carsoul/:sliderId", AuthRequired, r.sliderController.DeleteSilder)
+	api.Get("/carsoul", r.sliderController.GetSliders)
 
 }
