@@ -7,7 +7,6 @@ type Form struct {
 	Title            string             `json:"title" bson:"title"`
 	AssignmentTypeID primitive.ObjectID `json:"assignmentTypeId" bson:"assignmentTypeId"`
 	EstateTypeID     primitive.ObjectID `json:"estateTypeId" bson:"estateTypeId"`
-	//  Sections         []Section          `json:"sections" bson:"sections"`
 	Fields []Field `json:"fields" bson:"fields"`
 }
 

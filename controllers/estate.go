@@ -67,15 +67,14 @@ func (r *estateController) SearchEstate(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(estate)
 }
 func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
-
 	var estate models.Estate
 
-	// err := ctx.BodyParser(&estate)
 	strestate := ctx.FormValue("estate")
 
 	err := json.Unmarshal([]byte(strestate), &estate)
 
 	if err != nil {
+
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(err))
 	}
 
