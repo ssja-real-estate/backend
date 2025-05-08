@@ -30,11 +30,11 @@ func main() {
 	app.Use(logger.New())
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,https://ssja.ir", // بدون فاصله بین URLها
-		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,OPTIONS",
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-		AllowCredentials: true,
+		AllowOrigins: "*", // همه دامنه‌ها مجاز هستند
+		AllowMethods: "GET,POST,HEAD,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
+
 	db.ConnectDB()
 
 	usersRepo := repository.NewUsersRepository(db.DB)
