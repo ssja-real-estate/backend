@@ -19,35 +19,22 @@ import (
 	"realstate/repository"
 	"realstate/routes"
 
-	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-// func init() {
-// 	err := godotenv.Load()
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// }
-
 func main() {
 
 	app := fiber.New(fiber.Config{BodyLimit: 5 * 1024 * 1024})
 	app.Use(logger.New())
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000, https://ssja.ir",      // اجازه به دامنه‌های مشخص
-		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,OPTIONS",            // روش‌های مجاز
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization", // هدرهای مجاز
+		AllowOrigins:     "http://ssja.ir https://ssja.ir", // بین دامنه‌ها فاصله است نه کاما
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
-
-	app.Get("/swagger/*", swagger.New(swagger.Config{ // custom
-		URL:         "/swagger/doc.json",
-		DeepLinking: false,
-	}))
-
 	db.ConnectDB()
 
 	usersRepo := repository.NewUsersRepository(db.DB)
