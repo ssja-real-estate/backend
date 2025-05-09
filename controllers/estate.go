@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"realstate/db"
@@ -141,14 +142,19 @@ func (r *estateController) CreateEstate(ctx *fiber.Ctx) error {
 }
 
 func (r *estateController) GetEstate(ctx *fiber.Ctx) error {
+	log.Printf("in get state")
 	id, err := primitive.ObjectIDFromHex(ctx.Params("estaeId"))
 	if err != nil {
+		log.Printf("err in get state", err)
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNotFound))
 	}
 	estate, err := r.estate.GetEstateById(id)
 	if err != nil {
+		log.Printf("err in get state", err)
+
 		return ctx.Status(http.StatusNotFound).JSON(util.NewJError(err))
 	}
+
 	return ctx.Status(http.StatusOK).JSON(estate)
 }
 
