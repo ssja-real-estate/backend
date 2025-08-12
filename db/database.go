@@ -12,7 +12,7 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-	dbPass := os.Getenv("DATABASE_PASS")
+	dbPass := os.Getenv("DBPASS")
 	if dbPass == "" {
 		log.Fatal("DBPASS environment variable is not set")
 	}
