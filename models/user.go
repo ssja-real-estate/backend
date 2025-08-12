@@ -13,6 +13,7 @@ type User struct {
 	Mobile   string             `json:"mobile" bson:"mobile"`
 	// name family nationalcode birthday todo
 	// owner 1 Admin 2 User 3
+	GetMessage bool      `json:"-" bson:"getmessage"`
 	Role       int       `json:"role"  bson:"role"`
 	VerifyCode string    `json:"-" bson:"verifyCode"`
 	Verify     bool      `json:"-" bson:"verify"`
