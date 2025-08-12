@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -12,33 +14,36 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-	dbPass := os.Getenv("DBPASS")
-	fmt.Println(dbPass)
-	if dbPass == "" {
+	rawPass := os.Getenv("DBPASS")
+	fmt.Print("get pass in env")
+	if rawPass == "" {
 		log.Fatal("DBPASS environment variable is not set")
 	}
+	pass := url.QueryEscape(rawPass)
 
-	uri := fmt.Sprintf("mongodb+srv://analytics:%s@amlak.wjtlb.mongodb.net/amlak?retryWrites=true&w=majority", dbPass)
+	uri := "mongodb+srv://analytics:" + pass +
+		"@amlak.wjtlb.mongodb.net/amlak?retryWrites=true&w=majority&appName=Amlak"
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Successfully connected and pinged.")
+	log.Println("✅ Successfully connected and pinged.")
 	return client
-
 }
 
 var DB *mongo.Client = ConnectDB()
 
-// getting database collections
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	collection := client.Database("Amlak").Collection(collectionName)
-
-	return collection
+	return client.Database("amlak").Collection(collectionName)
 }
