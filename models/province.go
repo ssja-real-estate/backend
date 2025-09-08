@@ -7,6 +7,6 @@ import (
 type Province struct {
 	Id      primitive.ObjectID `json:"id" bson:"_id"`
 	Name    string             `json:"name" bson:"name"`
-	MapInfo mapInfo            `json:"mapInfo" bson:"mapInfo"`
+	MapInfo MapInfo            `json:"mapInfo" bson:"mapInfo"`
 	Cities  []City             `json:"cities" bson:"cities"`
 }

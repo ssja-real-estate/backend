@@ -18,4 +18,6 @@ type Estate struct {
 	CreatedAt    time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdateAt     time.Time          `json:"updatedAt" bson:"updatedAt"`
 	DataForm     Form               `json:"dataForm" bson:"dataForm"`
+	MapInfo      MapInfo            `json:"mapInfo" bson:"mapInfo"`
+	Address      string             `json:"address" bson:"address"`
 }
