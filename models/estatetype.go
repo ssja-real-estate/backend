@@ -4,12 +4,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// swagger:model
 type EstateType struct {
-	// required: false
-	Id primitive.ObjectID `json:"id" bson:"_id"`
-	// The name for a EstateType
-	// example: خرید
-	// required: true
-	Name string `json:"name" bson:"name"`
+	Id    primitive.ObjectID `json:"id" bson:"_id"`
+	Name  string             `json:"name" bson:"name"`
+	Order int32              `json:"order" bson:"order"`
 }
