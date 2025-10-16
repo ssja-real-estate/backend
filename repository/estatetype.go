@@ -35,7 +35,7 @@ func (r *estateTypeRepository) SaveEstateType(estatetype *models.EstateType) err
 }
 func (r *estateTypeRepository) UpdateEstateType(estatetype *models.EstateType, estatetypeid primitive.ObjectID) error {
 	filter := bson.M{"_id": estatetypeid}
-	update := bson.M{"$set": &estatetype}
+	update := bson.M{"$set": estatetype}
 	_, err := r.c.UpdateOne(context.TODO(), filter, update)
 	return err
 }
