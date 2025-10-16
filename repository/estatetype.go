@@ -35,11 +35,28 @@ func (r *estateTypeRepository) SaveEstateType(estatetype *models.EstateType) err
 }
 func (r *estateTypeRepository) UpdateEstateType(estatetype *models.EstateType, estatetypeid primitive.ObjectID) error {
 	filter := bson.M{"_id": estatetypeid}
-	update := bson.M{"$set": estatetype}
-	_, err := r.c.UpdateOne(context.TODO(), filter, update)
-	return err
-}
 
+	// فقط فیلدهایی را برای آپدیت ارسال می‌کنیم که قابل تغییر هستند
+	// این کار از آپدیت ناخواسته فیلدهایی مانند _id یا CreatedAt جلوگیری می‌کند
+	updatePayload := bson.M{
+		"name":  estatetype.Name,
+		"order": estatetype.Order,
+		// هر فیلد دیگری که باید آپدیت شود را اینجا اضافه کنید
+	}
+
+	update := bson.M{"$set": updatePayload}
+
+	result, err := r.c.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments // یا یک خطای سفارشی
+	}
+
+	return nil
+}
 func (r *estateTypeRepository) GetEstateTypeById(id primitive.ObjectID) (estatetype *models.EstateType, err error) {
 	err = r.c.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&estatetype)
 	return estatetype, err

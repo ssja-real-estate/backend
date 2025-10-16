@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 	"realstate/db"
 	"realstate/models"
@@ -84,44 +85,51 @@ func (c *estatetypeController) CreateEstateType(ctx *fiber.Ctx) error {
 // @Failure 404 {object} object
 // @Router /EstateType/ [put]
 // @Security ApiKeyAuth
+
 func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
+	// مرحله ۱: گرفتن شناسه از URL
 	estateTypeid, err := primitive.ObjectIDFromHex(ctx.Params("estateId"))
 	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(errors.New("invalid id format")))
+	}
+
+	// مرحله ۲: گرفتن اطلاعات جدید از Body
+	var estatetypeFromRequest models.EstateType
+	if err := ctx.BodyParser(&estatetypeFromRequest); err != nil {
 		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
 	}
 
-	var estatetype models.EstateType
-	err = ctx.BodyParser(&estatetype)
-	if err != nil {
-		return ctx.Status(http.StatusUnprocessableEntity).JSON(util.NewJError(err))
-	}
-	if len(estatetype.Name) < 2 {
+	// ولیدیشن‌های اولیه
+	if len(estatetypeFromRequest.Name) < 2 {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 
-	_, err = r.esstatetype.GetEstateTypeById(estateTypeid)
-
-	if err == mongo.ErrNoDocuments {
-		dbestatetype, err := r.esstatetype.GetEstateTypeById(estateTypeid)
-		if err != nil {
-			return ctx.
-				Status(http.StatusBadRequest).
-				JSON(util.NewJError(util.ErrNotFound))
+	// مرحله ۳: پیدا کردن رکورد موجود در دیتابیس
+	dbEstateType, err := r.esstatetype.GetEstateTypeById(estateTypeid)
+	if err != nil {
+		// مرحله ۴: اگر رکورد پیدا نشد، خطا برگردان
+		if err == mongo.ErrNoDocuments {
+			return ctx.Status(http.StatusNotFound).JSON(util.NewJError(util.ErrNotFound))
 		}
-
-		dbestatetype.Name = estatetype.Name
-		dbestatetype.Order = estatetype.Order
-		err = r.esstatetype.UpdateEstateType(dbestatetype, estateTypeid)
-		if err != nil {
-
-			return ctx.Status(http.StatusInternalServerError).JSON(err)
-		}
-		return ctx.Status(http.StatusOK).JSON(dbestatetype)
-
+		// برای خطاهای دیگر دیتابیس
+		return ctx.Status(http.StatusInternalServerError).JSON(util.NewJError(err))
 	}
 
-	return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrNameAlreadyExists))
+	// مرحله ۵: مقادیر جدید را روی رکورد قدیمی کپی کن
+	// فقط فیلدهایی را آپدیت می‌کنیم که باید تغییر کنند
+	dbEstateType.Name = estatetypeFromRequest.Name
+	dbEstateType.Order = estatetypeFromRequest.Order
+	// فیلدهای دیگر مانند CreatedAt و ... دست‌نخورده باقی می‌مانند
 
+	// مرحله ۶: ارسال رکورد به‌روز شده برای آپدیت در دیتابیس
+	err = r.esstatetype.UpdateEstateType(dbEstateType, estateTypeid)
+	if err != nil {
+		// اینجا جایی است که ممکن است خطای "نام تکراری" رخ دهد اگر این نام توسط رکورد دیگری استفاده شده باشد
+		// می‌توانید این خطا را به صورت خاص مدیریت کنید
+		return ctx.Status(http.StatusInternalServerError).JSON(util.NewJError(err))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(dbEstateType)
 }
 
 // GetEstateType ... Get EstateType by id
