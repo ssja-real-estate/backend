@@ -99,7 +99,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(util.NewJError(util.ErrEmptyName))
 	}
 
-	_, err = r.esstatetype.GetEstateTypeByName(estatetype.Name)
+	_, err = r.esstatetype.GetEstateTypeById(estateTypeid)
 
 	if err == mongo.ErrNoDocuments {
 		dbestatetype, err := r.esstatetype.GetEstateTypeById(estateTypeid)
