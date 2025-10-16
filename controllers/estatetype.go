@@ -110,6 +110,7 @@ func (r *estatetypeController) UpdateEstateType(ctx *fiber.Ctx) error {
 		}
 
 		dbestatetype.Name = estatetype.Name
+		dbestatetype.Order = estatetype.Order
 		err = r.esstatetype.UpdateEstateType(dbestatetype, estateTypeid)
 		if err != nil {
 
