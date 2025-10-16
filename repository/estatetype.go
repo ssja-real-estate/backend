@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const estatetypeCollection = "estatetype"
@@ -69,7 +70,15 @@ func (r *estateTypeRepository) GetEstateTypeByName(name string) (estatetype *mod
 func (r *estateTypeRepository) GetEstateTypeAll() ([]models.EstateType, error) {
 
 	var estattypes []models.EstateType
-	result, err := r.c.Find(context.TODO(), bson.M{})
+
+	// مرحله ۱: ساخت یک آپشن برای Find
+	findOptions := options.Find()
+
+	// مرحله ۲: تنظیم مرتب‌سازی بر اساس فیلد "order" به صورت صعودی
+	findOptions.SetSort(bson.D{{"order", 1}}) // عدد 1 برای ترتیب صعودی (A-Z, 1-10)
+
+	// مرحله ۳: ارسال آپشن به عنوان پارامتر سوم به متد Find
+	result, err := r.c.Find(context.TODO(), bson.M{}, findOptions)
 
 	if err != nil {
 		return make([]models.EstateType, 0), err
@@ -83,8 +92,8 @@ func (r *estateTypeRepository) GetEstateTypeAll() ([]models.EstateType, error) {
 			return make([]models.EstateType, 0), err
 		}
 		estattypes = append(estattypes, estatetype)
-
 	}
+
 	if estattypes == nil {
 		estattypes = make([]models.EstateType, 0)
 	}
