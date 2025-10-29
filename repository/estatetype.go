@@ -71,7 +71,7 @@ func (r *estateTypeRepository) GetEstateTypeAll() ([]models.EstateType, error) {
 
 	var estattypes []models.EstateType
 
-	// مرحله ۱: ساخت یک آپشن برای Find
+	
 	findOptions := options.Find()
 
 
