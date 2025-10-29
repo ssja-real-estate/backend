@@ -28,7 +28,7 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           envs: DOCKER_USERNAME,DOCKER_PASSWORD
           script: |
-             cd backend
+             cd /home/backend
              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
              docker pull webssja/realestate_app
              docker-compose down
