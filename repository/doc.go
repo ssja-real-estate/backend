@@ -23,7 +23,6 @@ type documentRepository struct {
 	c *mongo.Collection
 }
 
-// DeleteDocument implements DocumentRepository.
 func (r *documentRepository) DeleteDocument(id primitive.ObjectID) error {
 	_, err := r.c.DeleteOne(context.TODO(), bson.M{"_id": id})
 	return err
