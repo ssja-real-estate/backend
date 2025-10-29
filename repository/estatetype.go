@@ -74,10 +74,9 @@ func (r *estateTypeRepository) GetEstateTypeAll() ([]models.EstateType, error) {
 	// مرحله ۱: ساخت یک آپشن برای Find
 	findOptions := options.Find()
 
-	// مرحله ۲: تنظیم مرتب‌سازی بر اساس فیلد "order" به صورت صعودی
-	findOptions.SetSort(bson.D{{"order", 1}}) // عدد 1 برای ترتیب صعودی (A-Z, 1-10)
 
-	// مرحله ۳: ارسال آپشن به عنوان پارامتر سوم به متد Find
+	findOptions.SetSort(bson.D{{"order", 1}}) 
+
 	result, err := r.c.Find(context.TODO(), bson.M{}, findOptions)
 
 	if err != nil {
