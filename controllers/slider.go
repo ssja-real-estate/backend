@@ -30,7 +30,7 @@ func NewSliderController(sliderrepo repository.SliderRepository) sliderControlle
 
 func (r *sliderController) GetSliders(ctx *fiber.Ctx) error {
 	sliders, err := r.silder.GetSliders()
-	fmt.Println("test")
+
 	if err != nil {
 		log.Printf("Error getting sliders: %v\n", err)
 		return ctx.Status(http.StatusInternalServerError).JSON(util.NewJError(err))
@@ -40,7 +40,7 @@ func (r *sliderController) GetSliders(ctx *fiber.Ctx) error {
 
 func (r *sliderController) CreateSlider(ctx *fiber.Ctx) error {
 	var slider models.Slider
-	fmt.Println("Create Slide .....")
+
 	file, err := ctx.FormFile("slider")
 	if err != nil {
 		log.Printf("Error getting form file 'slider_image': %v\n", err)
@@ -101,7 +101,6 @@ func (r *sliderController) DeleteSilder(ctx *fiber.Ctx) error {
 
 	removePathDir := "/app/slider"
 	removePath := filepath.Join(removePathDir, slider.Path)
-	log.Printf("Attempting to remove file: %s\n", removePath)
 
 	err = os.Remove(removePath)
 	if err != nil {
