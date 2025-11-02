@@ -39,7 +39,7 @@ func (r *sliderController) GetSliders(ctx *fiber.Ctx) error {
 
 func (r *sliderController) CreateSlider(ctx *fiber.Ctx) error {
 	var slider models.Slider
-
+	fmt.Println("Create Slide .....")
 	file, err := ctx.FormFile("slider")
 	if err != nil {
 		log.Printf("Error getting form file 'slider_image': %v\n", err)
