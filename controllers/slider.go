@@ -30,6 +30,7 @@ func NewSliderController(sliderrepo repository.SliderRepository) sliderControlle
 
 func (r *sliderController) GetSliders(ctx *fiber.Ctx) error {
 	sliders, err := r.silder.GetSliders()
+	fmt.Println("test")
 	if err != nil {
 		log.Printf("Error getting sliders: %v\n", err)
 		return ctx.Status(http.StatusInternalServerError).JSON(util.NewJError(err))
