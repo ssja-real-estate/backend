@@ -6,6 +6,7 @@ import (
 
 type AssignmentType struct {
 	// required: false
-	Id   primitive.ObjectID `json:"id" bson:"_id"`
-	Name string             `json:"name" bson:"name"`
+	Id    primitive.ObjectID `json:"id" bson:"_id"`
+	Name  string             `json:"name" bson:"name"`
+	Order int32              `json:"order" bson:"order"`
 }
